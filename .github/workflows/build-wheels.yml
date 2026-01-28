@@ -38,18 +38,20 @@ jobs:
         shell: bash
         run: |
           echo "Vendor: ${{ matrix.vendor }}"
-          mkdir -p src/pycommander/_bin
-          
+          TARGET_DIR="src/pycommander/_bin"
+
+          mkdir -p "$TARGET_DIR"
+
           if [[ "${{ matrix.vendor }}" == windows-* ]]; then
             # Windows: Find the zip file and extract with PowerShell
             ARCHIVE=$(ls archives/Commander-cli_win32_*.zip 2>/dev/null | head -1)
             echo "Extracting: $ARCHIVE"
-            powershell -Command "Expand-Archive -Path '$ARCHIVE' -DestinationPath 'src/pycommander/_bin' -Force"
+            powershell -Command "Expand-Archive -Path '$ARCHIVE' -DestinationPath '$TARGET_DIR' -Force"
           elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
             # macOS: Find the zip file and extract with unzip
             ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
             echo "Extracting: $ARCHIVE"
-            unzip -o "$ARCHIVE" -d src/pycommander/_bin
+            unzip -o "$ARCHIVE" -d "$TARGET_DIR"
           else
             # Linux: Find the matching tar.bz file based on architecture
             if [[ "${{ matrix.vendor }}" == linux-x86_64 ]]; then
@@ -58,10 +60,10 @@ jobs:
               ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
             fi
             echo "Extracting: $ARCHIVE"
-            tar -xjf "$ARCHIVE" -C src/pycommander/_bin
-            find src/pycommander/_bin -type f -exec chmod a+x {} + || true
+            tar -xjf "$ARCHIVE" -C "$TARGET_DIR"
+            find "$TARGET_DIR" -type f -exec chmod a+x {} + || true
           fi
-          ls -la src/pycommander/_bin
+          ls -la "$TARGET_DIR"
 
       # - name: Install build tooling
       #   run: |
