@@ -68,6 +68,7 @@ jobs:
           ls -la "$TARGET_DIR"
 
       - name: Smoke Test Commander Executable
+        shell: bash
         run: |
           TARGET_DIR="src/pycommander/_bin"
           EXECUTABLE=""
