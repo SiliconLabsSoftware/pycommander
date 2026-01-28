@@ -61,6 +61,7 @@ jobs:
             tar -xjf "$ARCHIVE" -C src/pycommander/_bin
             find src/pycommander/_bin -type f -exec chmod a+x {} + || true
           fi
+          ls -la src/pycommander/_bin
 
       # - name: Install build tooling
       #   run: |
