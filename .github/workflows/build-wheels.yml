@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Extract vendor runtime
+      - name: Extract Commander Executable
         if: matrix.vendor != ''
         shell: bash
         run: |
@@ -63,9 +63,27 @@ jobs:
             tar -xjf "$ARCHIVE" -C "$TARGET_DIR"
             find "$TARGET_DIR" -type f -exec chmod a+x {} + || true
           fi
-          
+
           echo "Listing contents of $TARGET_DIR:"
           ls -la "$TARGET_DIR"
+
+      - name: Smoke Test Commander Executable
+        run: |
+          EXECUTABLE=""
+          if [[ "${{ matrix.vendor }}" == windows-* ]]; then
+            EXECUTABLE="$TARGET_DIR/Simplicity\ Commander CLI/commander-cli.exe"
+          elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
+            EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
+          else
+            EXECUTABLE="$TARGET_DIR/commander-cli/commander-cli"
+          fi
+          
+          echo "Smoke testing $EXECUTABLE"
+          "$EXECUTABLE" --version
+          if [ $? -ne 0 ]; then
+            echo "Smoke test failed; Commander returned non-zero exit code"
+            exit 1
+          fi
 
       # - name: Install build tooling
       #   run: |
