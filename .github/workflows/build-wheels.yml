@@ -19,13 +19,15 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            vendor: linux-x86_64
+            flavor: linux-x86_64
           - os: ubuntu-22.04-arm
-            vendor: linux-aarch64
+            flavor: linux-aarch64
+          - os: ubuntu-22.04-arm
+            flavor: linux-aarch32
           - os: macos-latest
-            vendor: macos-arm64
+            flavor: macos-arm64
           - os: windows-latest
-            vendor: windows-x86
+            flavor: windows-x86
 
     steps:
       - uses: actions/checkout@v4
@@ -37,31 +39,31 @@ jobs:
           check-latest: true
 
       - name: Extract Commander Executable
-        if: matrix.vendor != ''
+        if: matrix.flavor != ''
         shell: bash
         run: |
-          echo "Vendor: ${{ matrix.vendor }}"
+          echo "flavor: ${{ matrix.flavor }}"
           TARGET_DIR="src/pycommander/_bin"
 
           mkdir -p "$TARGET_DIR"
 
-          if [[ "${{ matrix.vendor }}" == windows-* ]]; then
+          if [[ "${{ matrix.flavor }}" == windows-* ]]; then
             # Windows: Find the zip file and extract with PowerShell
             ARCHIVE=$(ls archives/Commander-cli_win32_*.zip 2>/dev/null | head -1)
             echo "Extracting: $ARCHIVE"
             powershell -Command "Expand-Archive -Path '$ARCHIVE' -DestinationPath '$TARGET_DIR' -Force"
-          elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
+          elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
             # macOS: Find the zip file and extract with unzip
             ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
             echo "Extracting: $ARCHIVE"
             unzip -o "$ARCHIVE" -d "$TARGET_DIR"
           else
             # Linux: Find the matching tar.bz file based on architecture
-            if [[ "${{ matrix.vendor }}" == linux-x86_64 ]]; then
+            if [[ "${{ matrix.flavor }}" == linux-x86_64 ]]; then
               ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
-            elif [[ "${{ matrix.vendor }}" == linux-aarch32 ]]; then
+            elif [[ "${{ matrix.flavor }}" == linux-aarch32 ]]; then
               ARCHIVE=$(ls archives/Commander-cli_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
-            elif [[ "${{ matrix.vendor }}" == linux-aarch64 ]]; then
+            elif [[ "${{ matrix.flavor }}" == linux-aarch64 ]]; then
               ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
             fi
             echo "Extracting: $ARCHIVE"
@@ -73,13 +75,14 @@ jobs:
           ls -la "$TARGET_DIR"
 
       - name: Smoke Test Commander Executable
+        if: matrix.flavor != 'linux-aarch32'
         shell: bash
         run: |
           TARGET_DIR="src/pycommander/_bin"
           EXECUTABLE=""
-          if [[ "${{ matrix.vendor }}" == windows-* ]]; then
+          if [[ "${{ matrix.flavor }}" == windows-* ]]; then
             EXECUTABLE="$TARGET_DIR/Simplicity Commander CLI/commander-cli.exe"
-          elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
+          elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
             EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
           else
             EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
