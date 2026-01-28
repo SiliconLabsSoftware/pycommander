@@ -20,7 +20,7 @@ jobs:
         include:
           - os: ubuntu-latest
             vendor: linux-x86_64
-          - os: ubuntu-22.04-arm64
+          - os: ubuntu-22.04-arm
             vendor: linux-aarch64
           - os: macos-latest
             vendor: macos-arm64
