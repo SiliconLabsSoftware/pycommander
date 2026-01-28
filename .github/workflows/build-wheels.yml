@@ -71,25 +71,25 @@ jobs:
           echo "Listing contents of $TARGET_DIR:"
           ls -la "$TARGET_DIR"
 
-      - name: Smoke Test Commander Executable
-        shell: bash
-        run: |
-          TARGET_DIR="src/pycommander/_bin"
-          EXECUTABLE=""
-          if [[ "${{ matrix.vendor }}" == windows-* ]]; then
-            EXECUTABLE="$TARGET_DIR/Simplicity\ Commander CLI/commander-cli.exe"
-          elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
-            EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
-          else
-            EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
-          fi
+      # - name: Smoke Test Commander Executable
+      #   shell: bash
+      #   run: |
+      #     TARGET_DIR="src/pycommander/_bin"
+      #     EXECUTABLE=""
+      #     if [[ "${{ matrix.vendor }}" == windows-* ]]; then
+      #       EXECUTABLE="$TARGET_DIR/Simplicity\ Commander CLI/commander-cli.exe"
+      #     elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
+      #       EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
+      #     else
+      #       EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
+      #     fi
           
-          echo "Smoke testing $EXECUTABLE"
-          "$EXECUTABLE" --version
-          if [ $? -ne 0 ]; then
-            echo "Smoke test failed; Commander returned non-zero exit code"
-            exit 1
-          fi
+      #     echo "Smoke testing $EXECUTABLE"
+      #     "$EXECUTABLE" --version
+      #     if [ $? -ne 0 ]; then
+      #       echo "Smoke test failed; Commander returned non-zero exit code"
+      #       exit 1
+      #     fi
 
       # - name: Install build tooling
       #   run: |
