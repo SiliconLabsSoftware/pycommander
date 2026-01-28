@@ -85,9 +85,7 @@ jobs:
             EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
           fi
           
-          echo "Runner uname: $(uname -a)"
-          echo "Runner architecture: $(uname -m)"
-          echo "File info: $(file $EXECUTABLE)"
+          echo "Runner: $(uname -a)"
 
           echo "Smoke testing $EXECUTABLE"
           "$EXECUTABLE" --version
