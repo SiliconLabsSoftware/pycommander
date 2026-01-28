@@ -78,7 +78,7 @@ jobs:
           TARGET_DIR="src/pycommander/_bin"
           EXECUTABLE=""
           if [[ "${{ matrix.vendor }}" == windows-* ]]; then
-            EXECUTABLE="$TARGET_DIR/Simplicity\ Commander CLI/commander-cli.exe"
+            EXECUTABLE="$TARGET_DIR/Simplicity Commander CLI/commander-cli.exe"
           elif [[ "${{ matrix.vendor }}" == macos-* ]]; then
             EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
           else
