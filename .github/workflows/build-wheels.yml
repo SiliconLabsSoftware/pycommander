@@ -69,6 +69,7 @@ jobs:
 
       - name: Smoke Test Commander Executable
         run: |
+          TARGET_DIR="src/pycommander/_bin"
           EXECUTABLE=""
           if [[ "${{ matrix.vendor }}" == windows-* ]]; then
             EXECUTABLE="$TARGET_DIR/Simplicity\ Commander CLI/commander-cli.exe"
