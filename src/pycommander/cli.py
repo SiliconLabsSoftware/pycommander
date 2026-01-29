@@ -2,8 +2,13 @@ import sys
 import subprocess
 
 from .paths import EXECUTABLE_PATH
+from ._ensure_commander import ensure_commander
+
 
 def main(args: list[str] | None = None) -> int:
+  if not ensure_commander():
+    return 1
+
   if args is None:
     args = sys.argv[1:]  # Skip the script name
   else:
@@ -17,8 +22,4 @@ def main(args: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-  from ._ensure_commander import ensure_commander
-  if not ensure_commander():
-    sys.exit(1)
-
-  sys.exit(main())
+  raise SystemExit(main())
