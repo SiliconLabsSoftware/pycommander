@@ -27,4 +27,4 @@ packages = ["src/pycommander"]
 Homepage = "https://github.com/SiliconLabsSoftware/pycommander"
 
 [project.scripts]
-pycommander = "pycommander.__main__:main"
+pycommander = "pycommander.cli:main"
