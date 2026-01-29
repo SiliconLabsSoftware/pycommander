@@ -23,6 +23,9 @@ packages = ["src/pycommander"]
 [tool.hatch.build.targets.wheel.force-include]
 "src/pycommander/_archive" = "pycommander/_archive"
 
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "build_hook.py"
+
 [project.urls]
 Homepage = "https://github.com/SiliconLabsSoftware/pycommander"
 
