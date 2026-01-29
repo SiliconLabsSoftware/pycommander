@@ -48,9 +48,9 @@ jobs:
           mkdir -p "$TARGET_DIR"
 
           if [[ "${{ matrix.flavor }}" == windows-* ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_windows_x86_64_*.zip 2>/dev/null | head -1)
+            ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_osx_arm64_*.zip 2>/dev/null | head -1)
+            ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == linux-x86_64 ]]; then
             ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == linux-aarch32 ]]; then
