@@ -38,64 +38,59 @@ jobs:
           python-version: "3.10"
           check-latest: true
 
-      - name: Extract Commander Executable
+      - name: Pick Commander Executable
         if: matrix.flavor != ''
         shell: bash
         run: |
           echo "flavor: ${{ matrix.flavor }}"
-          TARGET_DIR="src/pycommander/_bin"
+          TARGET_DIR="src/pycommander/_archive/"
 
           mkdir -p "$TARGET_DIR"
 
           if [[ "${{ matrix.flavor }}" == windows-* ]]; then
-            # Windows: Find the zip file and extract with PowerShell
-            ARCHIVE=$(ls archives/Commander-cli_win32_*.zip 2>/dev/null | head -1)
-            echo "Extracting: $ARCHIVE"
-            powershell -Command "Expand-Archive -Path '$ARCHIVE' -DestinationPath '$TARGET_DIR' -Force"
+            ARCHIVE=$(ls archives/Commander-cli_windows_x86_64_*.zip 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
-            # macOS: Find the zip file and extract with unzip
-            ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
-            echo "Extracting: $ARCHIVE"
-            unzip -o "$ARCHIVE" -d "$TARGET_DIR"
+            ARCHIVE=$(ls archives/Commander-cli_osx_arm64_*.zip 2>/dev/null | head -1)
+          elif [[ "${{ matrix.flavor }}" == linux-x86_64 ]]; then
+            ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
+          elif [[ "${{ matrix.flavor }}" == linux-aarch32 ]]; then
+            ARCHIVE=$(ls archives/Commander-cli_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
+          elif [[ "${{ matrix.flavor }}" == linux-aarch64 ]]; then
+            ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
           else
-            # Linux: Find the matching tar.bz file based on architecture
-            if [[ "${{ matrix.flavor }}" == linux-x86_64 ]]; then
-              ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
-            elif [[ "${{ matrix.flavor }}" == linux-aarch32 ]]; then
-              ARCHIVE=$(ls archives/Commander-cli_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
-            elif [[ "${{ matrix.flavor }}" == linux-aarch64 ]]; then
-              ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
-            fi
-            echo "Extracting: $ARCHIVE"
-            tar -xjf "$ARCHIVE" -C "$TARGET_DIR"
-            find "$TARGET_DIR" -type f -exec chmod a+x {} + || true
+            echo "Unsupported flavor: ${{ matrix.flavor }}"
+            exit 1
           fi
+
+          echo "Copying archive: $ARCHIVE"
+
+          cp "$ARCHIVE" "$TARGET_DIR"
 
           echo "Listing contents of $TARGET_DIR:"
           ls -la "$TARGET_DIR"
 
-      - name: Smoke Test Commander Executable
-        if: matrix.flavor != 'linux-aarch32'
-        shell: bash
-        run: |
-          TARGET_DIR="src/pycommander/_bin"
-          EXECUTABLE=""
-          if [[ "${{ matrix.flavor }}" == windows-* ]]; then
-            EXECUTABLE="$TARGET_DIR/Simplicity Commander CLI/commander-cli.exe"
-          elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
-            EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
-          else
-            EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
-          fi
+      # - name: Smoke Test Commander Executable
+      #   if: matrix.flavor != 'linux-aarch32'
+      #   shell: bash
+      #   run: |
+      #     TARGET_DIR="src/pycommander/_bin"
+      #     EXECUTABLE=""
+      #     if [[ "${{ matrix.flavor }}" == windows-* ]]; then
+      #       EXECUTABLE="$TARGET_DIR/Simplicity Commander CLI/commander-cli.exe"
+      #     elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
+      #       EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
+      #     else
+      #       EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
+      #     fi
           
-          echo "Runner: $(uname -a)"
+      #     echo "Runner: $(uname -a)"
 
-          echo "Smoke testing $EXECUTABLE"
-          "$EXECUTABLE" --version
-          if [ $? -ne 0 ]; then
-            echo "Smoke test failed; Commander returned non-zero exit code"
-            exit 1
-          fi
+      #     echo "Smoke testing $EXECUTABLE"
+      #     "$EXECUTABLE" --version
+      #     if [ $? -ne 0 ]; then
+      #       echo "Smoke test failed; Commander returned non-zero exit code"
+      #       exit 1
+      #     fi
 
       # - name: Install build tooling
       #   run: |
