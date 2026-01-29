@@ -1,4 +1,4 @@
-name: Build wheels
+name: Build wheels and publish to PyPI
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   packages: write
 
 jobs:
-  build:
+  build-wheels:
     timeout-minutes: 10
     runs-on: ${{ matrix.os }}
     strategy:
@@ -67,40 +67,46 @@ jobs:
           echo "Listing contents of $TARGET_DIR:"
           ls -la "$TARGET_DIR"
 
-      # - name: Smoke Test Commander Executable
-      #   if: matrix.flavor != 'linux-aarch32'
-      #   shell: bash
-      #   run: |
-      #     TARGET_DIR="src/pycommander/_bin"
-      #     EXECUTABLE=""
-      #     if [[ "${{ matrix.flavor }}" == windows-* ]]; then
-      #       EXECUTABLE="$TARGET_DIR/Simplicity Commander CLI/commander-cli.exe"
-      #     elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
-      #       EXECUTABLE="$TARGET_DIR/Commander-cli.app/Contents/MacOS/Commander-cli"
-      #     else
-      #       EXECUTABLE="./$TARGET_DIR/commander-cli/commander-cli"
-      #     fi
-          
-      #     echo "Runner: $(uname -a)"
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip hatch
 
-      #     echo "Smoke testing $EXECUTABLE"
-      #     "$EXECUTABLE" --version
-      #     if [ $? -ne 0 ]; then
-      #       echo "Smoke test failed; Commander returned non-zero exit code"
-      #       exit 1
-      #     fi
+      - name: Build wheel
+        run: hatch build -t wheel
 
-      # - name: Install build tooling
-      #   run: |
-      #     python -m pip install --upgrade pip hatch twine
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.flavor }}
+          path: dist/*.whl
 
-      # - name: Build wheel
-      #   run: hatch build -t wheel
+  publish-to-pypi:
+    needs: build-wheels
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
 
-      # - name: Upload to PyPI
-      #   env:
-      #     TWINE_USERNAME: __token__
-      #     TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      #   run: |
-      #     python -m pip install --upgrade twine
-      #     python -m twine upload dist/*.whl
+    environment: testpypi # Switch to 'pypi' to publish to the real PyPI
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          check-latest: true
+
+      - name: Install twine
+        run: |
+          python -m pip install --upgrade pip twine
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m twine upload dist/*.whl
