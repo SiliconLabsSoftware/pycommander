@@ -45,8 +45,6 @@ jobs:
           echo "flavor: ${{ matrix.flavor }}"
           TARGET_DIR="src/pycommander/_archive/"
 
-          mkdir -p "$TARGET_DIR"
-
           if [[ "${{ matrix.flavor }}" == windows-* ]]; then
             ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == macos-* ]]; then

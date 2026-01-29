@@ -31,7 +31,15 @@
 *.xls
 *.html
 
+# Wheels
+dist/
 
+# Commander archives (keep __init__.py for package)
+src/pycommander/_archive/*
+!src/pycommander/_archive/__init__.py
+
+# Mac OS X
+.DS_Store
 
 #code convention tool gitignore
 code-convention-tool/
