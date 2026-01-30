@@ -78,7 +78,7 @@ jobs:
       - name: Retag aarch32 wheel
         if: matrix.flavor == 'linux-aarch32'
         run: |
-          python -m wheel tags --platform-tag manylinux2014_armv7l dist/*.whl -d dist/
+          python -m wheel tags --platform-tag manylinux2014_armv7l -w dist/ dist/*.whl
           rm -f dist/*-linux_aarch64.whl
 
       - uses: actions/upload-artifact@v4
