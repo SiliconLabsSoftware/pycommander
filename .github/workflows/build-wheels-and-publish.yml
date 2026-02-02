@@ -120,7 +120,8 @@ jobs:
           python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_x86_64 dist/*-linux_x86_64.whl
           python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_armv7l dist/*-linux_aarch32.whl
           python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_aarch64 dist/*-linux_aarch64.whl
-          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag macosx_10_9_universal2 dist/*-macosx_15_0_arm64.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag macosx_10_9_universal2 dist/*-macosx*.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none dist/*-win_*.whl
           ls -la dist
 
       - name: Publish to PyPI
