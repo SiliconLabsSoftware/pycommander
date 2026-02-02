@@ -70,15 +70,10 @@ jobs:
       - name: Install build tooling
         run: |
           python -m pip install --upgrade pip
-          python -m pip install hatch wheel
+          python -m pip install hatch
 
       - name: Build wheel
         run: hatch build -t wheel
-
-      - name: Retag aarch32 wheel
-        if: matrix.flavor == 'linux-aarch32'
-        run: |
-          python -m wheel tags --remove --platform-tag manylinux2014_armv7l dist/*.whl
 
       - uses: actions/upload-artifact@v4
         with:
@@ -103,13 +98,22 @@ jobs:
       - name: Install twine
         run: |
           python -m pip install --upgrade pip
-          python -m pip install twine
+          python -m pip install twine wheel
 
       - name: Download wheels
         uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
+
+      - name: Retag wheels
+        # Linux and MacOS wheels need some love
+        run: |
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_x86_64 dist/*-linux_x86_64.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_armv7l dist/*-linux_aarch32.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_aarch64 dist/*-linux_aarch64.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag macosx_10_9_universal2 dist/*-macosx_15_0_arm64.whl
+          ls -la dist
 
       - name: Publish to PyPI
         env:
