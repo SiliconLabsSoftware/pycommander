@@ -70,10 +70,18 @@ jobs:
       - name: Install build tooling
         run: |
           python -m pip install --upgrade pip
-          python -m pip install hatch
+          python -m pip install hatch wheel
 
       - name: Build wheel
         run: hatch build -t wheel
+
+      - name: Retag aarch32 wheel temporarily
+        # This wheel is built on aarch64, but the Commander executable is aarch32.
+        # We need to retag it to the correct platform. The real wheel will be retagged later,
+        # to a tag that PyPI will accept.
+        if: matrix.flavor == 'linux-aarch32'
+        run: |
+          python -m wheel tags --remove --platform-tag linux_aarch32 dist/*.whl
 
       - uses: actions/upload-artifact@v4
         with:
