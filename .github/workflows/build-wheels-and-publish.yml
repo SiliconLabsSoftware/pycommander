@@ -115,7 +115,6 @@ jobs:
           merge-multiple: true
 
       - name: Retag wheels
-        # Linux and MacOS wheels need some love
         run: |
           python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_x86_64 dist/*-linux_x86_64.whl
           python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_armv7l dist/*-linux_aarch32.whl
