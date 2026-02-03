@@ -17,9 +17,18 @@ LogConfig       = namedtuple("LogConfig", ["file", "kit_name"])
 class PyCommander:
   # Command overview. These are for type hinting only.
   # The commands are initialized in the __init__ method.
-  adapter : "AdapterCommand"
-  aem     : "AemCommand"
-  device  : "DeviceCommand"
+  adapter   : "AdapterCommand"
+  aem       : "AemCommand"
+  convert   : "ConvertCommand"
+  ctune     : "CtuneCommand"
+  device    : "DeviceCommand"
+  ebl       : "EblCommand"
+  extflash  : "ExtflashCommand"
+  flash     : "FlashCommand"
+  gbl3      : "Gbl3Command"
+  gbl4      : "Gbl4Command"
+  littlefs  : "LittlefsCommand"
+  nvm3      : "Nvm3Command"
 
   def __init__(self, 
               serial_number: str | None = None,
@@ -64,7 +73,6 @@ class PyCommander:
       command_class = getattr(commands, name)
       attribute_name = name.removesuffix("Command").lower() # e.g. "AdapterCommand" -> "adapter"
       setattr(self, attribute_name, command_class(self))
-
 
   def getVersionString(self) -> str:
     result : RunnerResult = self._runner.run("--version", "--json")
