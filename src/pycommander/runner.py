@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import json
 
 from collections import namedtuple
 from pathlib import Path
@@ -44,8 +45,9 @@ class Runner:
       raise TimeoutError("Command timed out")
 
     except subprocess.CalledProcessError as e:
-      error_message = f"Command failed with return code {e.returncode}: {e.output}"
-
+      json_output = json.loads(e.output)
+      error_string = "\n".join(json_output.get("error", ""))
+      error_message = f"Command failed with return code {e.returncode}: {error_string}"
       if e.returncode == -1 or e.returncode == 255:
         raise PyCommanderInputError(error_message)
       elif e.returncode == -2 or e.returncode == 254:
