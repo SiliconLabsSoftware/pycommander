@@ -35,26 +35,26 @@ class BaseCommand(ABC):
     return args
 
   def __get_serial_number_option(self) -> list[str]:
-    if self._commander.serial_number:
-      return ["--serialno", self._commander.serial_number]
+    if self._commander._serial_number:
+      return ["--serialno", self._commander._serial_number]
     return []
 
   def __get_ip_address_option(self) -> list[str]:
-    if self._commander.ip_address:
-      return ["--ip", self._commander.ip_address]
+    if self._commander._ip_address:
+      return ["--ip", self._commander._ip_address]
     return []
 
   def __get_serial_port_option(self) -> list[str]:
-    if self._commander.serial_port:
-      return ["--identifybyserialport", self._commander.serial_port]
+    if self._commander._serial_port:
+      return ["--identifybyserialport", self._commander._serial_port]
     return []
 
 
   # Device arguments
   def _get_device_args(self) -> list[str]:
     args = []
-    if self._commander.target_device:
-      args += ["--device", self._commander.target_device]
+    if self._commander._target_device:
+      args += ["--device", self._commander._target_device]
     return args
 
 
@@ -68,23 +68,23 @@ class BaseCommand(ABC):
     return args
 
   def __get_debug_speed_option(self) -> list[str]:
-    if self._commander.debug_speed:
-      return ["--speed", str(self._commander.debug_speed)]
+    if self._commander._debug_speed:
+      return ["--speed", str(self._commander._debug_speed)]
     return []
 
   def __get_debug_tif_option(self) -> list[str]:
-    if self._commander.debug_tif:
-      return ["--tif", self._commander.debug_tif]
+    if self._commander._debug_tif:
+      return ["--tif", self._commander._debug_tif]
     return []
 
   def __get_debug_irpre_option(self) -> list[str]:
-    if self._commander.debug_irpre:
-      return ["--irpre", str(self._commander.debug_irpre)]
+    if self._commander._debug_irpre:
+      return ["--irpre", str(self._commander._debug_irpre)]
     return []
 
   def __get_debug_drpre_option(self) -> list[str]:
-    if self._commander.debug_drpre:
-      return ["--drpre", str(self._commander.debug_drpre)]
+    if self._commander._debug_drpre:
+      return ["--drpre", str(self._commander._debug_drpre)]
     return []
 
 
@@ -96,12 +96,12 @@ class BaseCommand(ABC):
     return args
 
   def __get_force_option(self) -> list[str]:
-    if self._commander.force:
+    if self._commander._force:
       return ["--force"]
     return []
 
   def __get_show_timestamps_option(self) -> list[str]:
-    if self._commander.show_timestamps:
+    if self._commander._show_timestamps:
       return ["--timestamp"]
     return []
 

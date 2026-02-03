@@ -47,25 +47,25 @@ class PyCommander:
     self._runner : Runner = Runner(executable_path)
     
     # Adapter-specific parameters
-    self.serial_number : str | None = serial_number
-    self.ip_address    : str | None = ip_address
-    self.serial_port   : str | None = serial_port
+    self._serial_number : str | None = serial_number
+    self._ip_address    : str | None = ip_address
+    self._serial_port   : str | None = serial_port
 
     # Device-specific parameters
-    self.target_device : str | None = target_device
+    self._target_device : str | None = target_device
 
     # Debug parameters
-    self.debug_speed : int | None = debug_speed
-    self.debug_tif   : str | None = debug_tif
-    self.debug_irpre : int | None = debug_irpre
-    self.debug_drpre : int | None = debug_drpre
+    self._debug_speed : int | None = debug_speed
+    self._debug_tif   : str | None = debug_tif
+    self._debug_irpre : int | None = debug_irpre
+    self._debug_drpre : int | None = debug_drpre
 
     # Flags
-    self.force           : bool = force
-    self.show_timestamps : bool = show_timestamps
+    self._force           : bool = force
+    self._show_timestamps : bool = show_timestamps
 
     # Logging
-    self.log_config  : LogConfig | None = log_config
+    self._log_config  : LogConfig | None = log_config # TODO: To do
 
     # Initialize available commands
     from . import commands
