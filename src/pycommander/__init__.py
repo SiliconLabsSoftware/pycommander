@@ -12,5 +12,4 @@ sections of the MSLA applicable to Source Code.
 """
 
 # This is the entry point for the PyCommander package, when you do `import pycommander`
-
-from .api import *
+from .pycommander import PyCommander
