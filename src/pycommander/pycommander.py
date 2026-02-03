@@ -18,6 +18,7 @@ class PyCommander:
   # Command overview. These are for type hinting only.
   # The commands are initialized in the __init__ method.
   adapter : "AdapterCommand"
+  aem     : "AemCommand"
   device  : "DeviceCommand"
 
   def __init__(self, 
