@@ -107,6 +107,9 @@ class BaseCommand(ABC):
 
 
   # Helper methods for common arguments
+  def _get_address(self, address: int) -> str:
+    return f"0x{address:08X}"
+
   def _get_ranges(self, ranges: list[tuple[int, int]]) -> list[str]:
     args = []
     for range in ranges:
@@ -120,4 +123,16 @@ class BaseCommand(ABC):
     args = []
     for region in regions:
       args += ["--region", region]
+    return args
+
+  def _get_include_sections(self, include_sections: list[str]) -> list[str]:
+    args = []
+    for section in include_sections:
+      args += ["--include-section", section]
+    return args
+
+  def _get_exclude_sections(self, exclude_sections: list[str]) -> list[str]:
+    args = []
+    for section in exclude_sections:
+      args += ["--exclude-section", section]
     return args
