@@ -17,6 +17,7 @@ LogConfig       = namedtuple("LogConfig", ["file", "kit_name"])
 class PyCommander:
   # Command overview. These are for type hinting only.
   # The commands are initialized in the __init__ method.
+  adapter : "AdapterCommand"
   device  : "DeviceCommand"
 
   def __init__(self, 
