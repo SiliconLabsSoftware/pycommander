@@ -17,6 +17,9 @@ class BaseCommand(ABC):
   def _run(self, *args: str) -> CommandResult:
     print(args) # TODO: Remove before flight
 
+    # Strip away any empty elements
+    args = [arg for arg in args if arg]
+
     result : RunnerResult = self._runner.run(*args, "--json")
     json_output = json.loads(result.output)
 
