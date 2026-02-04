@@ -119,6 +119,15 @@ class BaseCommand(ABC):
       args += ["--range", f"0x{start:X}:0x{end:X}"]
     return args
 
+  def _get_secureranges(self, secureranges: list[tuple[int, int]]) -> list[str]:
+    args = []
+    for securerange in secureranges:
+      start = securerange[0]
+      end   = securerange[1]
+
+      args += ["--securerange", f"0x{start:X}:0x{end:X}"]
+    return args
+
   def _get_regions(self, regions: list[str]) -> list[str]:
     args = []
     for region in regions:

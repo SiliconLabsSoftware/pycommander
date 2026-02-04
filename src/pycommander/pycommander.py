@@ -29,6 +29,12 @@ class PyCommander:
   gbl4      : "Gbl4Command"
   littlefs  : "LittlefsCommand"
   nvm3      : "Nvm3Command"
+  postbuild : "PostbuildCommand"
+  readmem   : "ReadmemCommand"
+  serial    : "SerialCommand"
+  tokens    : "TokensCommand"
+  vcom      : "VcomCommand"
+  verify    : "VerifyCommand"
 
   def __init__(self, 
               serial_number: str | None = None,

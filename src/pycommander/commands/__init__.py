@@ -10,6 +10,12 @@ from .gbl3      import Gbl3Command
 from .gbl4      import Gbl4Command
 from .littlefs  import LittlefsCommand
 from .nvm3      import Nvm3Command
+from .postbuild import PostbuildCommand
+from .readmem   import ReadmemCommand
+from .serial    import SerialCommand
+from .tokens    import TokensCommand
+from .vcom      import VcomCommand
+from .verify    import VerifyCommand
 
 __all__ = [
   "AdapterCommand",
@@ -24,4 +30,10 @@ __all__ = [
   "Gbl4Command",
   "LittlefsCommand",
   "Nvm3Command",
+  "PostbuildCommand",
+  "ReadmemCommand",
+  "SerialCommand",
+  "TokensCommand",
+  "VcomCommand",
+  "VerifyCommand",
 ]
