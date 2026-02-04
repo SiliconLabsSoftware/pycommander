@@ -16,7 +16,7 @@ class LittlefsCommand(BaseCommand):
                          infile: str | None = None) -> list[str]:
     args = []
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
     if infile is not None:
@@ -101,7 +101,7 @@ class LittlefsCommand(BaseCommand):
     args += self._get_flags()
 
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
     if size is not None:

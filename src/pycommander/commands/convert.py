@@ -32,7 +32,7 @@ class ConvertCommand(BaseCommand):
     if outfile is not None:
       args += ["--outfile", outfile]
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if patches:
       args += self._get_patches(patches)
     if ranges:

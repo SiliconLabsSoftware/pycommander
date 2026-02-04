@@ -43,7 +43,7 @@ class ExtflashCommand(BaseCommand):
             verify: bool = True) -> dict:
     args = self._get_general_args()
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if board_id is not None:
       args += ["--board-id", board_id]
     if not verify:

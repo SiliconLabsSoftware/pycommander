@@ -29,7 +29,7 @@ class FlashCommand(BaseCommand):
             vtor: int | None = None) -> dict:
     args = self._get_general_args()
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if halt:
       args += ["--halt"]
     if masserase:
@@ -57,5 +57,5 @@ class FlashCommand(BaseCommand):
     if exclude_sections:
       args += self._get_exclude_sections(exclude_sections)
     if vtor is not None:
-      args += ["--vtor", self._get_address(vtor)]
+      args += ["--vtor", self._get_address_string(vtor)]
     return self._run("flash", *filenames, *args).output
