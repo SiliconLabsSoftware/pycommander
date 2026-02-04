@@ -14,8 +14,8 @@ class ConvertCommand(BaseCommand):
               address: int | None = None,
               patches: list[str] = [],
               ranges: list[tuple[int, int]] = [],
-              token: list[str] | None = None,
-              tokenfile: str | None = None,
+              tokens: list[str] = [],
+              tokenfiles: list[str] = [],
               tokengroup: str | None = None,
               tokendefs: str | None = None,
               secureboot: bool = False,
@@ -34,15 +34,13 @@ class ConvertCommand(BaseCommand):
     if address is not None:
       args += ["--address", self._get_address(address)]
     if patches:
-      for p in patches:
-        args += ["--patch", p]
+      args += self._get_patches(patches)
     if ranges:
       args += self._get_ranges(ranges)
-    if token:
-      for t in token:
-        args += ["--token", t]
-    if tokenfile is not None:
-      args += ["--tokenfile", tokenfile]
+    if tokens:
+      args += self._get_tokens(tokens)
+    if tokenfiles:
+      args += self._get_tokenfiles(tokenfiles)
     if tokengroup is not None:
       args += ["--tokengroup", tokengroup]
     if tokendefs is not None:

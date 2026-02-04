@@ -20,7 +20,7 @@ class FlashCommand(BaseCommand):
             verify: bool = True,
             patches: list[str] = [],
             tokens: list[str] = [],
-            tokenfile: str | None = None,
+            tokenfiles: list[str] = [],
             tokengroup: str | None = None,
             tokendefs: str | None = None,
             binary: bool = False,
@@ -41,13 +41,11 @@ class FlashCommand(BaseCommand):
     if not verify:
       args += ["--noverify"]
     if patches:
-      for p in patches:
-        args += ["--patch", p]
+      args += self._get_patches(patches)
     if tokens:
-      for t in tokens:
-        args += ["--token", t]
-    if tokenfile is not None:
-      args += ["--tokenfile", tokenfile]
+      args += self._get_tokens(tokens)
+    if tokenfiles:
+      args += self._get_tokenfiles(tokenfiles)
     if tokengroup is not None:
       args += ["--tokengroup", tokengroup]
     if tokendefs is not None:
