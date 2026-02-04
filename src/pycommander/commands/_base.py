@@ -125,6 +125,24 @@ class BaseCommand(ABC):
       args += ["--region", region]
     return args
 
+  def _get_patches(self, patches: list[str]) -> list[str]:
+    args = []
+    for patch in patches:
+      args += ["--patch", patch]
+    return args
+
+  def _get_tokens(self, tokens: list[str]) -> list[str]:
+    args = []
+    for token in tokens:
+      args += ["--token", token]
+    return args
+
+  def _get_tokenfiles(self, tokenfiles: list[str]) -> list[str]:
+    args = []
+    for tokenfile in tokenfiles:
+      args += ["--tokenfile", tokenfile]
+    return args
+
   def _get_include_sections(self, include_sections: list[str]) -> list[str]:
     args = []
     for section in include_sections:
