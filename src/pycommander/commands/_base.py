@@ -107,7 +107,7 @@ class BaseCommand(ABC):
 
 
   # Helper methods for common arguments
-  def _get_address(self, address: int) -> str:
+  def _get_address_string(self, address: int) -> str:
     return f"0x{address:08X}"
 
   def _get_ranges(self, ranges: list[tuple[int, int]]) -> list[str]:

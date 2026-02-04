@@ -27,7 +27,7 @@ class Nvm3Command(BaseCommand):
     if delete_all:
       args += ["--all"]
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
     args += ["--outfile", outfile]
@@ -67,7 +67,7 @@ class Nvm3Command(BaseCommand):
     args += ["--size", str(size_bytes)]
     args += ["--device", device]
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
     return self._run("nvm3", "initfile", *args).output
@@ -85,7 +85,7 @@ class Nvm3Command(BaseCommand):
     if nvm3file is not None:
       args += ["--nvm3file", nvm3file]
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
     return self._run("nvm3", "parse", filename, *args).output
@@ -115,7 +115,7 @@ class Nvm3Command(BaseCommand):
     args = self._get_offline_args()
     args += ["--outfile", outfile]
     if address is not None:
-      args += ["--address", self._get_address(address)]
+      args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
     if objects:
