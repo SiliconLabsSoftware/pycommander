@@ -20,7 +20,7 @@ class AemCommand(BaseCommand):
            triggerbelow_ma: float | None = None,
            triggertimeout_s: float | None = None,
            pretrigger_ms: int | None = None,
-           noheader: bool = False,
+           header: bool = True,
            calibrate: bool = False) -> dict:
     args = self._get_general_args()
 
@@ -38,7 +38,7 @@ class AemCommand(BaseCommand):
       args += ["--triggertimeout", str(triggertimeout_s)]
     if pretrigger_ms is not None:
       args += ["--pretrigger", str(pretrigger_ms)]
-    if noheader:
+    if not header:
       args += ["--noheader"]
     if calibrate:
       args += ["--calibrate"]

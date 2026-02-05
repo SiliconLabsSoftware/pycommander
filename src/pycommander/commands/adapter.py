@@ -19,10 +19,10 @@ class AdapterCommand(BaseCommand):
     mode_string = mode if mode is not None else ""
     return self._run("adapter", "drivermode", mode_string, *args).output
 
-  def fwupgrade(self, filename: str | None = None, nocheck: bool = False) -> dict:
+  def fwupgrade(self, filename: str | None = None, check: bool = True) -> dict:
     args = self._get_general_args()
     filename_string = filename if filename is not None else ""
-    if nocheck:
+    if not check:
       args += ["--nocheck"]
     return self._run("adapter", "fwupgrade", filename_string, *args).output
 
@@ -48,13 +48,13 @@ class AdapterCommand(BaseCommand):
   def list(self,
            net: bool = False,
            filter_regex: str | None = None,
-           noconnect: bool = False) -> dict:
+           connect: bool = True) -> dict:
     args = self._get_general_args()
     if net:
       args += ["--net"]
     if filter_regex is not None:
       args += ["--filter", filter_regex]
-    if noconnect:
+    if not connect:
       args += ["--noconnect"]    
     return self._run("adapter", "list", *args).output
 
@@ -86,9 +86,9 @@ class AdapterCommand(BaseCommand):
   def reset(self) -> dict:
     return self._run("adapter", "reset", *self._get_general_args()).output
 
-  def voltage(self, voltage: str | None = None, nocalibrate: bool = False) -> dict:
+  def voltage(self, voltage: str | None = None, calibrate: bool = True) -> dict:
     args = self._get_general_args()
     voltage_string = voltage if voltage is not None else ""
-    if nocalibrate:
+    if not calibrate:
       args += ["--nocalibrate"]
     return self._run("adapter", "voltage", voltage_string, *args).output
