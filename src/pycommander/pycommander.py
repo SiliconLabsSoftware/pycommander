@@ -33,6 +33,7 @@ class PyCommander:
   readmem   : "ReadmemCommand"
   serial    : "SerialCommand"
   tokens    : "TokensCommand"
+  util      : "UtilCommand"
   vcom      : "VcomCommand"
   verify    : "VerifyCommand"
 
