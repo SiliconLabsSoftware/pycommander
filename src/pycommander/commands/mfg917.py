@@ -45,7 +45,7 @@ class Mfg917Command(BaseCommand):
                   pinset: int | None = None,
                   storeinflash: bool = False,
                   storeinefuse: bool = False,
-                  noprompt: bool = False,
+                  prompt: bool = True,
                   vmcu18: bool = False) -> dict:
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
@@ -53,7 +53,7 @@ class Mfg917Command(BaseCommand):
       args += ["--storeinflash"]
     if storeinefuse:
       args += ["--storeinefuse"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     if vmcu18:
       args += ["--vmcu18"]
@@ -104,7 +104,7 @@ class Mfg917Command(BaseCommand):
                 pinset: int | None = None,
                 storeinflash: bool = False,
                 storeinefuse: bool = False,
-                noprompt: bool = False,
+                prompt: bool = True,
                 internalant: bool = False,
                 off0: int | None = None,
                 off1: int | None = None,
@@ -117,7 +117,7 @@ class Mfg917Command(BaseCommand):
       args += ["--storeinflash"]
     if storeinefuse:
       args += ["--storeinefuse"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     if internalant:
       args += ["--internalant"]
@@ -156,7 +156,7 @@ class Mfg917Command(BaseCommand):
            pinset: int | None = None,
            storeinflash: bool = False,
            storeinefuse: bool = False,
-           noprompt: bool = False,
+           prompt: bool = True,
            ch1: int | None = None,
            ch6: int | None = None,
            ch11: int | None = None,
@@ -168,7 +168,7 @@ class Mfg917Command(BaseCommand):
       args += ["--storeinflash"]
     if storeinefuse:
       args += ["--storeinefuse"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     if ch1 is not None:
       args += ["--ch1", str(ch1)]
@@ -225,7 +225,7 @@ class Mfg917Command(BaseCommand):
                     privatekey: str | None = None,
                     protectlength: int | None = None,
                     sha: str | None = None,
-                    noprompt: bool = False) -> dict:
+                    prompt: bool = True) -> dict:
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if symmetrickey is not None:
@@ -236,7 +236,7 @@ class Mfg917Command(BaseCommand):
       args += ["--protectlength", str(protectlength)]
     if sha is not None:
       args += ["--sha", sha]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("mfg917", "protectconfig", protection, *args).output
 
@@ -277,14 +277,14 @@ class Mfg917Command(BaseCommand):
                       pinset: int | None = None,
                       symmetrickey: str | None = None,
                       publickey: str | None = None,
-                      noprompt: bool = False) -> dict:
+                      prompt: bool = True) -> dict:
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if symmetrickey is not None:
       args += ["--symmetrickey", symmetrickey]
     if publickey is not None:
       args += ["--publickey", publickey]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("mfg917", "provisionotpkeys", *args).output
 
@@ -378,7 +378,7 @@ class Mfg917Command(BaseCommand):
             position: int | None = None,
             data: str | None = None,
             crc: bool = True,
-            noprompt: bool = False) -> dict:
+            prompt: bool = True) -> dict:
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if list_regions:
@@ -391,7 +391,7 @@ class Mfg917Command(BaseCommand):
       args += ["--data", data]
     if not crc:
       args += ["--nocrc"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("mfg917", "write", region, *args).output
 
@@ -407,7 +407,7 @@ class Mfg917Command(BaseCommand):
             storeinefuse: bool = False,
             offset_khz: int | None = None,
             ctuneoverride: str | None = None,
-            noprompt: bool = False,
+            prompt: bool = True,
             internalant: bool = False) -> dict:
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
@@ -419,7 +419,7 @@ class Mfg917Command(BaseCommand):
       args += ["--offset", str(offset_khz)]
     if ctuneoverride is not None:
       args += ["--ctuneoverride", ctuneoverride]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     if internalant:
       args += ["--internalant"]

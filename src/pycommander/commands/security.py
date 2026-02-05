@@ -27,13 +27,13 @@ class SecurityCommand(BaseCommand):
       args += ["--codeversion", str(codeversion)]
     return self._run("security", "closeregion", str(index), *args).output
 
-  def disabledeviceerase(self, reset: bool = True, dryrun: bool = False, noprompt: bool = False) -> dict:
+  def disabledeviceerase(self, reset: bool = True, dryrun: bool = False, prompt: bool = True) -> dict:
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
     if dryrun:
       args += ["--dryrun"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("security", "disabledeviceerase", *args).output
 
@@ -83,13 +83,13 @@ class SecurityCommand(BaseCommand):
                 filename: str = "",
                 reset: bool = True,
                 address: int | None = None,
-                noprompt: bool = False) -> dict:
+                prompt: bool = True) -> dict:
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
     if address is not None:
       args += ["--address", self._get_address_string(address)]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("security", "fwupgrade", filename, *args).output
 
@@ -223,7 +223,7 @@ class SecurityCommand(BaseCommand):
                  reset: bool = True,
                  secure_debug_unlock: str | None = None,
                  dryrun: bool = False,
-                 noprompt: bool = False) -> dict:
+                 prompt: bool = True) -> dict:
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -231,7 +231,7 @@ class SecurityCommand(BaseCommand):
       args += ["--secure-debug-unlock", secure_debug_unlock]
     if dryrun:
       args += ["--dryrun"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("security", "lockconfig", *args).output
 
@@ -319,13 +319,13 @@ class SecurityCommand(BaseCommand):
   def transitiontodevelopment(self,
                               reset: bool = True,
                               dryrun: bool = False,
-                              noprompt: bool = False) -> dict:
+                              prompt: bool = True) -> dict:
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
     if dryrun:
       args += ["--dryrun"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     return self._run("security", "transitiontodevelopment", *args).output
 
@@ -367,7 +367,7 @@ class SecurityCommand(BaseCommand):
                   store: bool = True,
                   reset: bool = True,
                   dryrun: bool = False,
-                  noprompt: bool = False,
+                  prompt: bool = True,
                   configfile: str | None = None) -> dict:
     args = self._get_general_args()
     if not store:
@@ -376,7 +376,7 @@ class SecurityCommand(BaseCommand):
       args += ["--noreset"]
     if dryrun:
       args += ["--dryrun"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     if configfile is not None:
       args += ["--configfile", configfile]
@@ -388,7 +388,7 @@ class SecurityCommand(BaseCommand):
                decrypt_keyfile: str | None = None,
                reset: bool = True,
                store: bool = True,
-               noprompt: bool = False,
+               prompt: bool = True,
                dryrun: bool = False) -> dict:
     args = self._get_general_args()
     if sign_keyfile is not None:
@@ -401,7 +401,7 @@ class SecurityCommand(BaseCommand):
       args += ["--noreset"]
     if not store:
       args += ["--nostore"]
-    if noprompt:
+    if not prompt:
       args += ["--noprompt"]
     if dryrun:
       args += ["--dryrun"]
