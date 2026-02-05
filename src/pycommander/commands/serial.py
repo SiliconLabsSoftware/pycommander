@@ -1,6 +1,10 @@
+"""Serial commands: getopn, load, lock, unlock."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class SerialCommand(BaseCommand):
+  """Serial commands."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -10,12 +14,30 @@ class SerialCommand(BaseCommand):
     return args
 
   def getopn(self, serialport: str = "") -> dict:
+    """Get OPN (Ordering Part Number) via serial.
+
+    Args:
+      serialport (str): Serial port to use.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if serialport:
       args += ["--serialport", serialport]
     return self._run("serial", "getopn", *args).output
 
   def load(self, filename: str, fixedspeed: bool = False, serialport: str = "") -> dict:
+    """Load image via serial.
+
+    Args:
+      filename (str): File to load.
+      fixedspeed (bool): Use fixed speed.
+      serialport (str): Serial port to use.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if fixedspeed:
       args += ["--fixedspeed"]
@@ -28,6 +50,17 @@ class SerialCommand(BaseCommand):
            key_file: str = "",
            userdata: str = "",
            serialport: str = "") -> dict:
+    """Lock device via serial.
+
+    Args:
+      token_file (str): Token file path.
+      key_file (str): Key file path.
+      userdata (str): User data.
+      serialport (str): Serial port to use.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if token_file:
       args += ["--token", token_file]
@@ -44,6 +77,17 @@ class SerialCommand(BaseCommand):
              key_file: str = "",
              userdata: str = "",
              serialport: str = "") -> dict:
+    """Unlock device via serial.
+
+    Args:
+      token_file (str): Token file path.
+      key_file (str): Key file path.
+      userdata (str): User data.
+      serialport (str): Serial port to use.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if token_file:
       args += ["--token", token_file]

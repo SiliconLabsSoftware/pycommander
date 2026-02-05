@@ -1,6 +1,10 @@
+"""Secure Engine commands: attestation, closeregion, lock/unlock, gencert, provision, etc."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class SecurityCommand(BaseCommand):
+  """Secure Engine commands."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -11,6 +15,14 @@ class SecurityCommand(BaseCommand):
     return args
 
   def attestation(self, reset: bool = True) -> dict:
+    """Run Secure Engine attestation.
+
+    Args:
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -20,6 +32,16 @@ class SecurityCommand(BaseCommand):
                   index: int,
                   reset: bool = True,
                   codeversion: int | None = None) -> dict:
+    """Close a Secure Engine region by index.
+
+    Args:
+      index (int): Region index to close.
+      reset (bool): Reset device after operation.
+      codeversion (int): Code version to set.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -28,6 +50,16 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "closeregion", str(index), *args).output
 
   def disabledeviceerase(self, reset: bool = True, dryrun: bool = False, prompt: bool = True) -> dict:
+    """Disable device erase capability.
+
+    Args:
+      reset (bool): Reset device after operation.
+      dryrun (bool): Show what would be done without doing it.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -48,6 +80,23 @@ class SecurityCommand(BaseCommand):
                     authorization: str | None = None,
                     cert_pubkey: str | None = None,
                     disable_param: str | None = None) -> dict:
+    """Disable tamper detection (cert/signature/authorization options).
+
+    Args:
+      reset (bool): Reset device after operation.
+      store (bool): Store settings.
+      cert (str): Certificate file.
+      cert_privkey (str): Certificate private key.
+      command_key (str): Command key file.
+      cert_signature (str): Certificate signature file.
+      command_signature (str): Command signature file.
+      authorization (str): Authorization data.
+      cert_pubkey (str): Certificate public key.
+      disable_param (str): Disable parameter.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -72,6 +121,15 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "disabletamper", *args).output
 
   def erasedevice(self, reset: bool = True, dryrun: bool = False) -> dict:
+    """Erase device (Secure Engine).
+
+    Args:
+      reset (bool): Reset device after operation.
+      dryrun (bool): Show what would be done without doing it.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -84,6 +142,17 @@ class SecurityCommand(BaseCommand):
                 reset: bool = True,
                 address: int | None = None,
                 prompt: bool = True) -> dict:
+    """Upgrade Secure Engine firmware.
+
+    Args:
+      filename (str): Firmware file path.
+      reset (bool): Reset device after operation.
+      address (int): Address for upgrade.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -94,6 +163,14 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "fwupgrade", filename, *args).output
 
   def fwupgradecheck(self, reset: bool = True) -> dict:
+    """Check if Secure Engine firmware upgrade is available.
+
+    Args:
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -104,6 +181,17 @@ class SecurityCommand(BaseCommand):
               store: bool = True,
               deviceserialno: str | None = None,
               reset: bool = True) -> dict:
+    """Generate authorization data.
+
+    Args:
+      outfile (str): Output file path.
+      store (bool): Store on device.
+      deviceserialno (str): Device serial number.
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -124,6 +212,21 @@ class SecurityCommand(BaseCommand):
               authorization: str | None = None,
               command_key: str | None = None,
               extsign: bool = False) -> dict:
+    """Generate Secure Engine certificate.
+
+    Args:
+      outfile (str): Output file path.
+      store (bool): Store on device.
+      deviceserialno (str): Device serial number.
+      reset (bool): Reset device after operation.
+      cert_pubkey (str): Certificate public key file.
+      authorization (str): Authorization data.
+      command_key (str): Command key file.
+      extsign (bool): Output for external signing.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -150,6 +253,19 @@ class SecurityCommand(BaseCommand):
                  action: str | None = None,
                  disable_param: int | None = None,
                  unlock_param: str | None = None) -> dict:
+    """Generate Secure Engine command (disable/unlock etc.).
+
+    Args:
+      outfile (str): Output file path.
+      store (bool): Store on device.
+      reset (bool): Reset device after operation.
+      action (str): Command action.
+      disable_param (int): Disable parameter.
+      unlock_param (str): Unlock parameter.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -170,6 +286,17 @@ class SecurityCommand(BaseCommand):
                 store: bool = True,
                 deviceserialno: str | None = None,
                 reset: bool = True) -> dict:
+    """Generate Secure Engine config.
+
+    Args:
+      outfile (str): Output file path.
+      store (bool): Store on device.
+      deviceserialno (str): Device serial number.
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -186,6 +313,17 @@ class SecurityCommand(BaseCommand):
              outfile: str | None = None,
              privkey: str | None = None,
              pubkey: str | None = None) -> dict:
+    """Generate Secure Engine key.
+
+    Args:
+      type (str): Key type.
+      outfile (str): Output file path.
+      privkey (str): Private key file path.
+      pubkey (str): Public key file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--type", type]
     if outfile is not None:
@@ -199,6 +337,15 @@ class SecurityCommand(BaseCommand):
   def getpath(self,
               reset: bool = True,
               deviceserialno: str | None = None) -> dict:
+    """Get Secure Engine path/certificate path.
+
+    Args:
+      reset (bool): Reset device after operation.
+      deviceserialno (str): Device serial number.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -210,6 +357,16 @@ class SecurityCommand(BaseCommand):
            reset: bool = True,
            dryrun: bool = False,
            trustzone: str | None = None) -> dict:
+    """Lock Secure Engine / device.
+
+    Args:
+      reset (bool): Reset device after operation.
+      dryrun (bool): Show what would be done.
+      trustzone (str): TrustZone config.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -224,6 +381,17 @@ class SecurityCommand(BaseCommand):
                  secure_debug_unlock: str | None = None,
                  dryrun: bool = False,
                  prompt: bool = True) -> dict:
+    """Lock Secure Engine config.
+
+    Args:
+      reset (bool): Reset device after operation.
+      secure_debug_unlock (str): Secure debug unlock config.
+      dryrun (bool): Show what would be done.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -236,12 +404,29 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "lockconfig", *args).output
 
   def otprollbackcount(self, reset: bool = True) -> dict:
+    """Read OTP rollback count.
+
+    Args:
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
     return self._run("security", "otprollbackcount", *args).output
 
   def provision(self, reset: bool = True, sefw: str | None = None) -> dict:
+    """Provision Secure Engine.
+
+    Args:
+      reset (bool): Reset device after operation.
+      sefw (str): Secure Engine firmware file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -253,6 +438,16 @@ class SecurityCommand(BaseCommand):
                cert_type: str,
                outfile: str | None = None,
                reset: bool = True) -> dict:
+    """Read Secure Engine certificate.
+
+    Args:
+      cert_type (str): Certificate type to read.
+      outfile (str): Output file path.
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -261,6 +456,14 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "readcert", cert_type, *args).output
 
   def readconfig(self, reset: bool = True) -> dict:
+    """Read Secure Engine config.
+
+    Args:
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -272,6 +475,18 @@ class SecurityCommand(BaseCommand):
               outfile: str | None = None,
               reset: bool = True,
               store: bool = True) -> dict:
+    """Read Secure Engine key (sign/command key).
+
+    Args:
+      sign (bool): Read sign key.
+      command (bool): Read command key.
+      outfile (str): Output file path.
+      reset (bool): Reset device after operation.
+      store (bool): Store on device.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if sign:
       args += ["--sign"]
@@ -288,6 +503,15 @@ class SecurityCommand(BaseCommand):
   def readregionconfig(self,
                        outfile: str | None = None,
                        reset: bool = True) -> dict:
+    """Read Secure Engine region config.
+
+    Args:
+      outfile (str): Output file path.
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -307,6 +531,16 @@ class SecurityCommand(BaseCommand):
              reset: bool = True,
              trustzone: bool = False,
              verbose: bool = False) -> dict:
+    """Read Secure Engine status.
+
+    Args:
+      reset (bool): Reset device after operation.
+      trustzone (bool): Include TrustZone info.
+      verbose (bool): Verbose output.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -320,6 +554,16 @@ class SecurityCommand(BaseCommand):
                               reset: bool = True,
                               dryrun: bool = False,
                               prompt: bool = True) -> dict:
+    """Transition device to development (unlock for debug).
+
+    Args:
+      reset (bool): Reset device after operation.
+      dryrun (bool): Show what would be done.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -340,6 +584,23 @@ class SecurityCommand(BaseCommand):
              authorization: str | None = None,
              cert_pubkey: str | None = None,
              unlock_param: str | None = None) -> dict:
+    """Unlock Secure Engine (cert/signature/authorization options).
+
+    Args:
+      reset (bool): Reset device after operation.
+      store (bool): Store on device.
+      cert (str): Certificate file.
+      cert_privkey (str): Certificate private key.
+      command_key (str): Command key file.
+      cert_signature (str): Certificate signature file.
+      command_signature (str): Command signature file.
+      authorization (str): Authorization data.
+      cert_pubkey (str): Certificate public key.
+      unlock_param (str): Unlock parameter.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]
@@ -369,6 +630,18 @@ class SecurityCommand(BaseCommand):
                   dryrun: bool = False,
                   prompt: bool = True,
                   configfile: str | None = None) -> dict:
+    """Write Secure Engine config to device.
+
+    Args:
+      store (bool): Store on device.
+      reset (bool): Reset device after operation.
+      dryrun (bool): Show what would be done.
+      prompt (bool): Show confirmation prompt.
+      configfile (str): Config file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not store:
       args += ["--nostore"]
@@ -390,6 +663,20 @@ class SecurityCommand(BaseCommand):
                store: bool = True,
                prompt: bool = True,
                dryrun: bool = False) -> dict:
+    """Write Secure Engine key(s) to device.
+
+    Args:
+      sign_keyfile (str): Sign key file path.
+      command_keyfile (str): Command key file path.
+      decrypt_keyfile (str): Decrypt key file path.
+      reset (bool): Reset device after operation.
+      store (bool): Store on device.
+      prompt (bool): Show confirmation prompt.
+      dryrun (bool): Show what would be done.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if sign_keyfile is not None:
       args += ["--sign", sign_keyfile]
@@ -408,6 +695,15 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "writekey", *args).output
 
   def writeregionconfig(self, file: str, reset: bool = True) -> dict:
+    """Write Secure Engine region config from file.
+
+    Args:
+      file (str): Region config file path.
+      reset (bool): Reset device after operation.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if not reset:
       args += ["--noreset"]

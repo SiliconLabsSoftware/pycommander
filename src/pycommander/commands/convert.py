@@ -1,6 +1,10 @@
+"""Convert/combine image files, set tokens, patch binary data."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class ConvertCommand(BaseCommand):
+  """Conversion between image file formats; combine inputs, set tokens, patch data."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -28,6 +32,32 @@ class ConvertCommand(BaseCommand):
               extsign: bool = False,
               signature: str | None = None,
               verify_key: str | None = None) -> dict:
+    """Convert or combine input files to one output; set tokens and patch binary data.
+
+    Args:
+      infiles (list[str]): Input file(s) to convert or combine.
+      outfile (str): Output file path.
+      address (int): Start address when a .bin file is given as input.
+      patches (list[str]): Patch memory; each entry address:data[:length] (up to 8 bytes).
+      ranges (list[tuple[int,int]]): Limit output to these memory ranges (start, end).
+      tokens (list[str]): Token overrides as TOKEN_NAME:value.
+      tokenfiles (list[str]): Files describing tokens to write.
+      tokengroup (str): Token set to use: common, zigbee, or znet.
+      tokendefs (str): Path to JSON file defining the token set (alternative to tokengroup).
+      secureboot (bool): Create Secure Boot image (requires keyfile, signature, or extsign).
+      keyfile (str): ECC-P256 PEM private key for signing (e.g. from ebl keygen).
+      crc (bool): Add CRC32 for bootloader integrity (cannot combine with secureboot).
+      certificate (str): Certificate to append to Secure Boot application.
+      aeskey (str): AES key file (util genkey --type aes-ccm) for bootloader app properties.
+      include_sections (list[str]): ELF sections to include.
+      exclude_sections (list[str]): ELF sections to exclude.
+      extsign (bool): Output form suitable for external signature, insert later with --signature.
+      signature (str): DER ECDSA signature file for signing (e.g. with extsign).
+      verify_key (str): PEM public key to verify signed Secure Boot output.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = list(infiles) + self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]

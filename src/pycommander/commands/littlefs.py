@@ -1,6 +1,10 @@
+"""LittleFS commands: add, dump, extract, info, init, list, remove."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class LittlefsCommand(BaseCommand):
+  """Commands for interacting with the LittleFS filesystem."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -42,6 +46,19 @@ class LittlefsCommand(BaseCommand):
           address: int | None = None,
           range: tuple[int, int] | None = None,
           infile: str | None = None) -> dict:
+    """Add file(s) or dir(s) to a LittleFS filesystem.
+
+    Args:
+      outfile (str): Output filesystem file path.
+      file_paths (list[str]): Files to add (paths relative to cwd).
+      dir_paths (list[str]): Directories to add (paths relative to cwd).
+      address (int): Memory address of filesystem.
+      range (tuple[int,int]): Memory range (start, end).
+      infile (str): Binary file containing the filesystem (or app image).
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._add_location_args(address, range, infile)
     if file_paths:
@@ -56,6 +73,17 @@ class LittlefsCommand(BaseCommand):
            address: int | None = None,
            range: tuple[int, int] | None = None,
            infile: str | None = None) -> dict:
+    """Dump LittleFS filesystem to output file.
+
+    Args:
+      outfile (str): Output file path.
+      address (int): Memory address.
+      range (tuple[int,int]): Memory range.
+      infile (str): Input binary containing filesystem.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._add_location_args(address, range, infile)
     args += ["--outfile", outfile]
@@ -69,6 +97,20 @@ class LittlefsCommand(BaseCommand):
               address: int | None = None,
               range: tuple[int, int] | None = None,
               infile: str | None = None) -> dict:
+    """Extract file(s) or dir(s) from LittleFS to destination or zip.
+
+    Args:
+      dest_dir (str): Destination directory for extracted content.
+      zip_dir (str): Create zip at this path instead of extracting to dir.
+      file_paths (list[str]): Files to extract.
+      dir_paths (list[str]): Directories to extract.
+      address (int): Memory address.
+      range (tuple[int,int]): Memory range.
+      infile (str): Input binary containing filesystem.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._add_location_args(address, range, infile)
     if file_paths:
@@ -85,6 +127,16 @@ class LittlefsCommand(BaseCommand):
            address: int | None = None,
            range: tuple[int, int] | None = None,
            infile: str | None = None) -> dict:
+    """Show LittleFS filesystem info.
+
+    Args:
+      address (int): Memory address.
+      range (tuple[int,int]): Memory range.
+      infile (str): Input binary containing filesystem.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._add_location_args(address, range, infile)
     return self._run("littlefs", "info", *args).output
@@ -95,6 +147,18 @@ class LittlefsCommand(BaseCommand):
            size: int | None = None,
            address: int | None = None,
            range: tuple[int, int] | None = None) -> dict:
+    """Initialize a new LittleFS filesystem.
+
+    Args:
+      outfile (str): Output filesystem file path.
+      device (str): Device/device family for layout.
+      size (int): Filesystem size in bytes.
+      address (int): Memory address.
+      range (tuple[int,int]): Memory range.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     # Don't include the device argument from the PyCommander instance here
     args  = self._get_adapter_connection_args()
     args += self._get_debug_args()
@@ -115,6 +179,16 @@ class LittlefsCommand(BaseCommand):
            address: int | None = None,
            range: tuple[int, int] | None = None,
            infile: str | None = None) -> dict:
+    """List files in LittleFS filesystem.
+
+    Args:
+      address (int): Memory address.
+      range (tuple[int,int]): Memory range.
+      infile (str): Input binary containing filesystem.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._add_location_args(address, range, infile)
     return self._run("littlefs", "list", *args).output
@@ -125,6 +199,18 @@ class LittlefsCommand(BaseCommand):
              address: int | None = None,
              range: tuple[int, int] | None = None,
              infile: str | None = None) -> dict:
+    """Remove file(s) or dir(s) from LittleFS filesystem.
+
+    Args:
+      file_paths (list[str]): Files to remove.
+      dir_paths (list[str]): Directories to remove.
+      address (int): Memory address.
+      range (tuple[int,int]): Memory range.
+      infile (str): Input binary containing filesystem.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._add_location_args(address, range, infile)
     if file_paths:

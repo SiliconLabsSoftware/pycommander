@@ -1,6 +1,10 @@
+"""EBL commands: create, parse, print, keygen, keyconvert, aat-usageinfo."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class EblCommand(BaseCommand):
+  """Create, parse and other handling for EBL files."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -9,6 +13,11 @@ class EblCommand(BaseCommand):
     return args
 
   def aat_usageinfo(self) -> dict:
+    """Display flash and RAM usage from AAT data (Zigbee/Thread; RAM for EM3xx only).
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     return self._run("ebl", "aat-usageinfo", *self._get_general_args()).output
 
   def create(self,
@@ -19,6 +28,20 @@ class EblCommand(BaseCommand):
              extsign: bool = False,
              signature: str | None = None,
              verify_keyfile: str | None = None) -> dict:
+    """Create an EBL file.
+
+    Args:
+      outfile (str): Output EBL file path.
+      app (str): Application image to use when generating EBL.
+      sign_keyfile (str): ECC-P256 PEM private key to sign the EBL.
+      encrypt_keyfile (str): AES key file to encrypt the EBL (e.g. ebl keygen --type aes-ccm).
+      extsign (bool): Generate .extsign file for external signature, insert later with --signature.
+      signature (str): DER ECDSA signature file for signing (e.g. with extsign).
+      verify_keyfile (str): ECC-P256 PEM public key to verify signed EBL.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if app is not None:
       args += ["--app", app]
@@ -38,6 +61,16 @@ class EblCommand(BaseCommand):
                  infile: str,
                  type: str | None = None,
                  outfile: str | None = None) -> dict:
+    """Convert PEM public key to token file for flashing. Deprecated: use util keytotoken.
+
+    Args:
+      infile (str): Input PEM public key file.
+      type (str): Crypto algorithm: aes-ccm or ecc-p256.
+      outfile (str): Output file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if type is not None:
       args += ["--type", type]
@@ -48,6 +81,15 @@ class EblCommand(BaseCommand):
   def keygen(self,
              type: str,
              outfile: str | None = None) -> dict:
+    """Generate key for encrypt/decrypt or key pair for signing. Deprecated: use util genkey.
+
+    Args:
+      type (str): Algorithm: aes-ccm (encrypt/decrypt) or ecc-p256 (signing, Secure Boot).
+      outfile (str): Output file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = ["--type", type] + self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -58,6 +100,17 @@ class EblCommand(BaseCommand):
             app: str | None = None,
             verify_keyfile: str | None = None,
             decrypt_keyfile: str | None = None) -> dict:
+    """Parse an EBL file.
+
+    Args:
+      infile (str): Input EBL file.
+      app (str): File to write the application image to.
+      verify_keyfile (str): ECC-P256 PEM public key to verify signed EBL.
+      decrypt_keyfile (str): AES key file to decrypt the EBL.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if app is not None:
       args += ["--app", app]
@@ -68,5 +121,12 @@ class EblCommand(BaseCommand):
     return self._run("ebl", "parse", infile, *args).output
 
   def print(self, filename: str) -> dict:
-    """Print information about an EBL file. Named print_info to avoid shadowing built-in print."""
+    """Print information about an EBL file.
+
+    Args:
+      filename (str): EBL file to print info about.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     return self._run("ebl", "print", filename, *self._get_general_args()).output
