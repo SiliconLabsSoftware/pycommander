@@ -1,6 +1,10 @@
+"""mfg917 commands: provision SiWx91x manufacturing data (dpdtraining, dump, erase, etc.)."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class Mfg917Command(BaseCommand):
+  """Provision manufacturing data to the device (SiWx91x)."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -47,6 +51,24 @@ class Mfg917Command(BaseCommand):
                   storeinefuse: bool = False,
                   prompt: bool = True,
                   vmcu18: bool = False) -> dict:
+    """Run DPD (Digital Pre-Distortion) training.
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      storeinflash (bool): Store result in flash.
+      storeinefuse (bool): Store result in eFuse.
+      prompt (bool): Show confirmation prompt.
+      vmcu18 (bool): VMCU 1.8V option.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if storeinflash:
@@ -68,6 +90,21 @@ class Mfg917Command(BaseCommand):
            host: str | None = None,
            skipinit: bool = False,
            pinset: int | None = None) -> dict:
+    """Dump device data to file.
+
+    Args:
+      filename (str): Output file path.
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     return self._run("mfg917", "dump", filename, *args).output
@@ -84,6 +121,24 @@ class Mfg917Command(BaseCommand):
             list_regions: bool = False,
             range: tuple[int, int] | None = None,
             position: int | None = None) -> dict:
+    """Erase a region (or list regions with list_regions=True).
+
+    Args:
+      region (str): Region name to erase.
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      list_regions (bool): List available regions instead of erasing.
+      range (tuple[int,int]): Memory range.
+      position (int): Position for erase.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if list_regions:
@@ -111,6 +166,29 @@ class Mfg917Command(BaseCommand):
                 off2: int | None = None,
                 off3: int | None = None,
                 off4: int | None = None) -> dict:
+    """EVM offset calibration (off0–off4 for antenna offsets).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      storeinflash (bool): Store in flash.
+      storeinefuse (bool): Store in eFuse.
+      prompt (bool): Show confirmation prompt.
+      internalant (bool): Internal antenna.
+      off0 (int): Offset 0.
+      off1 (int): Offset 1.
+      off2 (int): Offset 2.
+      off3 (int): Offset 3.
+      off4 (int): Offset 4.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if storeinflash:
@@ -142,6 +220,21 @@ class Mfg917Command(BaseCommand):
                 host: str | None = None,
                 skipinit: bool = False,
                 pinset: int | None = None) -> dict:
+    """Upgrade device firmware.
+
+    Args:
+      filename (str): Firmware file path.
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     return self._run("mfg917", "fwupgrade", filename, *args).output
@@ -162,6 +255,28 @@ class Mfg917Command(BaseCommand):
            ch11: int | None = None,
            ch14: int | None = None,
            vmcu18: bool = False) -> dict:
+    """Gain calibration (per-channel: ch1, ch6, ch11, ch14).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      storeinflash (bool): Store in flash.
+      storeinefuse (bool): Store in eFuse.
+      prompt (bool): Show confirmation prompt.
+      ch1 (int): Channel 1 gain.
+      ch6 (int): Channel 6 gain.
+      ch11 (int): Channel 11 gain.
+      ch14 (int): Channel 14 gain.
+      vmcu18 (bool): VMCU 1.8V option.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if storeinflash:
@@ -190,6 +305,20 @@ class Mfg917Command(BaseCommand):
            host: str | None = None,
            skipinit: bool = False,
            pinset: int | None = None) -> dict:
+    """Show device info.
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     return self._run("mfg917", "info", *args).output
@@ -204,6 +333,22 @@ class Mfg917Command(BaseCommand):
            pinset: int | None = None,
            mbr: str | None = None,
            data: str | None = None) -> dict:
+    """Initialize device (MBR/data files).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      mbr (str): MBR file path.
+      data (str): Data file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if mbr is not None:
@@ -226,6 +371,26 @@ class Mfg917Command(BaseCommand):
                     protectlength: int | None = None,
                     sha: str | None = None,
                     prompt: bool = True) -> dict:
+    """Protect config (symmetric/private key, SHA).
+
+    Args:
+      protection (str): Protection type/level.
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      symmetrickey (str): Symmetric key file.
+      privatekey (str): Private key file.
+      protectlength (int): Protection length.
+      sha (str): SHA algorithm.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if symmetrickey is not None:
@@ -253,6 +418,25 @@ class Mfg917Command(BaseCommand):
                 data: str | None = None,
                 profile: str | None = None,
                 listprofiles: bool = False) -> dict:
+    """Provision device (MBR, keys, data, profile).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      mbr (str): MBR file path.
+      keys (str): Keys file path.
+      data (str): Data file path.
+      profile (str): Profile name.
+      listprofiles (bool): List available profiles.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if mbr is not None:
@@ -278,6 +462,23 @@ class Mfg917Command(BaseCommand):
                       symmetrickey: str | None = None,
                       publickey: str | None = None,
                       prompt: bool = True) -> dict:
+    """Provision OTP keys (symmetric/public key).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      symmetrickey (str): Symmetric key file.
+      publickey (str): Public key file.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if symmetrickey is not None:
@@ -304,6 +505,28 @@ class Mfg917Command(BaseCommand):
             stop: bool = False,
             internalant: bool = False,
             vmcu18: bool = False) -> dict:
+    """Radio test/calibration (channel, power, phy; start/stop/burst).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      channel (int): Radio channel.
+      power (int): Power level.
+      phy (str): PHY type.
+      burst (bool): Burst mode.
+      start (bool): Start radio.
+      stop (bool): Stop radio.
+      internalant (bool): Internal antenna.
+      vmcu18 (bool): VMCU 1.8V option.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if channel is not None:
@@ -338,6 +561,26 @@ class Mfg917Command(BaseCommand):
            position: int | None = None,
            outfile: str | None = None,
            property_field: str | None = None) -> dict:
+    """Read region (or list regions; optional range/position/outfile/property).
+
+    Args:
+      region (str): Region name to read.
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      list_regions (bool): List available regions.
+      range (tuple[int,int]): Memory range.
+      position (int): Position.
+      outfile (str): Output file path.
+      property_field (str): Property name.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if list_regions:
@@ -360,6 +603,20 @@ class Mfg917Command(BaseCommand):
                      host: str | None = None,
                      skipinit: bool = False,
                      pinset: int | None = None) -> dict:
+    """Setup serial/network interface for mfg917.
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     return self._run("mfg917", "setupinterface", *args).output
@@ -379,6 +636,27 @@ class Mfg917Command(BaseCommand):
             data: str | None = None,
             crc: bool = True,
             prompt: bool = True) -> dict:
+    """Write to region (address, position, data; optional crc/prompt).
+
+    Args:
+      region (str): Region name to write.
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      list_regions (bool): List available regions.
+      address (int): Address.
+      position (int): Position.
+      data (str): Data file path.
+      crc (bool): Verify CRC.
+      prompt (bool): Show confirmation prompt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if list_regions:
@@ -409,6 +687,26 @@ class Mfg917Command(BaseCommand):
             ctuneoverride: str | None = None,
             prompt: bool = True,
             internalant: bool = False) -> dict:
+    """XO (crystal) calibration (offset, ctune; store in flash/eFuse).
+
+    Args:
+      serialport (str): Serial port.
+      baudrate (int): Baud rate.
+      serialinterface (bool): Use serial interface.
+      closeinterface (bool): Close interface after.
+      host (str): Host address.
+      skipinit (bool): Skip initialization.
+      pinset (int): Pin set.
+      storeinflash (bool): Store in flash.
+      storeinefuse (bool): Store in eFuse.
+      offset_khz (int): Frequency offset in kHz.
+      ctuneoverride (str): CTUNE override value.
+      prompt (bool): Show confirmation prompt.
+      internalant (bool): Internal antenna.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
     if storeinflash:

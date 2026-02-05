@@ -1,6 +1,10 @@
+"""Verify command: compare device flash with input files."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class VerifyCommand(BaseCommand):
+  """Compare the contents in the device flash with the given input files and options."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -22,6 +26,24 @@ class VerifyCommand(BaseCommand):
              reset: bool = True,
              regions: list[str] = [],
              binary: bool = False) -> dict:
+    """Compare device flash with given files and options.
+
+    Args:
+      filenames (list[str]): File(s) to verify against. Omit with blank=True to check blank.
+      address (int): Address for .bin comparison; not for hex/s37.
+      patches (list[str]): Patch memory; each address:data[:length].
+      tokens (list[str]): Token overrides as TOKEN_NAME:value.
+      tokenfiles (list[str]): Files describing tokens.
+      tokengroup (str): Token set: common, zigbee, or znet.
+      tokendefs (str): Path to JSON token definitions.
+      blank (bool): Check that main flash (or regions) is blank; no file.
+      reset (bool): Reset device before verifying.
+      regions (list[str]): With --blank, regions to check if blank (@region).
+      binary (bool): Treat all files as flat binaries.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if filenames:
       args = list(filenames) + args

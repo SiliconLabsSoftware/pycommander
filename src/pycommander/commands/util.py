@@ -1,6 +1,10 @@
+"""Util commands: app info, ELF info, key/cert utilities, RPS info, usage, verify."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class UtilCommand(BaseCommand):
+  """Utility commands (appinfo, elfinfo, extractkeys, gencert, genkey, etc.)."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -9,12 +13,37 @@ class UtilCommand(BaseCommand):
     return args
 
   def appinfo(self, filename: str) -> dict:
+    """Show all available info about an application.
+
+    Args:
+      filename (str): File to get info about.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     return self._run("util", "appinfo", filename, *self._get_general_args()).output
 
   def elfinfo(self, filename: str) -> dict:
+    """Show information about the file's ELF sections.
+
+    Args:
+      filename (str): File to get ELF section info about.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     return self._run("util", "elfinfo", filename, *self._get_general_args()).output
 
   def extractkeys(self, filename: str, dir: str) -> dict:
+    """Extract cryptographic keys from a JSON config file into a directory.
+
+    Args:
+      filename (str): JSON configuration file from which keys will be extracted.
+      dir (str): Directory to store the extracted keys in.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--dir", dir]
     return self._run("util", "extractkeys", filename, *args).output
@@ -26,6 +55,21 @@ class UtilCommand(BaseCommand):
               cert_pubkey: str,
               sign_keyfile: str | None = None,
               extsign: bool = False) -> dict:
+    """Create a delegate certificate.
+
+    Args:
+      outfile (str): The file to write output to.
+      cert_version (int): Running certificate version number; used for rollback
+        prevention (device will not allow a lower cert than seen).
+      cert_type (str): Type of certificate (e.g. gbl, secureboot).
+      cert_pubkey (str): Public key file to be included in the certificate.
+      sign_keyfile (str): Private key file used to sign the certificate.
+      extsign (bool): If True, generate an unsigned certificate to be signed later
+        via signcert.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--outfile", outfile]
     args += ["--cert-version", str(cert_version)]
@@ -43,6 +87,19 @@ class UtilCommand(BaseCommand):
              privkey: str | None = None,
              outfile: str | None = None,
              tokenfile: str | None = None) -> dict:
+    """Generate a key for encrypt/decrypt or a key pair for signing.
+
+    Args:
+      type (str): Algorithm: "ecc-p256" (key pair for signing) or "aes-ccm"
+        (key for encrypting/decrypting; requires outfile).
+      pubkey (str): Filename to write the public key to; required with ecc-p256.
+      privkey (str): Filename to write the private key to; required with ecc-p256.
+      outfile (str): Output file (e.g. for aes-ccm key).
+      tokenfile (str): Optional token file to write public key to (ecc-p256).
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--type", type]
     if pubkey is not None:
@@ -56,6 +113,14 @@ class UtilCommand(BaseCommand):
     return self._run("util", "genkey", *args).output
 
   def genkeyconfig(self, outfile: str) -> dict:
+    """Generate key configuration for SiWx91x devices.
+
+    Args:
+      outfile (str): The file to write output to.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--outfile", outfile]
     return self._run("util", "genkeyconfig", *args).output
@@ -64,6 +129,16 @@ class UtilCommand(BaseCommand):
                  keyfile: str,
                  outfile: str | None = None,
                  key_type: str | None = None) -> dict:
+    """Convert a public key in PEM format to a token file for flashing.
+
+    Args:
+      keyfile (str): Input PEM public key file.
+      outfile (str): The file to write output to.
+      key_type (str): Key type (optional).
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = [keyfile] + self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -72,6 +147,14 @@ class UtilCommand(BaseCommand):
     return self._run("util", "keytotoken", *args).output
 
   def rpsinfo(self, filename: str) -> dict:
+    """Show information about an RPS application/key file.
+
+    Args:
+      filename (str): RPS file to get information about.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     return self._run("util", "rpsinfo", filename, *self._get_general_args()).output
 
   def signcert(self,
@@ -80,6 +163,18 @@ class UtilCommand(BaseCommand):
                cert_type: str,
                outfile: str,
                verify_keyfile: str | None = None) -> dict:
+    """Sign a delegate certificate using a signature from an external party.
+
+    Args:
+      filename (str): Input certificate file.
+      signature (str): Certificate signature (file or data).
+      cert_type (str): Type of certificate (e.g. gbl, secureboot).
+      outfile (str): The file to write output to.
+      verify_keyfile (str): Public key file to verify the signature.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--signature", signature]
     args += ["--cert-type", cert_type]
@@ -93,6 +188,17 @@ class UtilCommand(BaseCommand):
             map_filename: str | None = None,
             include_sections: list[str] = [],
             exclude_sections: list[str] = []) -> dict:
+    """Show flash and RAM usage of an ELF application.
+
+    Args:
+      filename (str): ELF file to get usage info about.
+      map_filename (str): .map file to get the device memory layout from.
+      include_sections (list[str]): ELF section names to include in usage statistics.
+      exclude_sections (list[str]): ELF section names to exclude from usage statistics.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if map_filename is not None:
       args += ["--map", map_filename]
@@ -103,6 +209,15 @@ class UtilCommand(BaseCommand):
     return self._run("util", "usage", filename, *args).output
 
   def verifysign(self, filename: str, verify_keyfile: str) -> dict:
+    """Verify the signature of a file.
+
+    Args:
+      filename (str): File whose signature is to be verified.
+      verify_keyfile (str): Public key file to verify the signature.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--verify", verify_keyfile]
     return self._run("util", "verifysign", filename, *args).output

@@ -1,6 +1,10 @@
+"""GBL3 commands: create, parse, sign, keygen, keyconvert, aat-usageinfo."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class Gbl3Command(BaseCommand):
+  """Create, parse and other handling for GBL3 files."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -9,6 +13,11 @@ class Gbl3Command(BaseCommand):
     return args
 
   def aat_usageinfo(self) -> dict:
+    """Display flash and RAM usage from AAT data (Zigbee/Thread; RAM for EM3xx only).
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     return self._run("gbl3", "aat-usageinfo", *self._get_general_args()).output
 
   def create(self,
@@ -31,6 +40,32 @@ class Gbl3Command(BaseCommand):
              extsign: bool = False,
              signature: str | None = None,
              verify_keyfile: str | None = None) -> dict:
+    """Create a GBL3 file.
+
+    Args:
+      outfile (str): Output GBL3 file path.
+      app (str): Application image for GBL3.
+      bootloader (str): Bootloader image (with bootloader upgrade support).
+      seupgrade (str): Secure Engine upgrade image.
+      metadata (str): Metadata binary file.
+      compress (str): Compression for app: lz4 or lzma.
+      certificate (str): Certificate to add.
+      include_sections (list[str]): ELF sections to include.
+      exclude_sections (list[str]): ELF sections to exclude.
+      seunencrypted (bool): Place SE upgrade outside encrypted area.
+      dep_app (str): App version dependency (e.g. statement:version).
+      dep_boot (str): Bootloader version dependency (major.minor.patch).
+      dep_se (str): SE upgrade version dependency.
+      delta_app (str): Create delta-upgrade GBL3 from this app (with --app).
+      sign_keyfile (str): ECC-P256 PEM private key to sign.
+      encrypt_keyfile (str): AES key file to encrypt (gbl3 keygen --type aes-ccm).
+      extsign (bool): Output .extsign for external signature (then gbl3 sign).
+      signature (str): DER ECDSA signature file.
+      verify_keyfile (str): ECC-P256 PEM public key to verify.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if app is not None:
       args += ["--app", app]
@@ -74,6 +109,16 @@ class Gbl3Command(BaseCommand):
                  infile: str,
                  type: str | None = None,
                  outfile: str | None = None) -> dict:
+    """Convert PEM public key to token file. Deprecated: use util keytotoken.
+
+    Args:
+      infile (str): Input PEM public key file.
+      type (str): Algorithm: aes-ccm or ecc-p256.
+      outfile (str): Output file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if type is not None:
       args += ["--type", type]
@@ -84,6 +129,15 @@ class Gbl3Command(BaseCommand):
   def keygen(self,
              type: str,
              outfile: str | None = None) -> dict:
+    """Generate key for encrypt/sign. Deprecated: use util genkey.
+
+    Args:
+      type (str): Algorithm: aes-ccm or ecc-p256.
+      outfile (str): Output file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = ["--type", type] + self._get_general_args()
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -97,6 +151,20 @@ class Gbl3Command(BaseCommand):
             metadata: str | None = None,
             verify_keyfile: str | None = None,
             decrypt_keyfile: str | None = None) -> dict:
+    """Parse a GBL3 file.
+
+    Args:
+      infile (str): Input GBL3 file.
+      app (str): File to write application image to.
+      bootloader (str): File to write bootloader image to.
+      seupgrade (str): File to write SE upgrade image to.
+      metadata (str): File to write metadata binary to.
+      verify_keyfile (str): ECC-P256 PEM public key to verify signature.
+      decrypt_keyfile (str): AES key file to decrypt.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if app is not None:
       args += ["--app", app]
@@ -117,6 +185,17 @@ class Gbl3Command(BaseCommand):
            outfile: str,
            signature: str,
            verify_keyfile: str | None = None) -> dict:
+    """Sign a GBL3 file using a signature from an external party.
+
+    Args:
+      infile (str): Input GBL3 file (e.g. .extsign from create --extsign).
+      outfile (str): Output signed file path.
+      signature (str): DER ECDSA signature file.
+      verify_keyfile (str): ECC-P256 PEM public key to verify.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--outfile", outfile]
     args += ["--signature", signature]

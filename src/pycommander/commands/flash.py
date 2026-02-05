@@ -1,6 +1,10 @@
+"""Flash command: write files to target flash."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class FlashCommand(BaseCommand):
+  """Write one or more files to the target flash."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -27,6 +31,29 @@ class FlashCommand(BaseCommand):
             include_sections: list[str] = [],
             exclude_sections: list[str] = [],
             vtor: int | None = None) -> dict:
+    """Write one or more files to the target flash.
+
+    Args:
+      filenames (list[str]): File(s) to flash.
+      address (int): Address to flash to; not applicable for hex/s37.
+      halt (bool): Leave target halted after flashing (PC/SP from vector table).
+      masserase (bool): Mass erase entire main flash before flashing.
+      reset (bool): Reset device after flashing (use noreset to skip).
+      close (bool): Close code regions after flashing on applicable devices.
+      verify (bool): Verify contents written to flash.
+      patches (list[str]): Patch memory; each address:data[:length] (up to 8 bytes).
+      tokens (list[str]): Token overrides as TOKEN_NAME:value.
+      tokenfiles (list[str]): Files describing tokens to write.
+      tokengroup (str): Token set: common, zigbee, or znet.
+      tokendefs (str): Path to JSON file defining token set.
+      binary (bool): Treat all files as flat binaries (no GBL/s37/hex parsing).
+      include_sections (list[str]): ELF sections to include.
+      exclude_sections (list[str]): ELF sections to exclude.
+      vtor (int): Vector table address (with --halt or RAM code).
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if address is not None:
       args += ["--address", self._get_address_string(address)]

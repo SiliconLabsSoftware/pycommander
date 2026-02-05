@@ -1,6 +1,10 @@
+"""OTA commands: create, parse, sign, verify."""
+
 from pycommander.commands._base import BaseCommand
 
+
 class OtaCommand(BaseCommand):
+  """OTA commands."""
 
   def _get_general_args(self) -> list[str]:
     args = []
@@ -35,6 +39,39 @@ class OtaCommand(BaseCommand):
              certificate: str | None = None,
              sign: bool = False,
              extsign: bool = False) -> dict:
+    """Create OTA file (Matter or Zigbee).
+
+    Args:
+      outfile (str): Output file path.
+      type (str): matter or zigbee (default zigbee).
+      input_files (list[str]): Matter: upgrade file(s).
+      vendorid (int): Matter vendor ID.
+      productid (int): Matter product ID.
+      swversion (int): Matter software version.
+      swstring (str): Matter human-readable version.
+      min_sw (int): Matter minimum software version.
+      max_sw (int): Matter maximum software version.
+      releasenote (str): Matter release notes URL.
+      digest (str): Matter digest algorithm (sha256, sha384, etc.).
+      upgrade_images (list[str]): Zigbee: GBL file(s).
+      firmware_version (int): Zigbee firmware version.
+      manufacturer_id (int): Zigbee manufacturer ID.
+      image_type (int): Zigbee image type ID.
+      string (str): Zigbee header string.
+      stack_version (int): Zigbee stack version.
+      credentials (int): Zigbee security credentials.
+      destination (str): Zigbee destination.
+      min_hw (int): Zigbee minimum hardware version.
+      max_hw (int): Zigbee maximum hardware version.
+      null_tag (str): Zigbee null tag.
+      manufacturer_tags (list[str]): Zigbee manufacturer tag(s).
+      certificate (str): Certificate file.
+      sign (bool): Sign the OTA file.
+      extsign (bool): Output for external signing.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--outfile", outfile]
     if type is not None:
@@ -96,6 +133,16 @@ class OtaCommand(BaseCommand):
             filename: str,
             type: str | None = None,
             outfile: str | None = None) -> dict:
+    """Parse an OTA file.
+
+    Args:
+      filename (str): Input OTA file.
+      type (str): matter or zigbee.
+      outfile (str): Output file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     if type is not None:
       args += ["--type", type]
@@ -108,6 +155,17 @@ class OtaCommand(BaseCommand):
            signature: str,
            outfile: str,
            curve: str) -> dict:
+    """Sign an OTA file.
+
+    Args:
+      filename (str): Input OTA file.
+      signature (str): Signature file.
+      outfile (str): Output signed file path.
+      curve (str): Curve name for signing.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--signature", signature]
     args += ["--outfile", outfile]
@@ -115,6 +173,15 @@ class OtaCommand(BaseCommand):
     return self._run("ota", "sign", filename, *args).output
 
   def verify(self, filename: str, certificate: str) -> dict:
+    """Verify an OTA file with a certificate.
+
+    Args:
+      filename (str): OTA file to verify.
+      certificate (str): Certificate file path.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
     args = self._get_general_args()
     args += ["--certificate", certificate]
     return self._run("ota", "verify", filename, *args).output
