@@ -14,6 +14,7 @@ from .postbuild import PostbuildCommand
 from .readmem   import ReadmemCommand
 from .serial    import SerialCommand
 from .tokens    import TokensCommand
+from .util      import UtilCommand
 from .vcom      import VcomCommand
 from .verify    import VerifyCommand
 
@@ -34,6 +35,7 @@ __all__ = [
   "ReadmemCommand",
   "SerialCommand",
   "TokensCommand",
+  "UtilCommand",
   "VcomCommand",
   "VerifyCommand",
 ]
