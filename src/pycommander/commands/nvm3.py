@@ -1,20 +1,22 @@
 """NVM3 commands: delete, deletedevice, dump, initfile, parse, readdevice, set, writedevice."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class Nvm3Command(BaseCommand):
   """NVM3 commands (Non-Volatile Memory storage)."""
 
-  def _get_on_device_args(self) -> list[str]:
-    args = self._get_offline_args()
+  def _get_on_device_args(self, **kwargs: Any) -> list[str]:
+    args = self._get_offline_args(**kwargs)
     args += self._get_adapter_connection_args()
     args += self._get_debug_args()
     return args
 
-  def _get_offline_args(self) -> list[str]:
+  def _get_offline_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def delete(self,
@@ -23,7 +25,8 @@ class Nvm3Command(BaseCommand):
              object_keys: list[str] | None = None,
              delete_all: bool = False,
              address: int | None = None,
-             range: tuple[int, int] | None = None) -> dict:
+             range: tuple[int, int] | None = None,
+             **kwargs: Any) -> dict:
     """Delete NVM3 objects from file; write result to outfile.
 
     Args:
@@ -37,7 +40,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_offline_args()
+    args = self._get_offline_args(**kwargs)
     if object_keys:
       for k in object_keys:
         args += ["--key", k]
@@ -53,7 +56,8 @@ class Nvm3Command(BaseCommand):
   def deletedevice(self,
                    object_keys: list[str] | None = None,
                    delete_all: bool = False,
-                   range: tuple[int, int] | None = None) -> dict:
+                   range: tuple[int, int] | None = None,
+                   **kwargs: Any) -> dict:
     """Delete NVM3 objects on device.
 
     Args:
@@ -64,7 +68,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_on_device_args()
+    args = self._get_on_device_args(**kwargs)
     if object_keys:
       for k in object_keys:
         args += ["--key", k]
@@ -76,7 +80,8 @@ class Nvm3Command(BaseCommand):
 
   def dump(self,
            outfile: str,
-           range: tuple[int, int] | None = None) -> dict:
+           range: tuple[int, int] | None = None,
+           **kwargs: Any) -> dict:
     """Dump NVM3 contents from device to file.
 
     Args:
@@ -86,7 +91,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_offline_args()
+    args = self._get_offline_args(**kwargs)
     args += ["--outfile", outfile]
     if range is not None:
       args += self._get_ranges([range])
@@ -97,7 +102,8 @@ class Nvm3Command(BaseCommand):
                size_bytes: int,
                device: str,
                address: int | None = None,
-               range: tuple[int, int] | None = None) -> dict:
+               range: tuple[int, int] | None = None,
+               **kwargs: Any) -> dict:
     """Create an initialized NVM3 file.
 
     Args:
@@ -110,7 +116,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_offline_args() 
+    args = self._get_offline_args(**kwargs)
     args += ["--outfile", outfile]
     args += ["--size", str(size_bytes)]
     args += ["--device", device]
@@ -125,7 +131,8 @@ class Nvm3Command(BaseCommand):
             object_keys: list[str] | None = None,
             nvm3file: str | None = None,
             address: int | None = None,
-            range: tuple[int, int] | None = None) -> dict:
+            range: tuple[int, int] | None = None,
+            **kwargs: Any) -> dict:
     """Parse NVM3 file and optionally export objects.
 
     Args:
@@ -138,7 +145,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_offline_args()
+    args = self._get_offline_args(**kwargs)
     if object_keys:
       for k in object_keys:
         args += ["--key", k]
@@ -153,7 +160,8 @@ class Nvm3Command(BaseCommand):
   def readdevice(self,
                  object_keys: list[str] | None = None,
                  nvm3file: str | None = None,
-                 range: tuple[int, int] | None = None) -> dict:
+                 range: tuple[int, int] | None = None,
+                 **kwargs: Any) -> dict:
     """Read NVM3 objects from device.
 
     Args:
@@ -164,7 +172,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_on_device_args()
+    args = self._get_on_device_args(**kwargs)
     if object_keys:
       for k in object_keys:
         args += ["--key", k]
@@ -181,7 +189,8 @@ class Nvm3Command(BaseCommand):
           range: tuple[int, int] | None = None,
           objects: list[str] | None = None,
           counters: list[str] | None = None,
-          nvm3file: str | None = None) -> dict:
+          nvm3file: str | None = None,
+          **kwargs: Any) -> dict:
     """Set NVM3 objects/counters in file; write to outfile.
 
     Args:
@@ -196,7 +205,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_offline_args()
+    args = self._get_offline_args(**kwargs)
     args += ["--outfile", outfile]
     if address is not None:
       args += ["--address", self._get_address_string(address)]
@@ -216,7 +225,8 @@ class Nvm3Command(BaseCommand):
                   range: tuple[int, int] | None = None,
                   objects: list[str] | None = None,
                   counters: list[str] | None = None,
-                  nvm3file: str | None = None) -> dict:
+                  nvm3file: str | None = None,
+                  **kwargs: Any) -> dict:
     """Write NVM3 objects/counters to device.
 
     Args:
@@ -228,7 +238,7 @@ class Nvm3Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_on_device_args()
+    args = self._get_on_device_args(**kwargs)
     if range is not None:
       args += self._get_ranges([range])
     if objects:

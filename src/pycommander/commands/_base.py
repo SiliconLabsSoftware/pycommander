@@ -2,6 +2,7 @@ import json
 
 from abc import ABC
 from collections import namedtuple
+from typing import Any
 
 from pycommander.commander import Commander
 from pycommander.runner import Runner, RunnerResult
@@ -49,15 +50,6 @@ class BaseCommand(ABC):
       return ["--identifybyserialport", self._commander._serial_port]
     return []
 
-
-  # Device arguments
-  def _get_device_args(self) -> list[str]:
-    args = []
-    if self._commander._target_device:
-      args += ["--device", self._commander._target_device]
-    return args
-
-
   # Debug arguments
   def _get_debug_args(self) -> list[str]:
     args = []
@@ -88,23 +80,14 @@ class BaseCommand(ABC):
     return []
 
 
-  # Flag arguments
-  def _get_flags(self) -> list[str]:
+  # Keyword arguments
+  def _get_kwargs(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self.__get_force_option()
-    args += self.__get_show_timestamps_option()
+    if kwargs.get("device", None) is not None:
+      args += ["--device", kwargs["device"]]
+    if kwargs.get("force", False):
+      args += ["--force"]
     return args
-
-  def __get_force_option(self) -> list[str]:
-    if self._commander._force:
-      return ["--force"]
-    return []
-
-  def __get_show_timestamps_option(self) -> list[str]:
-    if self._commander._show_timestamps:
-      return ["--timestamp"]
-    return []
-
 
   # Helper methods for common arguments
   def _get_address_string(self, address: int) -> str:

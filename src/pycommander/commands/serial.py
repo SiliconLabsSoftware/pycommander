@@ -1,19 +1,20 @@
 """Serial commands: getopn, load, lock, unlock."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class SerialCommand(BaseCommand):
   """Serial commands."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
-  def getopn(self, serialport: str = "") -> dict:
+  def getopn(self, serialport: str = "", **kwargs: Any) -> dict:
     """Get OPN (Ordering Part Number) via serial.
 
     Args:
@@ -22,12 +23,12 @@ class SerialCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if serialport:
       args += ["--serialport", serialport]
     return self._run("serial", "getopn", *args).output
 
-  def load(self, filename: str, fixedspeed: bool = False, serialport: str = "") -> dict:
+  def load(self, filename: str, fixedspeed: bool = False, serialport: str = "", **kwargs: Any) -> dict:
     """Load image via serial.
 
     Args:
@@ -38,7 +39,7 @@ class SerialCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if fixedspeed:
       args += ["--fixedspeed"]
     if serialport:
@@ -49,7 +50,8 @@ class SerialCommand(BaseCommand):
            token_file: str = "",
            key_file: str = "",
            userdata: str = "",
-           serialport: str = "") -> dict:
+           serialport: str = "",
+           **kwargs: Any) -> dict:
     """Lock device via serial.
 
     Args:
@@ -61,7 +63,7 @@ class SerialCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if token_file:
       args += ["--token", token_file]
     if key_file:
@@ -76,7 +78,8 @@ class SerialCommand(BaseCommand):
              token_file: str = "",
              key_file: str = "",
              userdata: str = "",
-             serialport: str = "") -> dict:
+             serialport: str = "",
+             **kwargs: Any) -> dict:
     """Unlock device via serial.
 
     Args:
@@ -88,7 +91,7 @@ class SerialCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if token_file:
       args += ["--token", token_file]
     if key_file:

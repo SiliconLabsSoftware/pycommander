@@ -46,12 +46,10 @@ class Commander:
               serial_number:    str  | None = None,
               ip_address:       str  | None = None,
               serial_port:      str  | None = None,
-              target_device:    str  | None = None,
               debug_speed:      int  | None = None,
               debug_tif:        str  | None = None,
               debug_irpre:      int  | None = None,
               debug_drpre:      int  | None = None,
-              show_timestamps:  bool        = False,
               log_file_path:    Path | None = None,
               executable_path:  Path        = EXECUTABLE_PATH):
 
@@ -65,9 +63,6 @@ class Commander:
     self._serial_number : str | None = serial_number
     self._ip_address    : str | None = ip_address
     self._serial_port   : str | None = serial_port
-
-    # Device-specific parameters
-    self._target_device : str | None = target_device
 
     # Debug parameters
     self._debug_speed : int | None = debug_speed

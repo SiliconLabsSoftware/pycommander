@@ -1,15 +1,16 @@
 """RPS commands: create, convert, load, sign."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class RpsCommand(BaseCommand):
   """Generate RPS files."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def create(self,
@@ -30,7 +31,8 @@ class RpsCommand(BaseCommand):
              combinedimage: bool = False,
              key_type: str | None = None,
              new_key: str | None = None,
-             prev_key: str | None = None) -> dict:
+             prev_key: str | None = None,
+             **kwargs: Any) -> dict:
     """Create RPS file.
 
     Args:
@@ -56,7 +58,7 @@ class RpsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if encrypt_key is not None:
       args += ["--encrypt", encrypt_key]
     if mic_key is not None:
@@ -105,7 +107,8 @@ class RpsCommand(BaseCommand):
               nwpapp: str | None = None,
               app_version: int | None = None,
               fw_info: int | None = None,
-              combinedimage: bool = False) -> dict:
+              combinedimage: bool = False,
+              **kwargs: Any) -> dict:
     """Convert to RPS file.
 
     Args:
@@ -125,7 +128,7 @@ class RpsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if encrypt_key is not None:
       args += ["--encrypt", encrypt_key]
     if mic_key is not None:
@@ -150,7 +153,7 @@ class RpsCommand(BaseCommand):
       args += ["--combinedimage"]
     return self._run("rps", "convert", outfile, *args).output
 
-  def load(self, filename: str, eraseapp: bool = False) -> dict:
+  def load(self, filename: str, eraseapp: bool = False, **kwargs: Any) -> dict:
     """Load RPS file to device.
 
     Args:
@@ -160,7 +163,7 @@ class RpsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args() + self._get_adapter_connection_args()
+    args = self._get_general_args(**kwargs) + self._get_adapter_connection_args()
     if eraseapp:
       args += ["--eraseapp"]
     return self._run("rps", "load", filename, *args).output
@@ -168,7 +171,8 @@ class RpsCommand(BaseCommand):
   def sign(self,
            filename: str,
            signature: str,
-           outfile: str | None = None) -> dict:
+           outfile: str | None = None,
+           **kwargs: Any) -> dict:
     """Sign RPS file with external signature.
 
     Args:
@@ -179,7 +183,7 @@ class RpsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = [filename, "--signature", signature] + self._get_general_args()
+    args = [filename, "--signature", signature] + self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     return self._run("rps", "sign", *args).output

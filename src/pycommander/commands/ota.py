@@ -1,15 +1,16 @@
 """OTA commands: create, parse, sign, verify."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class OtaCommand(BaseCommand):
   """OTA commands."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def create(self,
@@ -38,7 +39,8 @@ class OtaCommand(BaseCommand):
              manufacturer_tags: list[str] = [],
              certificate: str | None = None,
              sign: bool = False,
-             extsign: bool = False) -> dict:
+             extsign: bool = False,
+             **kwargs: Any) -> dict:
     """Create OTA file (Matter or Zigbee).
 
     Args:
@@ -72,7 +74,7 @@ class OtaCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--outfile", outfile]
     if type is not None:
       args += ["--type", type]
@@ -132,7 +134,8 @@ class OtaCommand(BaseCommand):
   def parse(self,
             filename: str,
             type: str | None = None,
-            outfile: str | None = None) -> dict:
+            outfile: str | None = None,
+            **kwargs: Any) -> dict:
     """Parse an OTA file.
 
     Args:
@@ -143,7 +146,7 @@ class OtaCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if type is not None:
       args += ["--type", type]
     if outfile is not None:
@@ -154,7 +157,8 @@ class OtaCommand(BaseCommand):
            filename: str,
            signature: str,
            outfile: str,
-           curve: str) -> dict:
+           curve: str,
+           **kwargs: Any) -> dict:
     """Sign an OTA file.
 
     Args:
@@ -166,13 +170,13 @@ class OtaCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--signature", signature]
     args += ["--outfile", outfile]
     args += ["--curve", curve]
     return self._run("ota", "sign", filename, *args).output
 
-  def verify(self, filename: str, certificate: str) -> dict:
+  def verify(self, filename: str, certificate: str, **kwargs: Any) -> dict:
     """Verify an OTA file with a certificate.
 
     Args:
@@ -182,6 +186,6 @@ class OtaCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--certificate", certificate]
     return self._run("ota", "verify", filename, *args).output

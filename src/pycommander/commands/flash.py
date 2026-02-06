@@ -1,17 +1,18 @@
 """Flash command: write files to target flash."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class FlashCommand(BaseCommand):
   """Write one or more files to the target flash."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def flash(self,
@@ -30,7 +31,8 @@ class FlashCommand(BaseCommand):
             binary: bool = False,
             include_sections: list[str] = [],
             exclude_sections: list[str] = [],
-            vtor: int | None = None) -> dict:
+            vtor: int | None = None,
+            **kwargs: Any) -> dict:
     """Write one or more files to the target flash.
 
     Args:
@@ -54,7 +56,7 @@ class FlashCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if address is not None:
       args += ["--address", self._get_address_string(address)]
     if halt:

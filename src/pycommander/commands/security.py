@@ -1,20 +1,21 @@
 """Secure Engine commands: attestation, closeregion, lock/unlock, gencert, provision, etc."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class SecurityCommand(BaseCommand):
   """Secure Engine commands."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
-  def attestation(self, reset: bool = True) -> dict:
+  def attestation(self, reset: bool = True, **kwargs: Any) -> dict:
     """Run Secure Engine attestation.
 
     Args:
@@ -23,7 +24,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     return self._run("security", "attestation", *args).output
@@ -31,7 +32,8 @@ class SecurityCommand(BaseCommand):
   def closeregion(self,
                   index: int,
                   reset: bool = True,
-                  codeversion: int | None = None) -> dict:
+                  codeversion: int | None = None,
+                  **kwargs: Any) -> dict:
     """Close a Secure Engine region by index.
 
     Args:
@@ -42,14 +44,14 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if codeversion is not None:
       args += ["--codeversion", str(codeversion)]
     return self._run("security", "closeregion", str(index), *args).output
 
-  def disabledeviceerase(self, reset: bool = True, dryrun: bool = False, prompt: bool = True) -> dict:
+  def disabledeviceerase(self, reset: bool = True, dryrun: bool = False, prompt: bool = True, **kwargs: Any) -> dict:
     """Disable device erase capability.
 
     Args:
@@ -60,7 +62,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if dryrun:
@@ -79,7 +81,8 @@ class SecurityCommand(BaseCommand):
                     command_signature: str | None = None,
                     authorization: str | None = None,
                     cert_pubkey: str | None = None,
-                    disable_param: str | None = None) -> dict:
+                    disable_param: str | None = None,
+                    **kwargs: Any) -> dict:
     """Disable tamper detection (cert/signature/authorization options).
 
     Args:
@@ -97,7 +100,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if not store:
@@ -120,7 +123,7 @@ class SecurityCommand(BaseCommand):
       args += ["--disable-param", disable_param]
     return self._run("security", "disabletamper", *args).output
 
-  def erasedevice(self, reset: bool = True, dryrun: bool = False) -> dict:
+  def erasedevice(self, reset: bool = True, dryrun: bool = False, **kwargs: Any) -> dict:
     """Erase device (Secure Engine).
 
     Args:
@@ -130,7 +133,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if dryrun:
@@ -141,7 +144,8 @@ class SecurityCommand(BaseCommand):
                 filename: str = "",
                 reset: bool = True,
                 address: int | None = None,
-                prompt: bool = True) -> dict:
+                prompt: bool = True,
+                **kwargs: Any) -> dict:
     """Upgrade Secure Engine firmware.
 
     Args:
@@ -153,7 +157,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if address is not None:
@@ -162,7 +166,7 @@ class SecurityCommand(BaseCommand):
       args += ["--noprompt"]
     return self._run("security", "fwupgrade", filename, *args).output
 
-  def fwupgradecheck(self, reset: bool = True) -> dict:
+  def fwupgradecheck(self, reset: bool = True, **kwargs: Any) -> dict:
     """Check if Secure Engine firmware upgrade is available.
 
     Args:
@@ -171,7 +175,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     return self._run("security", "fwupgradecheck", *args).output
@@ -180,7 +184,8 @@ class SecurityCommand(BaseCommand):
               outfile: str | None = None,
               store: bool = True,
               deviceserialno: str | None = None,
-              reset: bool = True) -> dict:
+              reset: bool = True,
+              **kwargs: Any) -> dict:
     """Generate authorization data.
 
     Args:
@@ -192,7 +197,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if not store:
@@ -211,7 +216,8 @@ class SecurityCommand(BaseCommand):
               cert_pubkey: str | None = None,
               authorization: str | None = None,
               command_key: str | None = None,
-              extsign: bool = False) -> dict:
+              extsign: bool = False,
+              **kwargs: Any) -> dict:
     """Generate Secure Engine certificate.
 
     Args:
@@ -227,7 +233,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if not store:
@@ -252,7 +258,8 @@ class SecurityCommand(BaseCommand):
                  reset: bool = True,
                  action: str | None = None,
                  disable_param: int | None = None,
-                 unlock_param: str | None = None) -> dict:
+                 unlock_param: str | None = None,
+                 **kwargs: Any) -> dict:
     """Generate Secure Engine command (disable/unlock etc.).
 
     Args:
@@ -266,7 +273,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if not store:
@@ -284,8 +291,9 @@ class SecurityCommand(BaseCommand):
   def genconfig(self,
                 outfile: str | None = None,
                 store: bool = True,
-                deviceserialno: str | None = None,
-                reset: bool = True) -> dict:
+              deviceserialno: str | None = None,
+              reset: bool = True,
+              **kwargs: Any) -> dict:
     """Generate Secure Engine config.
 
     Args:
@@ -297,7 +305,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if not store:
@@ -312,7 +320,8 @@ class SecurityCommand(BaseCommand):
              type: str,
              outfile: str | None = None,
              privkey: str | None = None,
-             pubkey: str | None = None) -> dict:
+             pubkey: str | None = None,
+             **kwargs: Any) -> dict:
     """Generate Secure Engine key.
 
     Args:
@@ -324,7 +333,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--type", type]
     if outfile is not None:
       args += ["--outfile", outfile]
@@ -336,7 +345,8 @@ class SecurityCommand(BaseCommand):
 
   def getpath(self,
               reset: bool = True,
-              deviceserialno: str | None = None) -> dict:
+              deviceserialno: str | None = None,
+              **kwargs: Any) -> dict:
     """Get Secure Engine path/certificate path.
 
     Args:
@@ -346,7 +356,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if deviceserialno is not None:
@@ -356,7 +366,8 @@ class SecurityCommand(BaseCommand):
   def lock(self,
            reset: bool = True,
            dryrun: bool = False,
-           trustzone: str | None = None) -> dict:
+           trustzone: str | None = None,
+           **kwargs: Any) -> dict:
     """Lock Secure Engine / device.
 
     Args:
@@ -367,7 +378,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if dryrun:
@@ -380,7 +391,8 @@ class SecurityCommand(BaseCommand):
                  reset: bool = True,
                  secure_debug_unlock: str | None = None,
                  dryrun: bool = False,
-                 prompt: bool = True) -> dict:
+                 prompt: bool = True,
+                 **kwargs: Any) -> dict:
     """Lock Secure Engine config.
 
     Args:
@@ -392,7 +404,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if secure_debug_unlock is not None:
@@ -403,7 +415,7 @@ class SecurityCommand(BaseCommand):
       args += ["--noprompt"]
     return self._run("security", "lockconfig", *args).output
 
-  def otprollbackcount(self, reset: bool = True) -> dict:
+  def otprollbackcount(self, reset: bool = True, **kwargs: Any) -> dict:
     """Read OTP rollback count.
 
     Args:
@@ -412,12 +424,12 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     return self._run("security", "otprollbackcount", *args).output
 
-  def provision(self, reset: bool = True, sefw: str | None = None) -> dict:
+  def provision(self, reset: bool = True, sefw: str | None = None, **kwargs: Any) -> dict:
     """Provision Secure Engine.
 
     Args:
@@ -427,7 +439,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if sefw is not None:
@@ -437,7 +449,8 @@ class SecurityCommand(BaseCommand):
   def readcert(self,
                cert_type: str,
                outfile: str | None = None,
-               reset: bool = True) -> dict:
+               reset: bool = True,
+               **kwargs: Any) -> dict:
     """Read Secure Engine certificate.
 
     Args:
@@ -448,14 +461,14 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if not reset:
       args += ["--noreset"]
     return self._run("security", "readcert", cert_type, *args).output
 
-  def readconfig(self, reset: bool = True) -> dict:
+  def readconfig(self, reset: bool = True, **kwargs: Any) -> dict:
     """Read Secure Engine config.
 
     Args:
@@ -464,7 +477,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     return self._run("security", "readconfig", *args).output
@@ -474,7 +487,8 @@ class SecurityCommand(BaseCommand):
               command: bool = False,
               outfile: str | None = None,
               reset: bool = True,
-              store: bool = True) -> dict:
+              store: bool = True,
+              **kwargs: Any) -> dict:
     """Read Secure Engine key (sign/command key).
 
     Args:
@@ -487,7 +501,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if sign:
       args += ["--sign"]
     if command:
@@ -502,7 +516,8 @@ class SecurityCommand(BaseCommand):
 
   def readregionconfig(self,
                        outfile: str | None = None,
-                       reset: bool = True) -> dict:
+                       reset: bool = True,
+                       **kwargs: Any) -> dict:
     """Read Secure Engine region config.
 
     Args:
@@ -512,15 +527,15 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if not reset:
       args += ["--noreset"]
     return self._run("security", "readregionconfig", *args).output
 
-  def rollchallenge(self, reset: bool = True, store: bool = True) -> dict:
-    args = self._get_general_args()
+  def rollchallenge(self, reset: bool = True, store: bool = True, **kwargs: Any) -> dict:
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if not store:
@@ -530,7 +545,8 @@ class SecurityCommand(BaseCommand):
   def status(self,
              reset: bool = True,
              trustzone: bool = False,
-             verbose: bool = False) -> dict:
+             verbose: bool = False,
+             **kwargs: Any) -> dict:
     """Read Secure Engine status.
 
     Args:
@@ -541,7 +557,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if trustzone:
@@ -553,7 +569,8 @@ class SecurityCommand(BaseCommand):
   def transitiontodevelopment(self,
                               reset: bool = True,
                               dryrun: bool = False,
-                              prompt: bool = True) -> dict:
+                              prompt: bool = True,
+                              **kwargs: Any) -> dict:
     """Transition device to development (unlock for debug).
 
     Args:
@@ -564,7 +581,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if dryrun:
@@ -583,7 +600,8 @@ class SecurityCommand(BaseCommand):
              command_signature: str | None = None,
              authorization: str | None = None,
              cert_pubkey: str | None = None,
-             unlock_param: str | None = None) -> dict:
+             unlock_param: str | None = None,
+             **kwargs: Any) -> dict:
     """Unlock Secure Engine (cert/signature/authorization options).
 
     Args:
@@ -601,7 +619,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     if not store:
@@ -629,7 +647,8 @@ class SecurityCommand(BaseCommand):
                   reset: bool = True,
                   dryrun: bool = False,
                   prompt: bool = True,
-                  configfile: str | None = None) -> dict:
+                  configfile: str | None = None,
+                  **kwargs: Any) -> dict:
     """Write Secure Engine config to device.
 
     Args:
@@ -642,7 +661,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not store:
       args += ["--nostore"]
     if not reset:
@@ -662,7 +681,8 @@ class SecurityCommand(BaseCommand):
                reset: bool = True,
                store: bool = True,
                prompt: bool = True,
-               dryrun: bool = False) -> dict:
+               dryrun: bool = False,
+               **kwargs: Any) -> dict:
     """Write Secure Engine key(s) to device.
 
     Args:
@@ -677,7 +697,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if sign_keyfile is not None:
       args += ["--sign", sign_keyfile]
     if command_keyfile is not None:
@@ -694,7 +714,7 @@ class SecurityCommand(BaseCommand):
       args += ["--dryrun"]
     return self._run("security", "writekey", *args).output
 
-  def writeregionconfig(self, file: str, reset: bool = True) -> dict:
+  def writeregionconfig(self, file: str, reset: bool = True, **kwargs: Any) -> dict:
     """Write Secure Engine region config from file.
 
     Args:
@@ -704,7 +724,7 @@ class SecurityCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
     return self._run("security", "writeregionconfig", file, *args).output

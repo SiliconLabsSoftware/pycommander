@@ -1,18 +1,19 @@
 """Util commands: app info, ELF info, key/cert utilities, RPS info, usage, verify."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class UtilCommand(BaseCommand):
   """Utility commands (appinfo, elfinfo, extractkeys, gencert, genkey, etc.)."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
-  def appinfo(self, filename: str) -> dict:
+  def appinfo(self, filename: str, **kwargs: Any) -> dict:
     """Show all available info about an application.
 
     Args:
@@ -21,9 +22,9 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("util", "appinfo", filename, *self._get_general_args()).output
+    return self._run("util", "appinfo", filename, *self._get_general_args(**kwargs)).output
 
-  def elfinfo(self, filename: str) -> dict:
+  def elfinfo(self, filename: str, **kwargs: Any) -> dict:
     """Show information about the file's ELF sections.
 
     Args:
@@ -32,9 +33,9 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("util", "elfinfo", filename, *self._get_general_args()).output
+    return self._run("util", "elfinfo", filename, *self._get_general_args(**kwargs)).output
 
-  def extractkeys(self, filename: str, dir: str) -> dict:
+  def extractkeys(self, filename: str, dir: str, **kwargs: Any) -> dict:
     """Extract cryptographic keys from a JSON config file into a directory.
 
     Args:
@@ -44,7 +45,7 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--dir", dir]
     return self._run("util", "extractkeys", filename, *args).output
 
@@ -54,7 +55,8 @@ class UtilCommand(BaseCommand):
               cert_type: str,
               cert_pubkey: str,
               sign_keyfile: str | None = None,
-              extsign: bool = False) -> dict:
+              extsign: bool = False,
+              **kwargs: Any) -> dict:
     """Create a delegate certificate.
 
     Args:
@@ -70,7 +72,7 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--outfile", outfile]
     args += ["--cert-version", str(cert_version)]
     args += ["--cert-type", cert_type]
@@ -86,7 +88,8 @@ class UtilCommand(BaseCommand):
              pubkey: str | None = None,
              privkey: str | None = None,
              outfile: str | None = None,
-             tokenfile: str | None = None) -> dict:
+             tokenfile: str | None = None,
+             **kwargs: Any) -> dict:
     """Generate a key for encrypt/decrypt or a key pair for signing.
 
     Args:
@@ -100,7 +103,7 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--type", type]
     if pubkey is not None:
       args += ["--pubkey", pubkey]
@@ -112,7 +115,7 @@ class UtilCommand(BaseCommand):
       args += self._get_tokenfiles([tokenfile])
     return self._run("util", "genkey", *args).output
 
-  def genkeyconfig(self, outfile: str) -> dict:
+  def genkeyconfig(self, outfile: str, **kwargs: Any) -> dict:
     """Generate key configuration for SiWx91x devices.
 
     Args:
@@ -121,14 +124,15 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--outfile", outfile]
     return self._run("util", "genkeyconfig", *args).output
 
   def keytotoken(self,
                  keyfile: str,
                  outfile: str | None = None,
-                 key_type: str | None = None) -> dict:
+                 key_type: str | None = None,
+                 **kwargs: Any) -> dict:
     """Convert a public key in PEM format to a token file for flashing.
 
     Args:
@@ -139,14 +143,14 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = [keyfile] + self._get_general_args()
+    args = [keyfile] + self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if key_type is not None:
       args += ["--type", key_type]
     return self._run("util", "keytotoken", *args).output
 
-  def rpsinfo(self, filename: str) -> dict:
+  def rpsinfo(self, filename: str, **kwargs: Any) -> dict:
     """Show information about an RPS application/key file.
 
     Args:
@@ -155,14 +159,15 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("util", "rpsinfo", filename, *self._get_general_args()).output
+    return self._run("util", "rpsinfo", filename, *self._get_general_args(**kwargs)).output
 
   def signcert(self,
                filename: str,
                signature: str,
                cert_type: str,
                outfile: str,
-               verify_keyfile: str | None = None) -> dict:
+               verify_keyfile: str | None = None,
+               **kwargs: Any) -> dict:
     """Sign a delegate certificate using a signature from an external party.
 
     Args:
@@ -175,7 +180,7 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--signature", signature]
     args += ["--cert-type", cert_type]
     args += ["--outfile", outfile]
@@ -187,7 +192,8 @@ class UtilCommand(BaseCommand):
             filename: str,
             map_filename: str | None = None,
             include_sections: list[str] = [],
-            exclude_sections: list[str] = []) -> dict:
+            exclude_sections: list[str] = [],
+            **kwargs: Any) -> dict:
     """Show flash and RAM usage of an ELF application.
 
     Args:
@@ -199,7 +205,7 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if map_filename is not None:
       args += ["--map", map_filename]
     if include_sections:
@@ -208,7 +214,7 @@ class UtilCommand(BaseCommand):
       args += self._get_exclude_sections(exclude_sections)
     return self._run("util", "usage", filename, *args).output
 
-  def verifysign(self, filename: str, verify_keyfile: str) -> dict:
+  def verifysign(self, filename: str, verify_keyfile: str, **kwargs: Any) -> dict:
     """Verify the signature of a file.
 
     Args:
@@ -218,6 +224,6 @@ class UtilCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--verify", verify_keyfile]
     return self._run("util", "verifysign", filename, *args).output
