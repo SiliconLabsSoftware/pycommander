@@ -12,7 +12,6 @@ from .paths import EXECUTABLE_PATH
 from .runner import Runner, RunnerResult
 
 CommanderResult = namedtuple("CommanderResult", ["returncode", "output"])
-LogConfig       = namedtuple("LogConfig", ["file", "kit_name"])
 
 class PyCommander:
   # Command overview. These are for type hinting only.
@@ -41,6 +40,8 @@ class PyCommander:
   vcom      : "VcomCommand"
   verify    : "VerifyCommand"
 
+  default_timeout_s : int = 300
+
   def __init__(self, 
               serial_number: str | None = None,
               ip_address: str | None = None,
@@ -52,10 +53,10 @@ class PyCommander:
               debug_drpre: int | None = None,
               force: bool = False,
               show_timestamps: bool = False,
-              log_config: LogConfig | None = None,
+              log_file_path: Path | None = None,
               executable_path: Path = EXECUTABLE_PATH):
 
-    self._runner : Runner = Runner(executable_path)
+    self._runner : Runner = Runner(executable_path, log_file_path=log_file_path, timeout_s=PyCommander.default_timeout_s)
     
     # Adapter-specific parameters
     self._serial_number : str | None = serial_number
@@ -75,9 +76,6 @@ class PyCommander:
     self._force           : bool = force
     self._show_timestamps : bool = show_timestamps
 
-    # Logging
-    self._log_config  : LogConfig | None = log_config # TODO: To do
-
     # Initialize available commands
     from . import commands
     for name in commands.__all__:
@@ -94,6 +92,9 @@ class PyCommander:
     return version_string
 
 
-  def runCommand(self, *args : str) -> CommanderResult:
-    result : RunnerResult = self._runner.run(*args)
-    return CommanderResult(result.returncode, result.output)
+  def runCommand(self, *args : str, json_formatted_output: bool = True) -> CommanderResult | dict:
+    result : RunnerResult = self._runner.run(*args, "--json" if json_formatted_output else "")
+    if json_formatted_output:
+      return json.loads(result.output)
+    else:
+      return CommanderResult(result.returncode, result.output)
