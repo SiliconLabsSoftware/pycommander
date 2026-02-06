@@ -3,14 +3,14 @@ import json
 from abc import ABC
 from collections import namedtuple
 
-from pycommander.pycommander import PyCommander
+from pycommander.commander import Commander
 from pycommander.runner import Runner, RunnerResult
 
 CommandResult = namedtuple("CommandResult", ["returncode", "output"])
 
 class BaseCommand(ABC):
-  def __init__(self, commander: PyCommander):
-    self._commander : PyCommander = commander
+  def __init__(self, commander: Commander):
+    self._commander : Commander = commander
     self._runner : Runner = self._commander._runner
 
 
