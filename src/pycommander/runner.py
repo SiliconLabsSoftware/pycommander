@@ -28,8 +28,14 @@ class Runner:
       ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX)
 
   def run(self, *args: str) -> RunnerResult:
+    if not self._executable.exists():
+      raise FileNotFoundError(f"Commander executable not found: {self._executable}")
+
+    if not self._executable.is_file():
+      raise FileNotFoundError(f"Commander executable is not a file: {self._executable}")
+
     json_formatted_output : bool = "--json" in args
-    
+
     try:
       self._write_log_file(f"{self._executable} {' '.join(args)}")
 
