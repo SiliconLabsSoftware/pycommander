@@ -9,12 +9,13 @@ if TYPE_CHECKING:
 
 from .paths import EXECUTABLE_PATH
 from .runner import Runner, RunnerResult
+from ._ensure_commander import ensure_commander
 
 CommanderResult = namedtuple("CommanderResult", ["returncode", "output"])
 
-class PyCommander:
+class Commander:
   # Command overview. These are for type hinting only.
-  # The commands are initialized in the __init__ method.
+  # The real commands are initialized in the __init__ method.
   adapter   : "AdapterCommand"
   aem       : "AemCommand"
   convert   : "ConvertCommand"
@@ -42,20 +43,23 @@ class PyCommander:
   default_timeout_s : int = 300
 
   def __init__(self, 
-              serial_number: str | None = None,
-              ip_address: str | None = None,
-              serial_port: str | None = None,
-              target_device: str | None = None,
-              debug_speed: int | None = None,
-              debug_tif: str | None = None,
-              debug_irpre: int | None = None,
-              debug_drpre: int | None = None,
-              force: bool = False,
-              show_timestamps: bool = False,
-              log_file_path: Path | None = None,
-              executable_path: Path = EXECUTABLE_PATH):
+              serial_number:    str  | None = None,
+              ip_address:       str  | None = None,
+              serial_port:      str  | None = None,
+              target_device:    str  | None = None,
+              debug_speed:      int  | None = None,
+              debug_tif:        str  | None = None,
+              debug_irpre:      int  | None = None,
+              debug_drpre:      int  | None = None,
+              show_timestamps:  bool        = False,
+              log_file_path:    Path | None = None,
+              executable_path:  Path        = EXECUTABLE_PATH):
 
-    self._runner : Runner = Runner(executable_path, log_file_path=log_file_path, timeout_s=PyCommander.default_timeout_s)
+    if executable_path == EXECUTABLE_PATH:
+      # If we're using the default executable, ensure we are unzipped and ready to go.
+      ensure_commander()
+
+    self._runner : Runner = Runner(executable_path, log_file_path=log_file_path, timeout_s=Commander.default_timeout_s)
     
     # Adapter-specific parameters
     self._serial_number : str | None = serial_number
@@ -71,11 +75,7 @@ class PyCommander:
     self._debug_irpre : int | None = debug_irpre
     self._debug_drpre : int | None = debug_drpre
 
-    # Flags
-    self._force           : bool = force
-    self._show_timestamps : bool = show_timestamps
-
-    # Initialize available commands
+    # Initialize all the available commands
     from . import commands
     for name in commands.__all__:
       command_class = getattr(commands, name)
@@ -90,7 +90,6 @@ class PyCommander:
     version_string = json_output["result"]["version"]["simplicity_commander_version"]
 
     return version_string
-
 
   def runCommand(self, *args : str, json_formatted_output: bool = True) -> CommanderResult | dict:
     result : RunnerResult = self._runner.run(*args, "--json" if json_formatted_output else "")
