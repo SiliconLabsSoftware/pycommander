@@ -1,5 +1,4 @@
 import json
-import importlib
 
 from pathlib import Path
 from collections import namedtuple
@@ -82,6 +81,7 @@ class PyCommander:
       command_class = getattr(commands, name)
       attribute_name = name.removesuffix("Command").lower() # e.g. "AdapterCommand" -> "adapter"
       setattr(self, attribute_name, command_class(self))
+
 
   def getVersionString(self) -> str:
     result : RunnerResult = self._runner.run("--version", "--json")
