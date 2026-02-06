@@ -18,7 +18,7 @@ def main(args: list[str] | None = None) -> int:
     result = subprocess.run([EXECUTABLE_PATH, *args])
     return result.returncode
   except KeyboardInterrupt:
-    return 0
+    return 128 + 2 # 128 + SIGINT
 
 
 if __name__ == "__main__":
