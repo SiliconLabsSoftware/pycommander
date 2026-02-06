@@ -56,6 +56,9 @@ def _extract_commander() -> None:
     _write_hash_to_file(STAMP_FILE_PATH, _compute_hash_of_resource("pycommander._archive", resource))
 
 def _extract_commander_macos(zip_file: Path, destination: Path) -> None:
+  if not zip_file.exists():
+    raise FileNotFoundError(f"Executable archive not found: {zip_file}")
+
   destination.mkdir(parents=True, exist_ok=True)
   subprocess.run(
     ["ditto", "-xk", str(zip_file), str(destination)],
@@ -63,6 +66,9 @@ def _extract_commander_macos(zip_file: Path, destination: Path) -> None:
   )
 
 def _extract_commander_linux(zip_file: Path, destination: Path) -> None:
+  if not zip_file.exists():
+    raise FileNotFoundError(f"Executable archive not found: {zip_file}")
+
   destination.mkdir(parents=True, exist_ok=True)
   subprocess.run(
     ["tar", "-xjf", str(zip_file), "-C", str(destination)],
@@ -70,6 +76,9 @@ def _extract_commander_linux(zip_file: Path, destination: Path) -> None:
   )
 
 def _extract_commander_windows(zip_file: Path, destination: Path) -> None:
+  if not zip_file.exists():
+    raise FileNotFoundError(f"Executable archive not found: {zip_file}")
+
   destination.mkdir(parents=True, exist_ok=True)
   subprocess.run(
     ["powershell", "-Command", "Expand-Archive", f"-Path {str(zip_file)}", f"-DestinationPath {str(destination)}"],
