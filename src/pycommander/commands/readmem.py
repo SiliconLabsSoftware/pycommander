@@ -1,23 +1,25 @@
 """Readmem command: read from target memory."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class ReadmemCommand(BaseCommand):
   """Read from target memory."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def readmem(self,
               outfile: str | None = None,
               ranges: list[tuple[int, int]] = [],
-              regions: list[str] = []) -> dict:
+              regions: list[str] = [],
+              **kwargs: Any) -> dict:
     """Read from target memory.
 
     Args:
@@ -28,7 +30,7 @@ class ReadmemCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if ranges:

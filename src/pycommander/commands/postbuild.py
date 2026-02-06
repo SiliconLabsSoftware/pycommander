@@ -1,21 +1,23 @@
 """Postbuild command: run post-build tasks from YAML."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class PostbuildCommand(BaseCommand):
   """Perform post-build tasks as defined in a post-build YAML (.slpb) file."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def postbuild(self,
                 filename: str,
                 parameters: list[tuple[str, str]] = [],
-                dryrun: bool = False) -> dict:
+                dryrun: bool = False,
+                **kwargs: Any) -> dict:
     """Run post-build tasks from a .slpb file.
 
     Args:
@@ -26,7 +28,7 @@ class PostbuildCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if parameters:
       for name, value in parameters:
         args += ["--parameter", f"{name}:{value}"]

@@ -1,25 +1,26 @@
 """AEM (Advanced Energy Monitor) commands: calibrate, dump, measure."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class AemCommand(BaseCommand):
   """Advanced Energy Monitor (AEM) commands."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
-  def calibrate(self) -> dict:
+  def calibrate(self, **kwargs: Any) -> dict:
     """Calibrate AEM.
 
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("aem", "calibrate", *self._get_general_args()).output
+    return self._run("aem", "calibrate", *self._get_general_args(**kwargs)).output
 
   def dump(self,
            outfile: str,
@@ -30,7 +31,8 @@ class AemCommand(BaseCommand):
            triggertimeout_s: float | None = None,
            pretrigger_ms: int | None = None,
            header: bool = True,
-           calibrate: bool = False) -> dict:
+           calibrate: bool = False,
+           **kwargs: Any) -> dict:
     """Log AEM measurements as time series data to a file.
 
     Args:
@@ -47,7 +49,7 @@ class AemCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
 
     # Require outfile and duration, since we are not in interactive CLI mode here
     args += ["--outfile", outfile]
@@ -71,7 +73,8 @@ class AemCommand(BaseCommand):
 
   def measure(self,
               windowlength_ms: int | None = None,
-              calibrate: bool = False) -> dict:
+              calibrate: bool = False,
+              **kwargs: Any) -> dict:
     """Measure the average current in a time window.
 
     Args:
@@ -81,7 +84,7 @@ class AemCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if windowlength_ms is not None:
       args += ["--windowlength", str(windowlength_ms)]
     if calibrate:

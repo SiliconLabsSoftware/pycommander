@@ -1,17 +1,18 @@
 """Verify command: compare device flash with input files."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class VerifyCommand(BaseCommand):
   """Compare the contents in the device flash with the given input files and options."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def verify(self,
@@ -25,7 +26,8 @@ class VerifyCommand(BaseCommand):
              blank: bool = False,
              reset: bool = True,
              regions: list[str] = [],
-             binary: bool = False) -> dict:
+             binary: bool = False,
+             **kwargs: Any) -> dict:
     """Compare device flash with given files and options.
 
     Args:
@@ -44,7 +46,7 @@ class VerifyCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if filenames:
       args = list(filenames) + args
     if address is not None:

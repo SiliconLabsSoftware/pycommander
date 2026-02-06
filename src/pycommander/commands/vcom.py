@@ -1,22 +1,24 @@
 """VCOM commands: configure adapter VCOM settings."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class VcomCommand(BaseCommand):
   """VCOM commands."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def config(self,
              baudrate: int | None = None,
              handshake: str | None = None,
-             store: bool = False) -> dict:
+             store: bool = False,
+             **kwargs: Any) -> dict:
     """Configure adapter board VCOM settings.
 
     Args:
@@ -27,7 +29,7 @@ class VcomCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if baudrate is not None:
       args += ["--baudrate", str(baudrate)]
     if handshake is not None:

@@ -1,15 +1,16 @@
 """GBLv4 commands: create, createconfig, info, parse, sign."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class Gbl4Command(BaseCommand):
   """GBLv4 commands."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def create(self,
@@ -24,7 +25,8 @@ class Gbl4Command(BaseCommand):
              extsign: bool = False,
              productid: str | None = None,
              bundleversion: str | None = None,
-             minversion: str | None = None) -> dict:
+             minversion: str | None = None,
+             **kwargs: Any) -> dict:
     """Create a GBLv4 file.
 
     Args:
@@ -44,7 +46,7 @@ class Gbl4Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if config is not None:
       args += ["--config", config]
     if data:
@@ -70,7 +72,7 @@ class Gbl4Command(BaseCommand):
       args += ["--minversion", minversion]
     return self._run("gbl4", "create", outfile, *args).output
 
-  def createconfig(self, outfile: str) -> dict:
+  def createconfig(self, outfile: str, **kwargs: Any) -> dict:
     """Create template config YAML file for GBLv4 input.
 
     Args:
@@ -79,11 +81,11 @@ class Gbl4Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--outfile", outfile]
     return self._run("gbl4", "createconfig", *args).output
 
-  def info(self, filename: str) -> dict:
+  def info(self, filename: str, **kwargs: Any) -> dict:
     """Parse and show info about a GBLv4 file.
 
     Args:
@@ -92,12 +94,13 @@ class Gbl4Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("gbl4", "info", filename, *self._get_general_args()).output
+    return self._run("gbl4", "info", filename, *self._get_general_args(**kwargs)).output
 
   def parse(self,
             infile: str,
             seupgrade: str | None = None,
-            outfile: str | None = None) -> dict:
+            outfile: str | None = None,
+            **kwargs: Any) -> dict:
     """Parse a GBLv4 file; export updates and/or SE upgrade to files.
 
     Args:
@@ -108,7 +111,7 @@ class Gbl4Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if seupgrade is not None:
       args += ["--seupgrade", seupgrade]
     if outfile is not None:
@@ -119,7 +122,8 @@ class Gbl4Command(BaseCommand):
            infile: str,
            signature: str,
            outfile: str,
-           verify_keyfile: str | None = None) -> dict:
+           verify_keyfile: str | None = None,
+           **kwargs: Any) -> dict:
     """Sign a GBLv4 file using external signature (from create --extsign).
 
     Args:
@@ -131,7 +135,7 @@ class Gbl4Command(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += ["--signature", signature]
     args += ["--outfile", outfile]
     if verify_keyfile is not None:

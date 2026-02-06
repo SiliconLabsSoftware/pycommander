@@ -1,24 +1,25 @@
 """EBL commands: create, parse, print, keygen, keyconvert, aat-usageinfo."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class EblCommand(BaseCommand):
   """Create, parse and other handling for EBL files."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
-  def aat_usageinfo(self) -> dict:
+  def aat_usageinfo(self, **kwargs: Any) -> dict:
     """Display flash and RAM usage from AAT data (Zigbee/Thread; RAM for EM3xx only).
 
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("ebl", "aat-usageinfo", *self._get_general_args()).output
+    return self._run("ebl", "aat-usageinfo", *self._get_general_args(**kwargs)).output
 
   def create(self,
              outfile: str,
@@ -27,7 +28,8 @@ class EblCommand(BaseCommand):
              encrypt_keyfile: str | None = None,
              extsign: bool = False,
              signature: str | None = None,
-             verify_keyfile: str | None = None) -> dict:
+             verify_keyfile: str | None = None,
+             **kwargs: Any) -> dict:
     """Create an EBL file.
 
     Args:
@@ -42,7 +44,7 @@ class EblCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if app is not None:
       args += ["--app", app]
     if sign_keyfile is not None:
@@ -60,7 +62,8 @@ class EblCommand(BaseCommand):
   def keyconvert(self,
                  infile: str,
                  type: str | None = None,
-                 outfile: str | None = None) -> dict:
+                 outfile: str | None = None,
+                 **kwargs: Any) -> dict:
     """Convert PEM public key to token file for flashing. Deprecated: use util keytotoken.
 
     Args:
@@ -71,7 +74,7 @@ class EblCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if type is not None:
       args += ["--type", type]
     if outfile is not None:
@@ -80,7 +83,8 @@ class EblCommand(BaseCommand):
 
   def keygen(self,
              type: str,
-             outfile: str | None = None) -> dict:
+             outfile: str | None = None,
+             **kwargs: Any) -> dict:
     """Generate key for encrypt/decrypt or key pair for signing. Deprecated: use util genkey.
 
     Args:
@@ -90,7 +94,8 @@ class EblCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = ["--type", type] + self._get_general_args()
+    args = self._get_general_args(**kwargs)
+    args += ["--type", type]
     if outfile is not None:
       args += ["--outfile", outfile]
     return self._run("ebl", "keygen", *args).output
@@ -99,7 +104,8 @@ class EblCommand(BaseCommand):
             infile: str,
             app: str | None = None,
             verify_keyfile: str | None = None,
-            decrypt_keyfile: str | None = None) -> dict:
+            decrypt_keyfile: str | None = None,
+            **kwargs: Any) -> dict:
     """Parse an EBL file.
 
     Args:
@@ -111,7 +117,7 @@ class EblCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if app is not None:
       args += ["--app", app]
     if verify_keyfile is not None:
@@ -120,7 +126,7 @@ class EblCommand(BaseCommand):
       args += ["--decrypt", decrypt_keyfile]
     return self._run("ebl", "parse", infile, *args).output
 
-  def print(self, filename: str) -> dict:
+  def print(self, filename: str, **kwargs: Any) -> dict:
     """Print information about an EBL file.
 
     Args:
@@ -129,4 +135,4 @@ class EblCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    return self._run("ebl", "print", filename, *self._get_general_args()).output
+    return self._run("ebl", "print", filename, *self._get_general_args(**kwargs)).output

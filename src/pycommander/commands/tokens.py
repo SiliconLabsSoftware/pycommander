@@ -1,23 +1,25 @@
 """Tokens commands: createheader, erase, read, write."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class TokensCommand(BaseCommand):
   """Commands for handling manufacturing tokens."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def createheader(self,
                    filename: str,
                    tokengroup: str | None = None,
-                   tokendefs: str | None = None) -> dict:
+                   tokendefs: str | None = None,
+                   **kwargs: Any) -> dict:
     """Create token header file.
 
     Args:
@@ -28,7 +30,7 @@ class TokensCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if tokengroup is not None:
       args += ["--tokengroup", tokengroup]
     if tokendefs is not None:
@@ -40,7 +42,8 @@ class TokensCommand(BaseCommand):
             type: str | None = None,
             tokens: list[str] = [],
             tokengroup: str | None = None,
-            tokendefs: str | None = None) -> dict:
+            tokendefs: str | None = None,
+            **kwargs: Any) -> dict:
     """Erase tokens (on device or in secure range).
 
     Args:
@@ -53,7 +56,7 @@ class TokensCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if securerange is not None:
       args += self._get_secureranges([securerange])
     if type is not None:
@@ -77,7 +80,8 @@ class TokensCommand(BaseCommand):
            range: tuple[int, int] | None = None,
            type: str | None = None,
            includeall: bool = False,
-           address: int | None = None) -> dict:
+           address: int | None = None,
+           **kwargs: Any) -> dict:
     """Read tokens from device or from file(s).
 
     Args:
@@ -96,7 +100,7 @@ class TokensCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if filenames:
       args = list(filenames) + args
     if outfile is not None:
@@ -126,7 +130,8 @@ class TokensCommand(BaseCommand):
             tokens: list[str] = [],
             tokengroup: str | None = None,
             tokendefs: str | None = None,
-            securerange: tuple[int, int] | None = None) -> dict:
+            securerange: tuple[int, int] | None = None,
+            **kwargs: Any) -> dict:
     """Write tokens to device.
 
     Args:
@@ -139,7 +144,7 @@ class TokensCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     if tokenfiles:
       args += self._get_tokenfiles(tokenfiles)
     if tokens:

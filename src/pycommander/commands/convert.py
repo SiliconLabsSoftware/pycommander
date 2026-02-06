@@ -1,15 +1,16 @@
 """Convert/combine image files, set tokens, patch binary data."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class ConvertCommand(BaseCommand):
   """Conversion between image file formats; combine inputs, set tokens, patch data."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
-    args += self._get_device_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def convert(self,
@@ -31,7 +32,8 @@ class ConvertCommand(BaseCommand):
               exclude_sections: list[str] = [],
               extsign: bool = False,
               signature: str | None = None,
-              verify_key: str | None = None) -> dict:
+              verify_key: str | None = None,
+              **kwargs: Any) -> dict:
     """Convert or combine input files to one output; set tokens and patch binary data.
 
     Args:
@@ -58,7 +60,7 @@ class ConvertCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = list(infiles) + self._get_general_args()
+    args = list(infiles) + self._get_general_args(**kwargs)
     if outfile is not None:
       args += ["--outfile", outfile]
     if address is not None:

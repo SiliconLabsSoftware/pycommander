@@ -1,17 +1,18 @@
 """LittleFS commands: add, dump, extract, info, init, list, remove."""
 
+from typing import Any
+
 from pycommander.commands._base import BaseCommand
 
 
 class LittlefsCommand(BaseCommand):
   """Commands for interacting with the LittleFS filesystem."""
 
-  def _get_general_args(self) -> list[str]:
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = []
     args += self._get_adapter_connection_args()
-    args += self._get_device_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
     return args
 
   def _add_location_args(self,
@@ -45,7 +46,8 @@ class LittlefsCommand(BaseCommand):
           dir_paths: list[str] = [],
           address: int | None = None,
           range: tuple[int, int] | None = None,
-          infile: str | None = None) -> dict:
+          infile: str | None = None,
+          **kwargs: Any) -> dict:
     """Add file(s) or dir(s) to a LittleFS filesystem.
 
     Args:
@@ -59,7 +61,7 @@ class LittlefsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += self._add_location_args(address, range, infile)
     if file_paths:
       args += self._get_file_paths(file_paths)
@@ -72,7 +74,8 @@ class LittlefsCommand(BaseCommand):
            outfile: str,
            address: int | None = None,
            range: tuple[int, int] | None = None,
-           infile: str | None = None) -> dict:
+           infile: str | None = None,
+           **kwargs: Any) -> dict:
     """Dump LittleFS filesystem to output file.
 
     Args:
@@ -84,7 +87,7 @@ class LittlefsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += self._add_location_args(address, range, infile)
     args += ["--outfile", outfile]
     return self._run("littlefs", "dump", *args).output
@@ -96,7 +99,8 @@ class LittlefsCommand(BaseCommand):
               dir_paths: list[str] = [],
               address: int | None = None,
               range: tuple[int, int] | None = None,
-              infile: str | None = None) -> dict:
+              infile: str | None = None,
+              **kwargs: Any) -> dict:
     """Extract file(s) or dir(s) from LittleFS to destination or zip.
 
     Args:
@@ -111,7 +115,7 @@ class LittlefsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += self._add_location_args(address, range, infile)
     if file_paths:
       args += self._get_file_paths(file_paths)
@@ -126,7 +130,8 @@ class LittlefsCommand(BaseCommand):
   def info(self,
            address: int | None = None,
            range: tuple[int, int] | None = None,
-           infile: str | None = None) -> dict:
+           infile: str | None = None,
+           **kwargs: Any) -> dict:
     """Show LittleFS filesystem info.
 
     Args:
@@ -137,7 +142,7 @@ class LittlefsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += self._add_location_args(address, range, infile)
     return self._run("littlefs", "info", *args).output
 
@@ -146,7 +151,8 @@ class LittlefsCommand(BaseCommand):
            device: str,
            size: int | None = None,
            address: int | None = None,
-           range: tuple[int, int] | None = None) -> dict:
+           range: tuple[int, int] | None = None,
+           **kwargs: Any) -> dict:
     """Initialize a new LittleFS filesystem.
 
     Args:
@@ -162,7 +168,7 @@ class LittlefsCommand(BaseCommand):
     # Don't include the device argument from the PyCommander instance here
     args  = self._get_adapter_connection_args()
     args += self._get_debug_args()
-    args += self._get_flags()
+    args += self._get_kwargs(**kwargs)
 
     if address is not None:
       args += ["--address", self._get_address_string(address)]
@@ -178,7 +184,8 @@ class LittlefsCommand(BaseCommand):
   def list_files(self,
            address: int | None = None,
            range: tuple[int, int] | None = None,
-           infile: str | None = None) -> dict:
+           infile: str | None = None,
+           **kwargs: Any) -> dict:
     """List files in LittleFS filesystem.
 
     Args:
@@ -189,7 +196,7 @@ class LittlefsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += self._add_location_args(address, range, infile)
     return self._run("littlefs", "list", *args).output
 
@@ -198,7 +205,8 @@ class LittlefsCommand(BaseCommand):
              dir_paths: list[str] = [],
              address: int | None = None,
              range: tuple[int, int] | None = None,
-             infile: str | None = None) -> dict:
+             infile: str | None = None,
+             **kwargs: Any) -> dict:
     """Remove file(s) or dir(s) from LittleFS filesystem.
 
     Args:
@@ -211,7 +219,7 @@ class LittlefsCommand(BaseCommand):
     Returns:
       Command output as parsed JSON (dict).
     """
-    args = self._get_general_args()
+    args = self._get_general_args(**kwargs)
     args += self._add_location_args(address, range, infile)
     if file_paths:
       args += self._get_file_paths(file_paths)
