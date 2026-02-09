@@ -21,7 +21,7 @@ class BaseCommand(ABC):
     # Strip away any empty elements
     args = [arg for arg in args if arg]
 
-    result : RunnerResult = self._runner.run(*args, json=True)
+    result : RunnerResult = self._runner.run(*args, json_format=True)
     json_output = json.loads(result.output)
 
     return CommandResult(result.returncode, json_output)

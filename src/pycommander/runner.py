@@ -1,3 +1,4 @@
+import json
 import sys
 import subprocess
 import datetime
@@ -26,14 +27,14 @@ class Runner:
       SEM_NOGPFAULTERRORBOX = 0x0002 # From MSDN
       ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX)
 
-  def run(self, *args: str, json: bool = True) -> RunnerResult:
+  def run(self, *args: str, json_format: bool = True) -> RunnerResult:
     if not self._executable.exists():
       raise FileNotFoundError(f"Commander executable not found: {self._executable}")
 
     if not self._executable.is_file():
       raise FileNotFoundError(f"Commander executable is not a file: {self._executable}")
 
-    if json:
+    if json_format:
       args += ("--json",)
 
     try:
@@ -60,7 +61,7 @@ class Runner:
 
     except subprocess.CalledProcessError as e:
       self._write_log_file(f"Command failed with return code {e.returncode}: {e.output}")
-      if json:
+      if json_format:
         command_output = json.loads(e.output)
         error_string = "\n".join(command_output.get("error", ""))
 
