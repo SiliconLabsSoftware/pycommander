@@ -1,10 +1,36 @@
 from .commander import Commander
-from .types import CtuneValue
+from .types import CtuneValue, DeviceInfo
 
 class Device:
   def __init__(self, part_number: str, commander: Commander):
     self._commander : Commander = commander
     self.part_number : str = part_number
+
+
+  def info(self) -> DeviceInfo | None:
+    """Get information about the device.
+
+    Returns:
+      A DeviceInfo object containing the information about the device, or None if the information could not be retrieved.
+    """
+
+    result : dict = self._commander.device.info(target_device=self.part_number)
+    if not result["success"]:
+      return None
+
+    if "device_info" not in result["result"]:
+      return None
+
+    device_info = DeviceInfo(
+      part_number=result["result"]["device_info"].get("part_number", None),
+      die_revision=result["result"]["device_info"].get("die_revision", None),
+      production_version=result["result"]["device_info"].get("production_version", None),
+      flash_size_kb=result["result"]["device_info"].get("flash_size_kb", None),
+      sram_size_kb=result["result"]["device_info"].get("sram_size_kb", None),
+      unique_id=result["result"]["device_info"].get("unique_id", None),
+    )
+
+    return device_info
 
 
   def getCTUNE(self) -> CtuneValue | None:
