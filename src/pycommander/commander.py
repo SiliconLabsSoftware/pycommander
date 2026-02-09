@@ -87,7 +87,16 @@ class Commander:
     return version_string
 
   def runCommand(self, *args : str, json_formatted_output: bool = True) -> CommanderResult | dict:
-    result : RunnerResult = self._runner.run(*args, "--json" if json_formatted_output else "")
+    """Run a command and return the result.
+
+    Args:
+      args (str): The arguments to pass to the command.
+      json_formatted_output (bool): Whether to return the output as JSON.
+
+    Returns:
+      The result of the command.
+    """
+    result : RunnerResult = self._runner.run(*args, json=json_formatted_output)
     if json_formatted_output:
       return json.loads(result.output)
     else:
