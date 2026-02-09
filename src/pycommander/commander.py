@@ -78,7 +78,12 @@ class Commander:
       setattr(self, attribute_name, command_class(self))
 
 
-  def getVersionString(self) -> str:
+  def getVersion(self) -> str:
+    """Get the version of the Commander executable.
+
+    Returns:
+      The version of the Commander executable, e.g. "1v22p0b1234"
+    """
     result : RunnerResult = self._runner.run("--version", "--json")
 
     json_output = json.loads(result.output)
