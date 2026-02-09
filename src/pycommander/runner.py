@@ -1,6 +1,5 @@
 import sys
 import subprocess
-import json
 import datetime
 
 from collections import namedtuple
@@ -27,14 +26,15 @@ class Runner:
       SEM_NOGPFAULTERRORBOX = 0x0002 # From MSDN
       ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX)
 
-  def run(self, *args: str) -> RunnerResult:
+  def run(self, *args: str, json: bool = True) -> RunnerResult:
     if not self._executable.exists():
       raise FileNotFoundError(f"Commander executable not found: {self._executable}")
 
     if not self._executable.is_file():
       raise FileNotFoundError(f"Commander executable is not a file: {self._executable}")
 
-    json_formatted_output : bool = "--json" in args
+    if json:
+      args += ("--json",)
 
     try:
       self._write_log_file(f"{self._executable} {' '.join(args)}")
@@ -60,14 +60,14 @@ class Runner:
 
     except subprocess.CalledProcessError as e:
       self._write_log_file(f"Command failed with return code {e.returncode}: {e.output}")
-      if json_formatted_output:
+      if json:
         command_output = json.loads(e.output)
         error_string = "\n".join(command_output.get("error", ""))
-      
+
       else:
         command_output = e.output
         error_string = "\n".join([line for line in command_output.split("\n") if line.startswith("ERROR:")])
-      
+
       error_message = f"Command failed with return code {e.returncode}: {error_string}"
       if e.returncode == -1 or e.returncode == 255:
         raise PyCommanderInputError(error_message)
