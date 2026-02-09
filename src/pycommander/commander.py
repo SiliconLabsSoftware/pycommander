@@ -101,7 +101,7 @@ class Commander:
     Returns:
       The result of the command.
     """
-    result : RunnerResult = self._runner.run(*args, json=json_formatted_output)
+    result : RunnerResult = self._runner.run(*args, json_format=json_formatted_output)
     if json_formatted_output:
       return json.loads(result.output)
     else:
