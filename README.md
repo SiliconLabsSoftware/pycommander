@@ -16,14 +16,17 @@ Additionally, Simplicity Commander requires the SEGGER J-Link drivers to be inst
 ## Installation
 
 ```bash
-pip install silabs-pycommander
+pip install silabs-pycommander[cli]
+pip install silabs-pycommander[gui]
 ```
 
 ## Usage
 
+More details about Simplicity Commander and its Command Line Interface can be found in the [official documentation for Simplicity Commander](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/). The documentation is also helpful when using the Python API, as the command names and available options are the same.
+
 ### Command Line Interface
 
-PyCommander behaves exactly like the Simplicity Commander CLI, so you can use it as a drop-in replacement. More details can be found in the [official documentation](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/).
+From the command line, `pycommander` is a razor-thin wrapper around the Simplicity Commander CLI; it behaves exactly like the Simplicity Commander CLI.
 
 ```bash
 pycommander --help
@@ -34,6 +37,15 @@ pycommander <command> <subcommand> [<options>]
 
 ### Python API
 
+At the lowest level, the `PyCommander` class provides all the CLI commands as methods. These methods return a dictionary containing the command output, similarly to what the Simplicity Commander CLI does when the `--json` flag is used.
+
+`PyCommander` also exposes several convenience methods for common tasks. These tasks include:
+
+- herp
+- derp
+- chirp
+
 ```python
+import pycommander
 
 ```
