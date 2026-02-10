@@ -1,4 +1,4 @@
-# Silicon Labs PyCommander
+# Silicon Labs PyCommander (CLI version)
 
 ## Introduction
 
@@ -13,11 +13,12 @@ This package was developed using Python 3.10. Required PyPI packages are:
 
 Additionally, Simplicity Commander requires the SEGGER J-Link drivers to be installed on your system.
 
+Note that this package only contains the CLI version of Simplicity Commander. The GUI version is available in the `silabs-pycommander-gui` package.
+
 ## Installation
 
 ```bash
-pip install silabs-pycommander[cli]
-pip install silabs-pycommander[gui]
+pip install silabs-pycommander-cli
 ```
 
 ## Usage
@@ -46,6 +47,6 @@ At the lowest level, the `PyCommander` class provides all the CLI commands as me
 - chirp
 
 ```python
-import pycommander
+import pycommander_cli
 
 ```
