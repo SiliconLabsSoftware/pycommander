@@ -1,6 +1,6 @@
 [project]
 name = "silabs-pycommander"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python library for Silicon Labs Simplicity Commander"
 authors = [
     { name = "Silicon Labs"}
@@ -19,5 +19,5 @@ packages = ["src/pycommander"]
 
 
 [project.optional-dependencies]
-cli = ["silabs-pycommander-cli==0.1.1"]
-gui = ["silabs-pycommander-gui==0.1.1"]
+cli = ["silabs-pycommander-cli==0.1.2"]
+gui = ["silabs-pycommander-gui==0.1.2"]
