@@ -4,8 +4,8 @@ version = "0.1.1"
 description = "Python library for Silicon Labs Simplicity Commander (CLI version)"
 authors = [{ name = "Silicon Labs"}]
 license = "LicenseRef-MSLA"
-license-files = ["../../LICENSE.md"]
-readme = "../../README.md"
+license-files = ["LICENSE.md"]
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
   "silabs-pycommander-core==0.1.1"
