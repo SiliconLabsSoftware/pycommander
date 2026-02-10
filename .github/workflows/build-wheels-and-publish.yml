@@ -98,8 +98,8 @@ jobs:
         # We need to retag it to the correct platform. The real wheel will be retagged later,
         # to a tag that PyPI will accept.
         if: matrix.flavor == 'linux-aarch32'
+        shell: bash
         run: |
-          shell: bash
           for package in packages/*; do
             cd "$package"
             echo "Retagging wheel for $package"
