@@ -38,55 +38,79 @@ jobs:
           python-version: "3.10"
           check-latest: true
 
-      - name: Pick Commander Executable
+      - name: Pick Commander Executables
         if: matrix.flavor != ''
         shell: bash
         run: |
           echo "flavor: ${{ matrix.flavor }}"
-          TARGET_DIR="src/pycommander/_archive/"
+          CLI_TARGET_DIR="packages/pycommander-cli/src/pycommander_cli/_archive/"
+          GUI_TARGET_DIR="packages/pycommander-gui/src/pycommander_gui/_archive/"
 
           if [[ "${{ matrix.flavor }}" == windows-* ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
+            CLI_ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_win32_x64_*.zip 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
+            CLI_ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_osx_*.zip 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == linux-x86_64 ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
+            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == linux-aarch32 ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
+            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
           elif [[ "${{ matrix.flavor }}" == linux-aarch64 ]]; then
-            ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
+            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
           else
             echo "Unsupported flavor: ${{ matrix.flavor }}"
             exit 1
           fi
 
-          echo "Copying archive: $ARCHIVE"
+          echo "Copying CLI archive: $CLI_ARCHIVE"
+          cp "$CLI_ARCHIVE" "$CLI_TARGET_DIR"
 
-          cp "$ARCHIVE" "$TARGET_DIR"
+          echo "Listing contents of $CLI_TARGET_DIR:"
+          ls -la "$CLI_TARGET_DIR"
 
-          echo "Listing contents of $TARGET_DIR:"
-          ls -la "$TARGET_DIR"
+          echo "Copying GUI archive: $GUI_ARCHIVE"
+          cp "$GUI_ARCHIVE" "$GUI_TARGET_DIR"
+
+          echo "Listing contents of $GUI_TARGET_DIR:"
+          ls -la "$GUI_TARGET_DIR"
 
       - name: Install build tooling
         run: |
           python -m pip install --upgrade pip
           python -m pip install hatch wheel
 
-      - name: Build wheel
-        run: hatch build -t wheel
+      - name: Build wheels
+        shell: bash
+        run: |
+          for package in packages/*; do
+            cd "$package"
+            echo "Building wheel for $package"
+            hatch build -t wheel
+            cd "../.."
+          done
 
       - name: Retag aarch32 wheel temporarily
         # This wheel is built on aarch64, but the Commander executable is aarch32.
         # We need to retag it to the correct platform. The real wheel will be retagged later,
         # to a tag that PyPI will accept.
         if: matrix.flavor == 'linux-aarch32'
+        shell: bash
         run: |
-          python -m wheel tags --remove --platform-tag linux_aarch32 dist/*.whl
+          for package in packages/*; do
+            cd "$package"
+            echo "Retagging wheel for $package"
+            python -m wheel tags --remove --platform-tag linux_aarch32 dist/*.whl
+            cd "../.."
+          done
 
       - uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.flavor }}
-          path: dist/*.whl
+          path: packages/*/dist/*.whl
 
   publish-to-pypi:
     needs: build-wheels
@@ -111,21 +135,21 @@ jobs:
       - name: Download wheels
         uses: actions/download-artifact@v4
         with:
-          path: dist
+          path: packages
           merge-multiple: true
 
       - name: Retag wheels
         run: |
-          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_x86_64 dist/*-linux_x86_64.whl
-          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_armv7l dist/*-linux_aarch32.whl
-          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_aarch64 dist/*-linux_aarch64.whl
-          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag macosx_10_9_universal2 dist/*-macosx*.whl
-          python -m wheel tags --remove --python-tag py3 --abi-tag none dist/*-win_*.whl
-          ls -la dist
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_x86_64 packages/*/dist/*-linux_x86_64.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_armv7l packages/*/dist/*-linux_aarch32.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag manylinux2014_aarch64 packages/*/dist/*-linux_aarch64.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none --platform-tag macosx_10_9_universal2 packages/*/dist/*-macosx*.whl
+          python -m wheel tags --remove --python-tag py3 --abi-tag none packages/*/dist/*-win_*.whl
+          ls -la packages/*/dist/*.whl
 
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          python -m twine upload --verbose --repository testpypi dist/*.whl
+          python -m twine upload --verbose --repository testpypi packages/*/dist/*.whl

@@ -1,0 +1,32 @@
+[project]
+name = "silabs-pycommander-cli"
+version = "0.1.3"
+description = "Python library for Silicon Labs Simplicity Commander (CLI version)"
+authors = [{ name = "Silicon Labs"}]
+license = "LicenseRef-MSLA"
+license-files = ["LICENSE.md"]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "silabs-pycommander-core==0.1.3"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pycommander_cli"]
+ignore-vcs = true
+
+[tool.hatch.build.targets.wheel.package-data]
+"pycommander_cli._archive" = ["*.zip", "*.tar.bz"]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "build_hook.py"
+
+[project.urls]
+Homepage = "https://github.com/SiliconLabsSoftware/pycommander"
+
+[project.scripts]
+pycommander = "pycommander_cli.cli:main"
