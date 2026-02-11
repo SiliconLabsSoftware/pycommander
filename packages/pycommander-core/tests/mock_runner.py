@@ -18,13 +18,13 @@ class MockRunner(Runner):
     timeout_s: int = 300,
   ):
     super().__init__(executable, log_file_path=log_file_path, timeout_s=timeout_s)
-    self.logged_commands: list[str] = []
+    self.logged_commands: list[list[str]] = []
 
   def run(self, *args: str, json_format: bool = True) -> RunnerResult:
     if json_format:
       args = (*args, "--json")
-    full_cmd = f"{self._executable} {' '.join(args)}"
-    self.logged_commands.append(full_cmd)
+
+    self.logged_commands.append([str(self._executable), *args])
 
     if "--version" in args:
       output = json.dumps({
