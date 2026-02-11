@@ -30,22 +30,22 @@ class BaseCommand(ABC):
   # Adapter connection arguments
   def _get_adapter_connection_args(self) -> list[str]:
     args = []
-    args += self.__get_serial_number_option()
-    args += self.__get_ip_address_option()
-    args += self.__get_serial_port_option()
+    args += self._get_serial_number_option()
+    args += self._get_ip_address_option()
+    args += self._get_serial_port_option()
     return args
 
-  def __get_serial_number_option(self) -> list[str]:
+  def _get_serial_number_option(self) -> list[str]:
     if self._commander._serial_number:
       return ["--serialno", self._commander._serial_number]
     return []
 
-  def __get_ip_address_option(self) -> list[str]:
+  def _get_ip_address_option(self) -> list[str]:
     if self._commander._ip_address:
       return ["--ip", self._commander._ip_address]
     return []
 
-  def __get_serial_port_option(self) -> list[str]:
+  def _get_serial_port_option(self) -> list[str]:
     if self._commander._serial_port:
       return ["--identifybyserialport", self._commander._serial_port]
     return []
@@ -53,28 +53,28 @@ class BaseCommand(ABC):
   # Debug arguments
   def _get_debug_args(self) -> list[str]:
     args = []
-    args += self.__get_debug_speed_option()
-    args += self.__get_debug_tif_option()
-    args += self.__get_debug_irpre_option()
-    args += self.__get_debug_drpre_option()
+    args += self._get_debug_speed_option()
+    args += self._get_debug_tif_option()
+    args += self._get_debug_irpre_option()
+    args += self._get_debug_drpre_option()
     return args
 
-  def __get_debug_speed_option(self) -> list[str]:
+  def _get_debug_speed_option(self) -> list[str]:
     if self._commander._debug_speed:
       return ["--speed", str(self._commander._debug_speed)]
     return []
 
-  def __get_debug_tif_option(self) -> list[str]:
+  def _get_debug_tif_option(self) -> list[str]:
     if self._commander._debug_tif:
       return ["--tif", self._commander._debug_tif]
     return []
 
-  def __get_debug_irpre_option(self) -> list[str]:
+  def _get_debug_irpre_option(self) -> list[str]:
     if self._commander._debug_irpre:
       return ["--irpre", str(self._commander._debug_irpre)]
     return []
 
-  def __get_debug_drpre_option(self) -> list[str]:
+  def _get_debug_drpre_option(self) -> list[str]:
     if self._commander._debug_drpre:
       return ["--drpre", str(self._commander._debug_drpre)]
     return []
