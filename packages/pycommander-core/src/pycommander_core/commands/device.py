@@ -47,11 +47,11 @@ class DeviceCommand(BaseCommand):
     """
     return self._run("device", "masserase", *self._get_general_args(**kwargs)).output
 
-  def pageerase(self, ranges: list[tuple[int, int]] = [], regions: list[str] = [], **kwargs: Any) -> dict:
+  def pageerase(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = [], **kwargs: Any) -> dict:
     """Erase selected flash pages.
 
     Args:
-      ranges (list[tuple[int,int]]): Memory ranges to erase (start, end); extended to page boundaries.
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to erase (start, end); extended to page boundaries.
       regions (list[str]): Named memory regions (@region).
 
     Returns:
@@ -68,7 +68,7 @@ class DeviceCommand(BaseCommand):
               read: bool = False,
               write: bool = False,
               disable: bool = False,
-              ranges: list[tuple[int, int]] = [],
+              ranges: list[tuple[int | str, int | str]] = [],
               regions: list[str] = [],
               **kwargs: Any) -> dict:
     """Protect flash or functionality (read/write protection).
@@ -77,7 +77,7 @@ class DeviceCommand(BaseCommand):
       read (bool): Enable/disable read protection.
       write (bool): Enable/disable write protection.
       disable (bool): Disable read/write protection; if not set, enable is implied.
-      ranges (list[tuple[int,int]]): Memory ranges to protect (start, end).
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to protect (start, end).
       regions (list[str]): Named memory regions (@region).
 
     Returns:

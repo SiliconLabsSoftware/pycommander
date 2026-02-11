@@ -38,7 +38,7 @@ class TokensCommand(BaseCommand):
     return self._run("tokens", "createheader", filename, *args).output
 
   def erase(self,
-            securerange: tuple[int, int] | None = None,
+            securerange: tuple[int | str, int | str] | None = None,
             type: str | None = None,
             tokens: list[str] = [],
             tokengroup: str | None = None,
@@ -47,7 +47,7 @@ class TokensCommand(BaseCommand):
     """Erase tokens (on device or in secure range).
 
     Args:
-      securerange (tuple[int,int]): Memory range for secure tokens.
+      securerange (tuple[int | str, int | str]): Memory range for secure tokens.
       type (str): secure or device (static tokens only).
       tokens (list[str]): Token names to erase (TOKEN_NAME:value format for overrides).
       tokengroup (str): common, zigbee, or znet.
@@ -74,10 +74,10 @@ class TokensCommand(BaseCommand):
            outfile: str | None = None,
            showoverrides: bool = False,
            tokens: list[str] = [],
-           securerange: tuple[int, int] | None = None,
+           securerange: tuple[int | str, int | str] | None = None,
            tokengroup: str | None = None,
            tokendefs: str | None = None,
-           range: tuple[int, int] | None = None,
+           range: tuple[int | str, int | str] | None = None,
            type: str | None = None,
            includeall: bool = False,
            address: int | None = None,
@@ -89,10 +89,10 @@ class TokensCommand(BaseCommand):
       outfile (str): Output file; if not given, printed to stdout.
       showoverrides (bool): Show NVM3 overrides (static tokens only).
       tokens (list[str]): Limit output to these token names.
-      securerange (tuple[int,int]): Range for static secure tokens.
+      securerange (tuple[int | str, int | str]): Range for static secure tokens.
       tokengroup (str): common, zigbee, or znet.
       tokendefs (str): Path to JSON token definitions.
-      range (tuple[int,int]): NVM3 area range (start, end).
+      range (tuple[int | str, int | str]): NVM3 area range (start, end).
       type (str): secure or device (static tokens only).
       includeall (bool): Show all tokens in group (static only).
       address (int): Memory address.
@@ -130,7 +130,7 @@ class TokensCommand(BaseCommand):
             tokens: list[str] = [],
             tokengroup: str | None = None,
             tokendefs: str | None = None,
-            securerange: tuple[int, int] | None = None,
+            securerange: tuple[int | str, int | str] | None = None,
             **kwargs: Any) -> dict:
     """Write tokens to device.
 
@@ -139,7 +139,7 @@ class TokensCommand(BaseCommand):
       tokens (list[str]): Token overrides as TOKEN_NAME:value.
       tokengroup (str): common, zigbee, or znet.
       tokendefs (str): Path to JSON token definitions.
-      securerange (tuple[int,int]): Range for secure tokens.
+      securerange (tuple[int | str, int | str]): Range for secure tokens.
 
     Returns:
       Command output as parsed JSON (dict).
