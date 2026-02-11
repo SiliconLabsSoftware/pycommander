@@ -23,7 +23,7 @@ class FlashCommand(BaseCommand):
             reset: bool = True,
             close: bool = True,
             verify: bool = True,
-            patches: list[str] = [],
+            patches: list[tuple[int | str, int | str, int | str | None]] = [],
             tokens: list[str] = [],
             tokenfiles: list[str] = [],
             tokengroup: str | None = None,
@@ -43,7 +43,7 @@ class FlashCommand(BaseCommand):
       reset (bool): Reset device after flashing (use noreset to skip).
       close (bool): Close code regions after flashing on applicable devices.
       verify (bool): Verify contents written to flash.
-      patches (list[str]): Patch memory; each address:data[:length] (up to 8 bytes).
+      patches (list[tuple[int | str, int | str, int | str | None]]): Patch memory; each entry (address, data[, length (up to 8 bytes)]).
       tokens (list[str]): Token overrides as TOKEN_NAME:value.
       tokenfiles (list[str]): Files describing tokens to write.
       tokengroup (str): Token set: common, zigbee, or znet.

@@ -25,7 +25,7 @@ class Nvm3Command(BaseCommand):
              object_keys: list[str] | None = None,
              delete_all: bool = False,
              address: int | None = None,
-             range: tuple[int, int] | None = None,
+             range: tuple[int | str, int | str] | None = None,
              **kwargs: Any) -> dict:
     """Delete NVM3 objects from file; write result to outfile.
 
@@ -35,7 +35,7 @@ class Nvm3Command(BaseCommand):
       object_keys (list[str]): Object keys to delete.
       delete_all (bool): Delete all objects.
       address (int): NVM3 base address.
-      range (tuple[int,int]): NVM3 memory range.
+      range (tuple[int | str, int | str]): NVM3 memory range.
 
     Returns:
       Command output as parsed JSON (dict).
@@ -56,14 +56,14 @@ class Nvm3Command(BaseCommand):
   def deletedevice(self,
                    object_keys: list[str] | None = None,
                    delete_all: bool = False,
-                   range: tuple[int, int] | None = None,
+                   range: tuple[int | str, int | str] | None = None,
                    **kwargs: Any) -> dict:
     """Delete NVM3 objects on device.
 
     Args:
       object_keys (list[str]): Object keys to delete.
       delete_all (bool): Delete all objects.
-      range (tuple[int,int]): NVM3 memory range on device.
+      range (tuple[int | str, int | str]): NVM3 memory range on device.
 
     Returns:
       Command output as parsed JSON (dict).
@@ -80,13 +80,13 @@ class Nvm3Command(BaseCommand):
 
   def dump(self,
            outfile: str,
-           range: tuple[int, int] | None = None,
+           range: tuple[int | str, int | str] | None = None,
            **kwargs: Any) -> dict:
     """Dump NVM3 contents from device to file.
 
     Args:
       outfile (str): Output file path.
-      range (tuple[int,int]): NVM3 memory range.
+      range (tuple[int | str, int | str]): NVM3 memory range.
 
     Returns:
       Command output as parsed JSON (dict).
@@ -102,7 +102,7 @@ class Nvm3Command(BaseCommand):
                size_bytes: int,
                device: str,
                address: int | None = None,
-               range: tuple[int, int] | None = None,
+               range: tuple[int | str, int | str] | None = None,
                **kwargs: Any) -> dict:
     """Create an initialized NVM3 file.
 
@@ -111,7 +111,7 @@ class Nvm3Command(BaseCommand):
       size_bytes (int): NVM3 storage size in bytes.
       device (str): Device/device family.
       address (int): Base address.
-      range (tuple[int,int]): Memory range.
+      range (tuple[int | str, int | str]): Memory range.
 
     Returns:
       Command output as parsed JSON (dict).
@@ -131,7 +131,7 @@ class Nvm3Command(BaseCommand):
             object_keys: list[str] | None = None,
             nvm3file: str | None = None,
             address: int | None = None,
-            range: tuple[int, int] | None = None,
+            range: tuple[int | str, int | str] | None = None,
             **kwargs: Any) -> dict:
     """Parse NVM3 file and optionally export objects.
 
@@ -140,7 +140,7 @@ class Nvm3Command(BaseCommand):
       object_keys (list[str]): Keys to export.
       nvm3file (str): Output NVM3 file for exported data.
       address (int): Base address.
-      range (tuple[int,int]): Memory range.
+      range (tuple[int | str, int | str]): Memory range.
 
     Returns:
       Command output as parsed JSON (dict).
@@ -160,14 +160,14 @@ class Nvm3Command(BaseCommand):
   def readdevice(self,
                  object_keys: list[str] | None = None,
                  nvm3file: str | None = None,
-                 range: tuple[int, int] | None = None,
+                 range: tuple[int | str, int | str] | None = None,
                  **kwargs: Any) -> dict:
     """Read NVM3 objects from device.
 
     Args:
       object_keys (list[str]): Keys to read.
       nvm3file (str): Output file for read data.
-      range (tuple[int,int]): NVM3 range on device.
+      range (tuple[int | str, int | str]): NVM3 range on device.
 
     Returns:
       Command output as parsed JSON (dict).
@@ -186,7 +186,7 @@ class Nvm3Command(BaseCommand):
           filename: str,
           outfile: str,
           address: int | None = None,
-          range: tuple[int, int] | None = None,
+          range: tuple[int | str, int | str] | None = None,
           objects: list[str] | None = None,
           counters: list[str] | None = None,
           nvm3file: str | None = None,
@@ -197,7 +197,7 @@ class Nvm3Command(BaseCommand):
       filename (str): Input NVM3 file.
       outfile (str): Output file path.
       address (int): Base address.
-      range (tuple[int,int]): Memory range.
+      range (tuple[int | str, int | str]): Memory range.
       objects (list[str]): Object key:value entries.
       counters (list[str]): Counter key:value entries.
       nvm3file (str): NVM3 file for object data.
@@ -222,7 +222,7 @@ class Nvm3Command(BaseCommand):
     return self._run("nvm3", "set", filename, *args).output
 
   def writedevice(self,
-                  range: tuple[int, int] | None = None,
+                  range: tuple[int | str, int | str] | None = None,
                   objects: list[str] | None = None,
                   counters: list[str] | None = None,
                   nvm3file: str | None = None,
@@ -230,7 +230,7 @@ class Nvm3Command(BaseCommand):
     """Write NVM3 objects/counters to device.
 
     Args:
-      range (tuple[int,int]): NVM3 range on device.
+      range (tuple[int | str, int | str]): NVM3 range on device.
       objects (list[str]): Object key:value entries.
       counters (list[str]): Counter key:value entries.
       nvm3file (str): NVM3 file with data to write.

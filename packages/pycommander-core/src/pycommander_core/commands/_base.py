@@ -90,22 +90,38 @@ class BaseCommand:
   def _get_address_string(self, address: int) -> str:
     return f"0x{address:08X}"
 
-  def _get_ranges(self, ranges: list[tuple[int, int]]) -> list[str]:
+  def _get_ranges(self, ranges: list[tuple[int | str, int | str]]) -> list[str]:
     args = []
     for range in ranges:
+      if not isinstance(range, tuple) or len(range) != 2:
+        raise ValueError(f"Range must be a tuple with 2 elements: {range}")
+
       start = range[0]
       end   = range[1]
 
-      args += ["--range", f"0x{start:X}:0x{end:X}"]
+      if isinstance(start, int):
+        start = self._get_address_string(start)
+      if isinstance(end, int):
+        end = self._get_address_string(end)
+
+      args += ["--range", f"{start}:{end}"]
     return args
 
-  def _get_secureranges(self, secureranges: list[tuple[int, int]]) -> list[str]:
+  def _get_secureranges(self, secureranges: list[tuple[int | str, int | str]]) -> list[str]:
     args = []
     for securerange in secureranges:
+      if not isinstance(securerange, tuple) or len(securerange) != 2:
+        raise ValueError(f"Secure range must be a tuple with 2 elements: {securerange}")
+
       start = securerange[0]
       end   = securerange[1]
 
-      args += ["--securerange", f"0x{start:X}:0x{end:X}"]
+      if isinstance(start, int):
+        start = self._get_address_string(start)
+      if isinstance(end, int):
+        end = self._get_address_string(end)
+
+      args += ["--securerange", f"{start}:{end}"]
     return args
 
   def _get_regions(self, regions: list[str]) -> list[str]:
@@ -114,10 +130,28 @@ class BaseCommand:
       args += ["--region", region]
     return args
 
-  def _get_patches(self, patches: list[str]) -> list[str]:
+  def _get_patches(self, patches: list[tuple[int | str, int | str, int | str | None]]) -> list[str]:
     args = []
     for patch in patches:
-      args += ["--patch", patch]
+      if not isinstance(patch, tuple) or len(patch) not in [2, 3]:
+        raise ValueError(f"Patch must be a tuple with 2 or 3 elements: {patch}")
+
+      start = patch[0]
+      end   = patch[1]
+
+      if len(patch) > 2:
+        length = patch[2]
+      else:
+        length = None
+
+      if isinstance(start, int):
+        start = self._get_address_string(start)
+      if isinstance(end, int):
+        end = self._get_address_string(end)
+      if length is not None and isinstance(length, int):
+        length = str(length)
+
+      args += ["--patch", f"{start}:{end}{f':{length}' if length is not None else ''}"]
     return args
 
   def _get_tokens(self, tokens: list[str]) -> list[str]:

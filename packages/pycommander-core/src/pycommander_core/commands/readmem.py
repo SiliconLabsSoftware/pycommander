@@ -17,14 +17,14 @@ class ReadmemCommand(BaseCommand):
 
   def readmem(self,
               outfile: str | None = None,
-              ranges: list[tuple[int, int]] = [],
+              ranges: list[tuple[int | str, int | str]] = [],
               regions: list[str] = [],
               **kwargs: Any) -> dict:
     """Read from target memory.
 
     Args:
       outfile (str): Output file (bin, hex, s37 by extension). If not given, data is printed.
-      ranges (list[tuple[int,int]]): Memory ranges to read (start, end).
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to read (start, end).
       regions (list[str]): Named memory regions (@region) to read.
 
     Returns:

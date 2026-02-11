@@ -16,14 +16,14 @@ class ExtflashCommand(BaseCommand):
     return args
 
   def erase(self,
-            ranges: list[tuple[int, int]] = [],
+            ranges: list[tuple[int | str, int | str]] = [],
             board_id: str | None = None,
             verify: bool = True,
             **kwargs: Any) -> dict:
     """Erase external flash.
 
     Args:
-      ranges (list[tuple[int,int]]): Memory ranges to erase (start, end); format start:end or start:+length.
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to erase (start, end); format start:end or start:+length.
       board_id (str): Board ID for series 2 when default flashloader does not work.
       verify (bool): If True, verify contents after erase.
 
@@ -41,14 +41,14 @@ class ExtflashCommand(BaseCommand):
 
   def read(self,
            outfile: str | None = None,
-           ranges: list[tuple[int, int]] = [],
+           ranges: list[tuple[int | str, int | str]] = [],
            board_id: str | None = None,
            **kwargs: Any) -> dict:
     """Read from external flash.
 
     Args:
       outfile (str): Output file (bin, hex, s37 by extension). If not given, data is printed.
-      ranges (list[tuple[int,int]]): Memory ranges to read (start, end).
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to read (start, end).
       board_id (str): Board ID for series 2 when default flashloader does not work.
 
     Returns:

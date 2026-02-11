@@ -122,7 +122,7 @@ class Mfg917Command(BaseCommand):
             skipinit: bool = False,
             pinset: int | None = None,
             list_regions: bool = False,
-            range: tuple[int, int] | None = None,
+            range: tuple[int | str, int | str] | None = None,
             position: int | None = None,
             **kwargs: Any) -> dict:
     """Erase a region (or list regions with list_regions=True).
@@ -137,7 +137,7 @@ class Mfg917Command(BaseCommand):
       skipinit (bool): Skip initialization.
       pinset (int): Pin set.
       list_regions (bool): List available regions instead of erasing.
-      range (tuple[int,int]): Memory range.
+      range (tuple[int | str, int | str]): Memory range.
       position (int): Position for erase.
 
     Returns:
@@ -570,7 +570,7 @@ class Mfg917Command(BaseCommand):
            skipinit: bool = False,
            pinset: int | None = None,
            list_regions: bool = False,
-           range: tuple[int, int] | None = None,
+           range: tuple[int | str, int | str] | None = None,
            position: int | None = None,
            outfile: str | None = None,
            property_field: str | None = None,
@@ -587,7 +587,7 @@ class Mfg917Command(BaseCommand):
       skipinit (bool): Skip initialization.
       pinset (int): Pin set.
       list_regions (bool): List available regions.
-      range (tuple[int,int]): Memory range.
+      range (tuple[int | str, int | str]): Memory range.
       position (int): Position.
       outfile (str): Output file path.
       property_field (str): Property name.
