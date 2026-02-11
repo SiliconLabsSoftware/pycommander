@@ -2,6 +2,7 @@ import unittest
 
 from tests.mock_commander import MockCommander
 
+
 class TestAdapter(unittest.TestCase):
   def test_adapter_dbgmode(self):
     commander = MockCommander(serial_number="123456789")
@@ -106,6 +107,7 @@ class TestAdapter(unittest.TestCase):
     commander.adapter.power("on")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected_command = ["mock", "adapter", "power", "on", "--serialno", "123456789", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected_command)
 
   def test_adapter_probe(self):
     commander = MockCommander(serial_number="123456789")

@@ -1,0 +1,42 @@
+import unittest
+
+from tests.mock_commander import MockCommander
+
+
+class TestFlash(unittest.TestCase):
+  def test_flash_minimal(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.flash.flash(["app.s37"])
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "flash", "app.s37", "--serialno", "123456789", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_flash_with_options(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.flash.flash(
+      ["app.s37", "bootloader.s37"],
+      address=0x08000000,
+      halt=True,
+      masserase=True,
+      reset=False,
+      close=False,
+      verify=False,
+      tokens=["TOKEN_X:1"],
+      tokengroup="zigbee",
+      binary=True,
+      include_sections=[".text"],
+      exclude_sections=[".debug"],
+      vtor=0x08000000,
+    )
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "flash", "app.s37", "bootloader.s37",
+      "--serialno", "123456789",
+      "--address", "0x08000000", "--halt", "--masserase", "--noreset", "--noclose", "--noverify",
+      "--token", "TOKEN_X:1", "--tokengroup", "zigbee",
+      "--binary",
+      "--include-section", ".text", "--exclude-section", ".debug",
+      "--vtor", "0x08000000",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
