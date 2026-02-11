@@ -1,6 +1,5 @@
 import json
 
-from abc import ABC
 from pathlib import Path
 from collections import namedtuple
 
@@ -14,7 +13,7 @@ from ._ensure_commander import ensure_commander
 
 CommanderResult = namedtuple("CommanderResult", ["returncode", "output"])
 
-class CommanderBase(ABC):
+class CommanderBase:
   # Command overview. These are for type hinting only.
   # The real commands are initialized in the __init__ method.
   adapter   : "AdapterCommand"
@@ -88,7 +87,7 @@ class CommanderBase(ABC):
     Returns:
       The version of the Commander executable, e.g. "1v22p0b1234"
     """
-    result : RunnerResult = self._runner.run("--version", "--json")
+    result : RunnerResult = self._runner.run("--version", json_format=True)
 
     json_output = json.loads(result.output)
     version_string = json_output["result"]["version"]["simplicity_commander_version"]

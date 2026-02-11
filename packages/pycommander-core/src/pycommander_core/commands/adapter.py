@@ -31,7 +31,7 @@ class AdapterCommand(BaseCommand):
     """Select driver mode - WinUSB (driverless) or SEGGER (legacy).
 
     Args:
-      mode (str): One of winusb or segger.
+      mode (str): One of winusb or segger. If not provided, gets current mode.
 
     Returns:
       Command output as parsed JSON (dict).
