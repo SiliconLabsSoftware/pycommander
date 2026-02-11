@@ -15,8 +15,8 @@ class BaseCommand:
 
 
   def _run(self, *args: str) -> CommandResult:
-    # Strip away any empty elements
-    args = [arg for arg in args if arg]
+    # Strip away any empty or None elements
+    args = [arg for arg in args if arg is not None and arg != ""]
 
     result : RunnerResult = self._runner.run(*args, json_format=True)
     json_output = json.loads(result.output)
