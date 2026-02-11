@@ -105,6 +105,10 @@ class CommanderBase(ABC):
     Returns:
       The result of the command.
     """
+
+    # Strip away any empty or None elements
+    args = [arg for arg in args if arg is not None and arg != ""]
+
     result : RunnerResult = self._runner.run(*args, json_format=json_formatted_output)
     if json_formatted_output:
       return json.loads(result.output)
