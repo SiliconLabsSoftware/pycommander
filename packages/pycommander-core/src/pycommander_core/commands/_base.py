@@ -1,6 +1,5 @@
 import json
 
-from abc import ABC
 from collections import namedtuple
 from typing import Any
 
@@ -9,15 +8,13 @@ from pycommander_core.runner import Runner, RunnerResult
 
 CommandResult = namedtuple("CommandResult", ["returncode", "output"])
 
-class BaseCommand(ABC):
+class BaseCommand:
   def __init__(self, commander: CommanderBase):
     self._commander : CommanderBase = commander
     self._runner : Runner = self._commander._runner
 
 
   def _run(self, *args: str) -> CommandResult:
-    print(args) # TODO: Remove before flight
-
     # Strip away any empty elements
     args = [arg for arg in args if arg]
 
