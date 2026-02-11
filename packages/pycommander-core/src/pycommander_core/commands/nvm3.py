@@ -187,8 +187,8 @@ class Nvm3Command(BaseCommand):
           outfile: str,
           address: int | None = None,
           range: tuple[int | str, int | str] | None = None,
-          objects: list[str] | None = None,
-          counters: list[str] | None = None,
+          objects: list[tuple[int, bytes]] | None = None,
+          counters: list[tuple[int, int]] | None = None,
           nvm3file: str | None = None,
           **kwargs: Any) -> dict:
     """Set NVM3 objects/counters in file; write to outfile.
@@ -198,8 +198,8 @@ class Nvm3Command(BaseCommand):
       outfile (str): Output file path.
       address (int): Base address.
       range (tuple[int | str, int | str]): Memory range.
-      objects (list[str]): Object key:value entries.
-      counters (list[str]): Counter key:value entries.
+      objects (list[tuple[int, bytes]]): Object (key, data) entries.
+      counters (list[tuple[int, int]]): Counter (key, value) entries.
       nvm3file (str): NVM3 file for object data.
 
     Returns:
@@ -212,27 +212,27 @@ class Nvm3Command(BaseCommand):
     if range is not None:
       args += self._get_ranges([range])
     if objects:
-      for o in objects:
-        args += ["--object", o]
+      for k, d in objects:
+        args += ["--object", f"0x{k:05X}:{d.hex()}"]
     if counters:
-      for c in counters:
-        args += ["--counter", c]
+      for k, v in counters:
+        args += ["--counter", f"0x{k:05X}:{v}"]
     if nvm3file is not None:
       args += ["--nvm3file", nvm3file]
     return self._run("nvm3", "set", filename, *args).output
 
   def writedevice(self,
                   range: tuple[int | str, int | str] | None = None,
-                  objects: list[str] | None = None,
-                  counters: list[str] | None = None,
+                  objects: list[tuple[int, bytes]] | None = None,
+                  counters: list[tuple[int, int]] | None = None,
                   nvm3file: str | None = None,
                   **kwargs: Any) -> dict:
     """Write NVM3 objects/counters to device.
 
     Args:
       range (tuple[int | str, int | str]): NVM3 range on device.
-      objects (list[str]): Object key:value entries.
-      counters (list[str]): Counter key:value entries.
+      objects (list[tuple[int, bytes]]): Object (key, data) entries.
+      counters (list[tuple[int, int]]): Counter (key, value) entries.
       nvm3file (str): NVM3 file with data to write.
 
     Returns:
@@ -242,11 +242,11 @@ class Nvm3Command(BaseCommand):
     if range is not None:
       args += self._get_ranges([range])
     if objects:
-      for o in objects:
-        args += ["--object", o]
+      for k, d in objects:
+        args += ["--object", f"0x{k:05X}:{d.hex()}"]
     if counters:
-      for c in counters:
-        args += ["--counter", c]
+      for k, v in counters:
+        args += ["--counter", f"0x{k:05X}:{v}"]
     if nvm3file is not None:
       args += ["--nvm3file", nvm3file]
     return self._run("nvm3", "writedevice", *args).output
