@@ -4,14 +4,14 @@ from tests.mock_commander import MockCommander
 
 
 class TestPostbuild(unittest.TestCase):
-  def test_postbuild(self):
+  def test_postbuild_command(self):
     commander = MockCommander()
     commander.postbuild.postbuild("tasks.slpb")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "postbuild", "tasks.slpb", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_postbuild_with_parameters_and_dryrun(self):
+  def test_postbuild_command_with_parameters_and_dryrun(self):
     commander = MockCommander()
     commander.postbuild.postbuild(
       "tasks.slpb",

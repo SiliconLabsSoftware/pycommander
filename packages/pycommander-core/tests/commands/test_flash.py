@@ -4,14 +4,14 @@ from tests.mock_commander import MockCommander
 
 
 class TestFlash(unittest.TestCase):
-  def test_flash_minimal(self):
+  def test_flash_command_minimal(self):
     commander = MockCommander(serial_number="123456789")
     commander.flash.flash(["app.s37"])
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "flash", "app.s37", "--serialno", "123456789", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_flash_with_options(self):
+  def test_flash_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.flash.flash(
       ["app.s37", "bootloader.s37"],

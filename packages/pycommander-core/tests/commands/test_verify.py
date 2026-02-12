@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestVerify(unittest.TestCase):
-  def test_verify(self):
+  def test_verify_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.verify.verify(
       ["app.s37", "boot.s37"],
@@ -26,7 +26,7 @@ class TestVerify(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_verify_blank(self):
+  def test_verify_command_blank(self):
     commander = MockCommander(serial_number="123456789")
     commander.verify.verify(filenames=None, blank=True, regions=["@main"])
     self.assertEqual(len(commander._runner.logged_commands), 1)

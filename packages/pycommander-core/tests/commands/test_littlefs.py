@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestLittlefs(unittest.TestCase):
-  def test_littlefs_add(self):
+  def test_littlefs_add_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.add("fs.bin", file_paths=["a.txt"], dir_paths=["dir"], address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -16,7 +16,7 @@ class TestLittlefs(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_littlefs_dump(self):
+  def test_littlefs_dump_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.dump("out.bin", address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -27,7 +27,7 @@ class TestLittlefs(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_littlefs_extract(self):
+  def test_littlefs_extract_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.extract(dest_dir="out/", file_paths=["f"], address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -38,14 +38,14 @@ class TestLittlefs(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_littlefs_info(self):
+  def test_littlefs_info_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.info(address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "littlefs", "info", "--serialno", "123456789", "--address", "0x08000000", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_littlefs_init(self):
+  def test_littlefs_init_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.init("fs.bin", "EFR32MG12", size=65536, address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -57,14 +57,14 @@ class TestLittlefs(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_littlefs_list(self):
+  def test_littlefs_list_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.list_files(address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "littlefs", "list", "--serialno", "123456789", "--address", "0x08000000", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_littlefs_remove(self):
+  def test_littlefs_remove_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.remove(file_paths=["a"], dir_paths=["d"], address=0x08000000)
     self.assertEqual(len(commander._runner.logged_commands), 1)

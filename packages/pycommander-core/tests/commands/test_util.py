@@ -4,28 +4,28 @@ from tests.mock_commander import MockCommander
 
 
 class TestUtil(unittest.TestCase):
-  def test_util_appinfo(self):
+  def test_util_appinfo_command(self):
     commander = MockCommander()
     commander.util.appinfo("app.s37")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "util", "appinfo", "app.s37", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_elfinfo(self):
+  def test_util_elfinfo_command(self):
     commander = MockCommander()
     commander.util.elfinfo("app.elf")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "util", "elfinfo", "app.elf", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_extractkeys(self):
+  def test_util_extractkeys_command(self):
     commander = MockCommander()
     commander.util.extractkeys("config.json", "keys_dir")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "util", "extractkeys", "config.json", "--dir", "keys_dir", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_gencert(self):
+  def test_util_gencert_command(self):
     commander = MockCommander()
     commander.util.gencert("cert.der", 1, "gbl", "pub.pem", sign_keyfile="key.pem", extsign=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -37,7 +37,7 @@ class TestUtil(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_genkey(self):
+  def test_util_genkey_command(self):
     commander = MockCommander()
     commander.util.genkey("ecc-p256", pubkey="pub.pem", privkey="priv.pem", outfile="out.pem", tokenfile="tok.dat")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -48,21 +48,21 @@ class TestUtil(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_keytotoken(self):
+  def test_util_keytotoken_command(self):
     commander = MockCommander()
     commander.util.keytotoken("pub.pem", outfile="token.dat", key_type="ecc-p256")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "util", "keytotoken", "pub.pem", "--outfile", "token.dat", "--type", "ecc-p256", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_rpsinfo(self):
+  def test_util_rpsinfo_command(self):
     commander = MockCommander()
     commander.util.rpsinfo("app.rps")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "util", "rpsinfo", "app.rps", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_usage(self):
+  def test_util_usage_command(self):
     commander = MockCommander()
     commander.util.usage("app.elf", map_filename="app.map", include_sections=[".text"], exclude_sections=[".debug"])
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -73,14 +73,14 @@ class TestUtil(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_verifysign(self):
+  def test_util_verifysign_command(self):
     commander = MockCommander()
     commander.util.verifysign("signed.bin", "pub.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "util", "verifysign", "signed.bin", "--verify", "pub.pem", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_util_signcert(self):
+  def test_util_signcert_command(self):
     commander = MockCommander()
     commander.util.signcert("cert.der", "sig.der", "gbl", "signed.der", verify_keyfile="pub.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)

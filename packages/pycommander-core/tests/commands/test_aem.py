@@ -4,21 +4,21 @@ from tests.mock_commander import MockCommander
 
 
 class TestAem(unittest.TestCase):
-  def test_aem_calibrate(self):
+  def test_aem_calibrate_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.aem.calibrate()
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "calibrate", "--serialno", "123456789", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_aem_dump(self):
+  def test_aem_dump_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.aem.dump("out.csv", 10.0)
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "dump", "--serialno", "123456789", "--outfile", "out.csv", "--duration", "10.0", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_aem_dump_with_options(self):
+  def test_aem_dump_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.aem.dump(
       "out.csv", 5.0,
@@ -42,14 +42,14 @@ class TestAem(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_aem_measure(self):
+  def test_aem_measure_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.aem.measure()
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "measure", "--serialno", "123456789", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_aem_measure_with_options(self):
+  def test_aem_measure_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.aem.measure(windowlength_ms=200, calibrate=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)

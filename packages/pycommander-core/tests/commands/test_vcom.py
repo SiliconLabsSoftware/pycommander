@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestVcom(unittest.TestCase):
-  def test_vcom_config(self):
+  def test_vcom_config_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.vcom.config(baudrate=115200, handshake="rtscts", store=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)

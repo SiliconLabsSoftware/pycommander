@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestTokens(unittest.TestCase):
-  def test_tokens_createheader(self):
+  def test_tokens_createheader_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.tokens.createheader("tokens.h", tokengroup="zigbee", tokendefs="defs.json")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -15,7 +15,7 @@ class TestTokens(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_tokens_erase(self):
+  def test_tokens_erase_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.tokens.erase(
       securerange=(0x08000000, 0x08001000),
@@ -32,7 +32,7 @@ class TestTokens(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_tokens_read(self):
+  def test_tokens_read_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.tokens.read(
       filenames=[],
@@ -55,7 +55,7 @@ class TestTokens(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_tokens_write(self):
+  def test_tokens_write_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.tokens.write(
       tokenfiles=["tokens.json"],
