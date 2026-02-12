@@ -15,9 +15,11 @@ from .commander import Commander
 from .adapter import Adapter
 
 from pycommander_core.device import Device
+from pycommander_core._version import __version__
 
 __all__ = [
   "Commander",
   "Adapter",
   "Device",
+  "__version__",
 ]
