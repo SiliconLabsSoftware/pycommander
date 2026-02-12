@@ -88,8 +88,7 @@ jobs:
       - name: Test CLI package
         shell: bash
         run: |
-          python -m pip install -e packages/pycommander-core --force-reinstall
-          python -m pip install -e packages/pycommander-cli --force-reinstall
+          python -m pip install -e packages/pycommander-core -e packages/pycommander-cli --force-reinstall
           cd packages/pycommander-cli
           python -m unittest discover -s tests -p "test_*.py" -v
           python -m pip uninstall -y silabs-pycommander-cli
@@ -97,8 +96,7 @@ jobs:
       - name: Test GUI package
         shell: bash
         run: |
-          python -m pip install -e packages/pycommander-core --force-reinstall
-          python -m pip install -e packages/pycommander-gui --force-reinstall
+          python -m pip install -e packages/pycommander-core -e packages/pycommander-gui --force-reinstall
           cd packages/pycommander-gui
           python -m unittest discover -s tests -p "test_*.py" -v
           python -m pip uninstall -y silabs-pycommander-gui
