@@ -19,15 +19,15 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            flavor: linux-x86_64
+            platform: linux-x86_64
           - os: ubuntu-22.04-arm
-            flavor: linux-aarch64
+            platform: linux-aarch64
           - os: ubuntu-22.04-arm
-            flavor: linux-aarch32
+            platform: linux-aarch32
           - os: macos-latest
-            flavor: macos-arm64
+            platform: macos-arm64
           - os: windows-latest
-            flavor: windows-x86
+            platform: windows-x86
 
     steps:
       - uses: actions/checkout@v4
@@ -39,30 +39,30 @@ jobs:
           check-latest: true
 
       - name: Pick Commander Executables
-        if: matrix.flavor != ''
+        if: matrix.platform != ''
         shell: bash
         run: |
-          echo "flavor: ${{ matrix.flavor }}"
+          echo "platform: ${{ matrix.platform }}"
           CLI_TARGET_DIR="packages/pycommander-cli/src/pycommander_cli/_archive/"
           GUI_TARGET_DIR="packages/pycommander-gui/src/pycommander_gui/_archive/"
 
-          if [[ "${{ matrix.flavor }}" == windows-* ]]; then
+          if [[ "${{ matrix.platform }}" == windows-* ]]; then
             CLI_ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
             GUI_ARCHIVE=$(ls archives/Commander_win32_x64_*.zip 2>/dev/null | head -1)
-          elif [[ "${{ matrix.flavor }}" == macos-* ]]; then
+          elif [[ "${{ matrix.platform }}" == macos-* ]]; then
             CLI_ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
             GUI_ARCHIVE=$(ls archives/Commander_osx_*.zip 2>/dev/null | head -1)
-          elif [[ "${{ matrix.flavor }}" == linux-x86_64 ]]; then
+          elif [[ "${{ matrix.platform }}" == linux-x86_64 ]]; then
             CLI_ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
             GUI_ARCHIVE=$(ls archives/Commander_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
-          elif [[ "${{ matrix.flavor }}" == linux-aarch32 ]]; then
+          elif [[ "${{ matrix.platform }}" == linux-aarch32 ]]; then
             CLI_ARCHIVE=$(ls archives/Commander-cli_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
             GUI_ARCHIVE=$(ls archives/Commander_linux_aarch32_*.tar.bz 2>/dev/null | head -1)
-          elif [[ "${{ matrix.flavor }}" == linux-aarch64 ]]; then
+          elif [[ "${{ matrix.platform }}" == linux-aarch64 ]]; then
             CLI_ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
             GUI_ARCHIVE=$(ls archives/Commander_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
           else
-            echo "Unsupported flavor: ${{ matrix.flavor }}"
+            echo "Unsupported platform: ${{ matrix.platform }}"
             exit 1
           fi
 
@@ -97,7 +97,7 @@ jobs:
         # This wheel is built on aarch64, but the Commander executable is aarch32.
         # We need to retag it to the correct platform. The real wheel will be retagged later,
         # to a tag that PyPI will accept.
-        if: matrix.flavor == 'linux-aarch32'
+        if: matrix.platform == 'linux-aarch32'
         shell: bash
         run: |
           for package in packages/*; do
@@ -109,7 +109,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.flavor }}
+          name: dist-${{ matrix.platform }}
           path: packages/*/dist/*.whl
 
   publish-to-pypi:
