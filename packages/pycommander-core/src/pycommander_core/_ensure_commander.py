@@ -5,6 +5,7 @@
 import hashlib
 import subprocess
 import shutil
+import re
 
 import importlib.resources as ir
 
@@ -46,6 +47,14 @@ def _extract_commander(package: str) -> None:
 
   resource = _find_executable_archive_resource(package)
 
+  # Get the version of the executable from the archive name
+  pattern = r"Commander-(?:\w+)_(\d+v\d+p\d+b\d+)\.(?:zip|tar\.bz)"
+  match = re.search(pattern, resource)
+  if match:
+    version = match.group(1)
+  else:
+    raise ValueError(f"Could not determine version from Commander archive name: {resource}")
+
   # Find the filename of the executable in the archive
   with ir.as_file(ir.files(package) / resource) as zip_file:
     if sys.platform == "darwin":
@@ -57,7 +66,8 @@ def _extract_commander(package: str) -> None:
     else:
       raise ValueError(f"Unsupported platform: {sys.platform}")
 
-    _write_hash_to_file(STAMP_FILE_PATH, _compute_hash_of_resource(package, resource))
+  _write_hash_to_file(STAMP_FILE_PATH, _compute_hash_of_resource(package, resource))
+  _write_version_to_file(VERSION_FILE_PATH, version)
 
 def _extract_commander_macos(zip_file: Path, destination: Path) -> None:
   if not zip_file.exists():
@@ -120,3 +130,6 @@ def _read_hash_from_file(stamp_file: Path) -> str:
 
 def _write_hash_to_file(stamp_file: Path, hash: str) -> None:
   stamp_file.write_text(hash)
+
+def _write_version_to_file(version_file: Path, version: str) -> None:
+  version_file.write_text(version)
