@@ -48,7 +48,7 @@ def _extract_commander(package: str) -> None:
   resource = _find_executable_archive_resource(package)
 
   # Get the version of the executable from the archive name
-  pattern = r"Commander-(?:\w+)_(\d+v\d+p\d+b\d+)\.(?:zip|tar\.bz)"
+  pattern = r"Commander(?:.+)_(\d+v\d+p\d+b\d+)\.(?:zip|tar\.bz)"
   match = re.search(pattern, resource)
   if match:
     version = match.group(1)
