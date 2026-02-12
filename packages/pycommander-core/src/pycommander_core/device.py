@@ -1,10 +1,9 @@
-from abc import ABC
 from pathlib import Path
 
 from .commander_base import CommanderBase
 from .types import CtuneValue, DeviceInfo
 
-class DeviceBase(ABC):
+class Device:
   def __init__(self, part_number: str, commander: CommanderBase):
     self._commander : CommanderBase = commander
     self.part_number : str = part_number

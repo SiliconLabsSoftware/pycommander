@@ -1,7 +1,7 @@
 from pycommander_core.adapter_base import AdapterBase
+from pycommander_core.device import Device
 
 from .commander import Commander
-from .device import Device
 
 class Adapter(AdapterBase):
   def __init__(self,
