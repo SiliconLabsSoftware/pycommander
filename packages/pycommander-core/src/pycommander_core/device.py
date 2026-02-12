@@ -120,4 +120,22 @@ class Device:
 
     return result["success"]
 
-  
+  def lockDebugAccess(self) -> bool:
+    """Lock the device for debug access.
+
+    Returns:
+      True if the debug lock was successful, False otherwise.
+    """
+
+    result = self._commander.device.lock(device=self.part_number)
+    return result["success"]
+
+  def unlockDebugAccess(self) -> bool:
+    """Unlock the device for debug access.
+
+    Returns:
+      True if the debug unlock was successful, False otherwise.
+    """
+
+    result = self._commander.device.unlock(device=self.part_number)
+    return result["success"]
