@@ -1,5 +1,7 @@
 # Silicon Labs PyCommander
 
+[![Unit tests](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest.yml/badge.svg)](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest.yml)
+
 ## Introduction
 
 This Python package wraps Simplicity Commander functionality and exposes a native Python API for interacting with Commander in your scripts.
