@@ -15,9 +15,11 @@ sections of the MSLA applicable to Source Code.
 from .commander_base import CommanderBase
 from .adapter_base import AdapterBase
 from .device import Device
+from ._version import __version__
 
 __all__ = [
   "CommanderBase",
   "AdapterBase",
   "Device",
+  "__version__",
 ]

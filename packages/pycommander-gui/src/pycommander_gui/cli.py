@@ -1,24 +1,12 @@
 import sys
-import subprocess
 
+from pycommander_core.cli import PyCommanderCLI
 from pycommander_core.paths import EXECUTABLE_PATH_GUI
-from pycommander_core._ensure_commander import ensure_commander
 
-
-def main(args: list[str] | None = None) -> int:
-  if not ensure_commander(cli=False):
-    return 1
-
-  if args is None:
-    args = sys.argv[1:]  # Skip the script name
-  else:
-    args = args
-
-  try:
-    result = subprocess.run([EXECUTABLE_PATH_GUI, *args])
-    return result.returncode
-  except KeyboardInterrupt:
-    return 128 + 2 # 128 + SIGINT
+def main() -> int:
+  cli = PyCommanderCLI(EXECUTABLE_PATH_GUI)
+  args = sys.argv[1:]  # Skip the script name
+  return cli.run(*args)
 
 
 if __name__ == "__main__":
