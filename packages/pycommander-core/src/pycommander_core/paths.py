@@ -5,6 +5,7 @@ from pathlib import Path
 ARCHIVE_DIR         = Path(__file__).parent / "_archive"
 PYCOMMANDER_DIR     = Path.home() / ".silabs" / "pycommander"
 STAMP_FILE_PATH     = PYCOMMANDER_DIR / ".stamp"
+VERSION_FILE_PATH   = PYCOMMANDER_DIR / ".version"
 EXECUTABLE_ROOT_DIR = PYCOMMANDER_DIR / "bin"
 
 EXECUTABLE_PATH_CLI = ""
