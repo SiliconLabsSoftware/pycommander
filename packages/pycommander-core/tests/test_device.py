@@ -502,3 +502,106 @@ class TestDevice(unittest.TestCase):
 
     self.assertEqual(device.unlockDebugAccess(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_enableWriteProtection_requires_range_or_region(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    with self.assertRaises(ValueError) as ctx:
+      device.enableWriteProtection()
+    self.assertIn("At least one range or region must be specified", str(ctx.exception))
+
+  def test_device_enableWriteProtection_with_range(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.enableWriteProtection(ranges=[(0x0, 0x1000)]), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--range", "0x00000000:0x00001000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_enableWriteProtection_with_region(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.enableWriteProtection(regions=["@main"]), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_enableWriteProtection_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to enable write protection"}'))
+
+    self.assertEqual(device.enableWriteProtection(ranges=[(0x0, 0x8000)]), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--range", "0x00000000:0x00008000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_enableReadProtection_requires_range_or_region(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    with self.assertRaises(ValueError) as ctx:
+      device.enableReadProtection()
+    self.assertIn("At least one range or region must be specified", str(ctx.exception))
+
+  def test_device_enableReadProtection_with_range(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.enableReadProtection(ranges=[(0x0, 0x1000)]), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--range", "0x00000000:0x00001000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_enableReadProtection_with_region(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.enableReadProtection(regions=["@main"]), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_enableReadProtection_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to enable read protection"}'))
+
+    self.assertEqual(device.enableReadProtection(ranges=[(0x0, 0x8000)]), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--range", "0x00000000:0x00008000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_disableWriteProtection(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.disableWriteProtection(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_disableWriteProtection_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to disable write protection"}'))
+
+    self.assertEqual(device.disableWriteProtection(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_disableReadProtection(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.disableReadProtection(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_disableReadProtection_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to disable read protection"}'))
+
+    self.assertEqual(device.disableReadProtection(), False)
