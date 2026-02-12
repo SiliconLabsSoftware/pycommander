@@ -139,3 +139,57 @@ class Device:
 
     result = self._commander.device.unlock(device=self.part_number)
     return result["success"]
+
+  def enableWriteProtection(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
+    """Enable write protection for the specified ranges and/or regions.
+
+    Args:
+      ranges (list[tuple[int | str, int | str]]): The ranges to write protect (start, end).
+      regions (list[str]): The regions to write protect (@region).
+
+    Returns:
+      True if the write protection was successful, False otherwise.
+    """
+
+    if len(ranges) == 0 and len(regions) == 0:
+      raise ValueError("At least one range or region must be specified")
+
+    result = self._commander.device.protect(write=True, ranges=ranges, regions=regions, device=self.part_number)
+    return result["success"]
+
+  def enableReadProtection(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
+    """Read protect the specified ranges and/or regions.
+
+    Args:
+      ranges (list[tuple[int | str, int | str]]): The ranges to read protect (start, end).
+      regions (list[str]): The regions to read protect (@region).
+
+    Returns:
+      True if the read protection was successful, False otherwise.
+    """
+
+    if len(ranges) == 0 and len(regions) == 0:
+      raise ValueError("At least one range or region must be specified")
+
+    result = self._commander.device.protect(read=True, ranges=ranges, regions=regions, device=self.part_number)
+    return result["success"]
+
+  def disableWriteProtection(self) -> bool:
+    """Disable write protection for the entire flash.
+
+    Returns:
+      True if the write protection was disabled successfully, False otherwise.
+    """
+
+    result = self._commander.device.protect(write=True, disable=True, device=self.part_number)
+    return result["success"]
+
+  def disableReadProtection(self) -> bool:
+    """Disable read protection for the entire flash.
+
+    Returns:
+      True if the read protection was disabled successfully, False otherwise.
+    """
+
+    result = self._commander.device.protect(read=True, disable=True, device=self.part_number)
+    return result["success"]
