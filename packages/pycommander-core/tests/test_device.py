@@ -54,6 +54,42 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.info(), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
 
+  def test_device_reset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.reset(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "reset", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_reset_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to reset the device"}'))
+
+    self.assertEqual(device.reset(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "reset", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_masserase(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.masserase(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "masserase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_masserase_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to mass erase the device"}'))
+
+    self.assertEqual(device.masserase(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "masserase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
   def test_device_getCTUNE(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
