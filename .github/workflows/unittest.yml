@@ -13,8 +13,22 @@ permissions:
   packages: write
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  unittest:
+    timeout-minutes: 10
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x86_64
+          - os: ubuntu-22.04-arm
+            platform: linux-aarch64
+          - os: macos-latest
+            platform: macos-arm64
+          - os: windows-latest
+            platform: windows-x86
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -23,6 +37,43 @@ jobs:
           python-version: "3.10"
           check-latest: true
 
+      - name: Pick Commander Executables
+        if: matrix.platform != ''
+        shell: bash
+        run: |
+          echo "platform: ${{ matrix.platform }}"
+          CLI_TARGET_DIR="packages/pycommander-cli/src/pycommander_cli/_archive/"
+          GUI_TARGET_DIR="packages/pycommander-gui/src/pycommander_gui/_archive/"
+
+          if [[ "${{ matrix.platform }}" == windows-* ]]; then
+            CLI_ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_win32_x64_*.zip 2>/dev/null | head -1)
+          elif [[ "${{ matrix.platform }}" == macos-* ]]; then
+            CLI_ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_osx_*.zip 2>/dev/null | head -1)
+          elif [[ "${{ matrix.platform }}" == linux-x86_64 ]]; then
+            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
+          elif [[ "${{ matrix.platform }}" == linux-aarch64 ]]; then
+            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
+            GUI_ARCHIVE=$(ls archives/Commander_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
+          else
+            echo "Unsupported platform: ${{ matrix.platform }}"
+            exit 1
+          fi
+
+          echo "Copying CLI archive: $CLI_ARCHIVE"
+          cp "$CLI_ARCHIVE" "$CLI_TARGET_DIR"
+
+          echo "Listing contents of $CLI_TARGET_DIR:"
+          ls -la "$CLI_TARGET_DIR"
+
+          echo "Copying GUI archive: $GUI_ARCHIVE"
+          cp "$GUI_ARCHIVE" "$GUI_TARGET_DIR"
+
+          echo "Listing contents of $GUI_TARGET_DIR:"
+          ls -la "$GUI_TARGET_DIR"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -30,22 +81,24 @@ jobs:
       - name: Test Core package
         shell: bash
         run: |
-          python -m pip install -e packages/pycommander-core
+          python -m pip install -e packages/pycommander-core --force-reinstall
           cd packages/pycommander-core
           python -m unittest discover -s tests -p "test_*.py" -v
 
       - name: Test CLI package
         shell: bash
         run: |
-          python -m pip uninstall -y silabs-pycommander-cli silabs-pycommander-gui
-          python -m pip install -e packages/pycommander-cli
+          python -m pip install -e packages/pycommander-core --force-reinstall
+          python -m pip install -e packages/pycommander-cli --force-reinstall
           cd packages/pycommander-cli
           python -m unittest discover -s tests -p "test_*.py" -v
+          python -m pip uninstall -y silabs-pycommander-cli
 
       - name: Test GUI package
         shell: bash
         run: |
-          python -m pip uninstall -y silabs-pycommander-cli silabs-pycommander-gui
-          python -m pip install -e packages/pycommander-gui
+          python -m pip install -e packages/pycommander-core --force-reinstall
+          python -m pip install -e packages/pycommander-gui --force-reinstall
           cd packages/pycommander-gui
           python -m unittest discover -s tests -p "test_*.py" -v
+          python -m pip uninstall -y silabs-pycommander-gui

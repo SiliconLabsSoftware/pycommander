@@ -9,6 +9,7 @@ class TestCommander(unittest.TestCase):
   def test_commander_cli_executable_path(self):
     commander = Commander()
     self.assertEqual(commander._runner._executable, EXECUTABLE_PATH_CLI)
+    self.assertTrue(commander._runner._executable.exists())
 
   def test_commander_cli_all_options_passed(self):
     commander = Commander(
