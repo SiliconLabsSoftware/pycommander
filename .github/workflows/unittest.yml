@@ -27,6 +27,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
 
+      - name: Install pycommander
+        shell: bash
+        run: |
+          python -m pip install -e packages/pycommander-core
+          python -m pip install -e packages/pycommander-cli
+          python -m pip install -e packages/pycommander-gui
+
       - name: Run tests
         shell: bash
         run: |
