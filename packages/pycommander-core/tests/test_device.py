@@ -466,3 +466,39 @@ class TestDevice(unittest.TestCase):
     
     self.assertEqual(device.setCTUNE(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_lockDebugAccess(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.lockDebugAccess(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_lockDebugAccess_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to lock the device"}'))
+
+    self.assertEqual(device.lockDebugAccess(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_unlockDebugAccess(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.unlockDebugAccess(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_unlockDebugAccess_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to unlock the device"}'))
+
+    self.assertEqual(device.unlockDebugAccess(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
