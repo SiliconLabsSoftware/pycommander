@@ -19,6 +19,7 @@ class MockRunner(Runner):
   ):
     super().__init__(executable, log_file_path=log_file_path, timeout_s=timeout_s)
     self.logged_commands: list[list[str]] = []
+    self.queued_results: list[RunnerResult] = []
 
   def run(self, *args: str, json_format: bool = True) -> RunnerResult:
     if json_format:
@@ -32,9 +33,15 @@ class MockRunner(Runner):
             "version": {"simplicity_commander_version": "0.0.0"},
         },
       })
+    elif self.queued_results:
+      result = self.queued_results.pop(0)
+      return result
     elif json_format:
       output = json.dumps({"result": {}})
     else:
       output = ""
 
     return RunnerResult(0, output)
+
+  def queue_result(self, result: RunnerResult):
+    self.queued_results.append(result)
