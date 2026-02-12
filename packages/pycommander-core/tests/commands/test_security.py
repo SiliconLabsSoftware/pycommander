@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestSecurity(unittest.TestCase):
-  def test_security_attestation(self):
+  def test_security_attestation_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.attestation(reset=False)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -15,7 +15,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_closeregion(self):
+  def test_security_closeregion_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.closeregion(1, reset=False, codeversion=2)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -26,7 +26,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_erasedevice(self):
+  def test_security_erasedevice_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.erasedevice(reset=False, dryrun=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -37,7 +37,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_gencert(self):
+  def test_security_gencert_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.gencert(outfile="cert.der", store=False, extsign=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -48,7 +48,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_genkey(self):
+  def test_security_genkey_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.genkey("ecc-p256", outfile="key.pem", privkey="priv.pem", pubkey="pub.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -60,7 +60,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_lock(self):
+  def test_security_lock_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.lock(reset=False, dryrun=True, trustzone="tz.yaml")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -71,7 +71,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_unlock(self):
+  def test_security_unlock_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.unlock(reset=False, store=False, cert="c.pem", authorization="auth.dat")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -82,7 +82,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_provision(self):
+  def test_security_provision_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.provision(reset=False, sefw="se.fw")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -93,7 +93,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_readcert(self):
+  def test_security_readcert_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.readcert("device", outfile="cert.der", reset=False)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -104,7 +104,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_status(self):
+  def test_security_status_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.status(reset=False, trustzone=True, verbose=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -115,7 +115,7 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_security_writekey(self):
+  def test_security_writekey_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.writekey(sign_keyfile="s.pem", command_keyfile="c.pem", reset=False, dryrun=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)

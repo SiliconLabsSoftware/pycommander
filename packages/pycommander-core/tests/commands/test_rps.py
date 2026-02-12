@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestRps(unittest.TestCase):
-  def test_rps_create(self):
+  def test_rps_create_command(self):
     commander = MockCommander()
     commander.rps.create(
       "out.rps",
@@ -39,7 +39,7 @@ class TestRps(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_rps_convert(self):
+  def test_rps_convert_command(self):
     commander = MockCommander()
     commander.rps.convert(
       "out.rps",
@@ -65,14 +65,14 @@ class TestRps(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_rps_load(self):
+  def test_rps_load_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.rps.load("file.rps", eraseapp=True)
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "rps", "load", "file.rps", "--serialno", "123456789", "--eraseapp", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_rps_sign(self):
+  def test_rps_sign_command(self):
     commander = MockCommander()
     commander.rps.sign("in.rps", "sig.der", outfile="signed.rps")
     self.assertEqual(len(commander._runner.logged_commands), 1)

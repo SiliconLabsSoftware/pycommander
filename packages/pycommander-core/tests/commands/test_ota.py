@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestOta(unittest.TestCase):
-  def test_ota_create(self):
+  def test_ota_create_command(self):
     commander = MockCommander()
     commander.ota.create(
       "out.ota",
@@ -52,14 +52,14 @@ class TestOta(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_ota_parse(self):
+  def test_ota_parse_command(self):
     commander = MockCommander()
     commander.ota.parse("in.ota", type="zigbee", outfile="out.bin")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "ota", "parse", "in.ota", "--type", "zigbee", "--outfile", "out.bin", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_ota_sign(self):
+  def test_ota_sign_command(self):
     commander = MockCommander()
     commander.ota.sign("in.ota", "sig.der", "out.ota", "prime256v1")
     self.assertEqual(len(commander._runner.logged_commands), 1)
@@ -70,7 +70,7 @@ class TestOta(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_ota_verify(self):
+  def test_ota_verify_command(self):
     commander = MockCommander()
     commander.ota.verify("file.ota", "cert.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)

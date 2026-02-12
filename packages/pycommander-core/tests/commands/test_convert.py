@@ -4,7 +4,7 @@ from tests.mock_commander import MockCommander
 
 
 class TestConvert(unittest.TestCase):
-  def test_convert(self):
+  def test_convert_command(self):
     commander = MockCommander()
     commander.convert.convert(
       ["a.bin", "b.hex"],

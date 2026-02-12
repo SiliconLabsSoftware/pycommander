@@ -4,14 +4,14 @@ from tests.mock_commander import MockCommander
 
 
 class TestGbl3(unittest.TestCase):
-  def test_gbl3_aat_usageinfo(self):
+  def test_gbl3_aat_usageinfo_command(self):
     commander = MockCommander()
     commander.gbl3.aat_usageinfo()
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "gbl3", "aat-usageinfo", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_gbl3_create(self):
+  def test_gbl3_create_command(self):
     commander = MockCommander()
     commander.gbl3.create(
       "out.gbl3",
@@ -47,21 +47,21 @@ class TestGbl3(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_gbl3_keyconvert(self):
+  def test_gbl3_keyconvert_command(self):
     commander = MockCommander()
     commander.gbl3.keyconvert("pub.pem", type="ecc-p256", outfile="tok.dat")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "gbl3", "keyconvert", "pub.pem", "--type", "ecc-p256", "--outfile", "tok.dat", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_gbl3_keygen(self):
+  def test_gbl3_keygen_command(self):
     commander = MockCommander()
     commander.gbl3.keygen("ecc-p256", outfile="key.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "gbl3", "keygen", "--type", "ecc-p256", "--outfile", "key.pem", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_gbl3_parse(self):
+  def test_gbl3_parse_command(self):
     commander = MockCommander()
     commander.gbl3.parse(
       "in.gbl3",
@@ -81,7 +81,7 @@ class TestGbl3(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_gbl3_sign(self):
+  def test_gbl3_sign_command(self):
     commander = MockCommander()
     commander.gbl3.sign("unsigned.gbl3", "signed.gbl3", "sig.der", verify_keyfile="pub.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)

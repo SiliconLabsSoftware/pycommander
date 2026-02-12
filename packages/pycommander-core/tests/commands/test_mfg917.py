@@ -12,7 +12,7 @@ def _serial_all(serialno: str = "123456789"):
 
 
 class TestMfg917(unittest.TestCase):
-  def test_mfg917_dpdtraining(self):
+  def test_mfg917_dpdtraining_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.dpdtraining(
       serialport="COM1",
@@ -36,7 +36,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_dump(self):
+  def test_mfg917_dump_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.dump(
       "out.bin",
@@ -52,7 +52,7 @@ class TestMfg917(unittest.TestCase):
     expected = ["mock", "mfg917", "dump", "out.bin"] + _serial_all() + ["--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_erase(self):
+  def test_mfg917_erase_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.erase(
       "region1",
@@ -76,7 +76,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_evmoffset(self):
+  def test_mfg917_evmoffset_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.evmoffset(
       serialport="COM1",
@@ -106,7 +106,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_fwupgrade(self):
+  def test_mfg917_fwupgrade_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.fwupgrade(
       "fw.bin",
@@ -122,7 +122,7 @@ class TestMfg917(unittest.TestCase):
     expected = ["mock", "mfg917", "fwupgrade", "fw.bin"] + _serial_all() + ["--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_gain(self):
+  def test_mfg917_gain_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.gain(
       serialport="COM1",
@@ -151,7 +151,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_info(self):
+  def test_mfg917_info_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.info(
       serialport="COM1",
@@ -166,7 +166,7 @@ class TestMfg917(unittest.TestCase):
     expected = ["mock", "mfg917", "info"] + _serial_all() + ["--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_init(self):
+  def test_mfg917_init_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.init(
       serialport="COM1",
@@ -188,7 +188,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_protectconfig(self):
+  def test_mfg917_protectconfig_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.protectconfig(
       "full",
@@ -215,7 +215,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_provision(self):
+  def test_mfg917_provision_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.provision(
       serialport="COM1",
@@ -240,7 +240,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_provisionotpkeys(self):
+  def test_mfg917_provisionotpkeys_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.provisionotpkeys(
       serialport="COM1",
@@ -263,7 +263,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_radio(self):
+  def test_mfg917_radio_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.radio(
       serialport="COM1",
@@ -292,7 +292,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_read_all_options(self):
+  def test_mfg917_read_command_all_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.read(
       "region1",
@@ -319,7 +319,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_setupinterface_all_options(self):
+  def test_mfg917_setupinterface_command_all_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.setupinterface(
       serialport="COM1",
@@ -334,7 +334,7 @@ class TestMfg917(unittest.TestCase):
     expected = ["mock", "mfg917", "setupinterface"] + _serial_all() + ["--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_write_all_options(self):
+  def test_mfg917_write_command_all_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.write(
       "region1",
@@ -362,7 +362,7 @@ class TestMfg917(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
-  def test_mfg917_xocal_all_options(self):
+  def test_mfg917_xocal_command_all_options(self):
     commander = MockCommander(serial_number="123456789")
     commander.mfg917.xocal(
       serialport="COM1",
