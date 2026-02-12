@@ -14,10 +14,10 @@ sections of the MSLA applicable to Source Code.
 # This is the entry point for the PyCommander package, when you do `import pycommander`
 from .commander_base import CommanderBase
 from .adapter_base import AdapterBase
-from .device_base import DeviceBase
+from .device import Device
 
 __all__ = [
   "CommanderBase",
   "AdapterBase",
-  "DeviceBase",
+  "Device",
 ]

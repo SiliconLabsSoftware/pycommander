@@ -13,7 +13,8 @@ sections of the MSLA applicable to Source Code.
 
 from .commander import Commander
 from .adapter import Adapter
-from .device import Device
+
+from pycommander_core.device import Device
 
 __all__ = [
   "Commander",
