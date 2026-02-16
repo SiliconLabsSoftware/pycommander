@@ -5,7 +5,6 @@
 import hashlib
 import subprocess
 import shutil
-import re
 
 import importlib.resources as ir
 
@@ -21,13 +20,11 @@ def ensure_commander(cli: bool = True) -> bool:
     executable_root_dir = ROOT_DIR_CLI
     executable_path     = EXECUTABLE_PATH_CLI
     stamp_file_path     = STAMP_FILE_PATH_CLI
-    version_file_path   = VERSION_FILE_PATH_CLI
     package_name        = "pycommander_cli._archive"
   else:
     executable_root_dir = ROOT_DIR_GUI
     executable_path     = EXECUTABLE_PATH_GUI
     stamp_file_path     = STAMP_FILE_PATH_GUI
-    version_file_path   = VERSION_FILE_PATH_GUI
     package_name        = "pycommander_gui._archive"
 
   # Look for the executable zip in the packages
@@ -40,31 +37,21 @@ def ensure_commander(cli: bool = True) -> bool:
       return True
     else:
       # The executable is not up to date, so we need to extract it from the archive
-      _extract_commander(package_name, executable_root_dir, version_file_path, stamp_file_path)
+      _extract_commander(package_name, executable_root_dir, stamp_file_path)
   else:
     # The executable is not present, or the stamp file is missing. Extract Commander.
-    _extract_commander(package_name, executable_root_dir, version_file_path, stamp_file_path)
+    _extract_commander(package_name, executable_root_dir, stamp_file_path)
 
   return True
 
-def _extract_commander(package_name: str, executable_root_dir: Path, version_file_path: Path, stamp_file_path: Path) -> None:
-  # Remove the existing executable, version, and stamp files, if they exist.
+def _extract_commander(package_name: str, executable_root_dir: Path, stamp_file_path: Path) -> None:
+  # Remove the existing executable and stamp files, if they exist.
   if executable_root_dir.exists():
     shutil.rmtree(executable_root_dir, ignore_errors=True)
-  if version_file_path.exists():
-    version_file_path.unlink()
   if stamp_file_path.exists():
     stamp_file_path.unlink()
 
   resource = _find_executable_archive_resource(package_name)
-
-  # Get the version of the executable from the archive name
-  pattern = r"Commander(?:.+)_(\d+v\d+p\d+b\d+)\.(?:zip|tar\.bz)"
-  match = re.search(pattern, resource)
-  if match:
-    version = match.group(1)
-  else:
-    raise ValueError(f"Could not determine version from Commander archive name: {resource}")
 
   # Find the filename of the executable in the archive
   with ir.as_file(ir.files(package_name) / resource) as zip_file:
@@ -78,7 +65,6 @@ def _extract_commander(package_name: str, executable_root_dir: Path, version_fil
       raise ValueError(f"Unsupported platform: {sys.platform}")
 
   _write_hash_to_file(stamp_file_path, _compute_hash_of_resource(package_name, resource))
-  _write_version_to_file(version_file_path, version)
 
 def _extract_commander_macos(zip_file: Path, destination: Path) -> None:
   if not zip_file.exists():
@@ -141,6 +127,3 @@ def _read_hash_from_file(stamp_file: Path) -> str:
 
 def _write_hash_to_file(stamp_file: Path, hash: str) -> None:
   stamp_file.write_text(hash)
-
-def _write_version_to_file(version_file: Path, version: str) -> None:
-  version_file.write_text(version)
