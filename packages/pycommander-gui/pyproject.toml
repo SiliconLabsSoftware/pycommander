@@ -1,6 +1,6 @@
 [project]
 name = "silabs-pycommander-gui"
-version = "0.1.3"
+version = "0.1.4"
 description = "Python library for Silicon Labs Simplicity Commander (GUI version)"
 authors = [{ name = "Silicon Labs"}]
 license = "LicenseRef-MSLA"
@@ -8,7 +8,7 @@ license-files = ["LICENSE.md"]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-  "silabs-pycommander-core==0.1.3"
+  "silabs-pycommander-core==0.1.4"
 ]
 
 [build-system]
