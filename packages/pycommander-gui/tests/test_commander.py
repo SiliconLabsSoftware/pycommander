@@ -14,8 +14,6 @@ class TestCommander(unittest.TestCase):
   def test_commander_gui_all_options_passed(self):
     commander = Commander(
       serial_number="123456789",
-      ip_address="192.168.1.1",
-      serial_port="COM1",
       debug_speed=115200,
       debug_tif="TIF1",
       debug_irpre=1,
@@ -25,11 +23,22 @@ class TestCommander(unittest.TestCase):
     )
 
     self.assertEqual(commander._serial_number, "123456789")
-    self.assertEqual(commander._ip_address, "192.168.1.1")
-    self.assertEqual(commander._serial_port, "COM1")
     self.assertEqual(commander._debug_speed, 115200)
     self.assertEqual(commander._debug_tif, "TIF1")
     self.assertEqual(commander._debug_irpre, 1)
     self.assertEqual(commander._debug_drpre, 1)
     self.assertEqual(commander._runner._log_file_path, Path("test.log"))
     self.assertEqual(commander._runner._executable, Path("derp"))
+
+
+  def test_commander_gui_serial_number_and_ip_address_provided(self):
+    with self.assertRaises(ValueError):
+      Commander(serial_number="123456789", ip_address="192.168.1.1")
+
+  def test_commander_gui_serial_number_and_serial_port_provided(self):
+    with self.assertRaises(ValueError):
+      Commander(serial_number="123456789", serial_port="COM1")
+
+  def test_commander_gui_ip_address_and_serial_port_provided(self):
+    with self.assertRaises(ValueError):
+      Commander(ip_address="192.168.1.1", serial_port="COM1")
