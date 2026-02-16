@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestEbl(unittest.TestCase):
@@ -16,6 +16,23 @@ class TestEbl(unittest.TestCase):
     commander.ebl.create("out.ebl", app="app.s37", sign_keyfile="key.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "ebl", "create", "out.ebl", "--app", "app.s37", "--sign", "key.pem", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_ebl_create_command_with_encrypt_extsign_signature_verify(self):
+    commander = MockCommander()
+    commander.ebl.create(
+      "out.ebl",
+      encrypt_keyfile="aes.key",
+      extsign=True,
+      signature="sig.der",
+      verify_keyfile="pub.pem",
+    )
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "ebl", "create", "out.ebl",
+      "--encrypt", "aes.key", "--extsign", "--signature", "sig.der", "--verify", "pub.pem",
+      "--json",
+    ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
   def test_ebl_keyconvert_command(self):
@@ -37,6 +54,13 @@ class TestEbl(unittest.TestCase):
     commander.ebl.parse("in.ebl", app="app.s37", verify_keyfile="pub.pem")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "ebl", "parse", "in.ebl", "--app", "app.s37", "--verify", "pub.pem", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_ebl_parse_command_with_decrypt(self):
+    commander = MockCommander()
+    commander.ebl.parse("in.ebl", decrypt_keyfile="aes.key")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "ebl", "parse", "in.ebl", "--decrypt", "aes.key", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
   def test_ebl_print_command(self):

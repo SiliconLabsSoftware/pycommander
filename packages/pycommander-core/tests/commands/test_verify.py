@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestVerify(unittest.TestCase):
@@ -9,9 +9,11 @@ class TestVerify(unittest.TestCase):
     commander.verify.verify(
       ["app.s37", "boot.s37"],
       address=0x08000000,
+      patches=[(0x100, 0xAB, 1)],
       tokens=["TOKEN_A:1"],
       tokenfiles=["tokens.json"],
       tokengroup="zigbee",
+      tokendefs="defs.json",
       reset=False,
       regions=["@main"],
       binary=True,
@@ -20,7 +22,10 @@ class TestVerify(unittest.TestCase):
     expected = [
       "mock", "verify", "app.s37", "boot.s37",
       "--serialno", "123456789",
-      "--address", "0x08000000", "--token", "TOKEN_A:1", "--tokenfile", "tokens.json", "--tokengroup", "zigbee",
+      "--address", "0x08000000",
+      "--patch", "0x00000100:0x000000AB:1",
+      "--token", "TOKEN_A:1", "--tokenfile", "tokens.json", "--tokengroup", "zigbee",
+      "--tokendefs", "defs.json",
       "--noreset", "--region", "@main", "--binary",
       "--json",
     ]

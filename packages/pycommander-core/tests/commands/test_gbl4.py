@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestGbl4(unittest.TestCase):
@@ -13,6 +13,7 @@ class TestGbl4(unittest.TestCase):
       seupgrade="se.s37",
       encrypt_keyfile="key.bin",
       compress="lz4",
+      certificate="cert.pem",
       sign_keyfile="key.pem",
       extsign=True,
       productid="0123456789ABCDEF",
@@ -23,7 +24,8 @@ class TestGbl4(unittest.TestCase):
     expected = [
       "mock", "gbl4", "create", "out.gbl4",
       "--config", "config.yaml", "--data", "app.s37", "--seupgrade", "se.s37",
-      "--encrypt", "key.bin", "--compress", "lz4", "--sign", "key.pem", "--extsign",
+      "--encrypt", "key.bin", "--compress", "lz4", "--certificate", "cert.pem",
+      "--sign", "key.pem", "--extsign",
       "--productid", "0123456789ABCDEF", "--bundleversion", "1.0.0", "--minversion", "0.9.0",
       "--json",
     ]

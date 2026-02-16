@@ -1,0 +1,17 @@
+[run]
+source =
+  packages/pycommander-core
+  packages/pycommander-cli
+  packages/pycommander-gui
+  packages/pycommander
+
+omit = 
+  */__init__.py
+  */__main__.py
+  */tests/*
+  */mock_*.py
+  */build_hook.py
+
+[report]
+show_missing = true
+sort = Cover

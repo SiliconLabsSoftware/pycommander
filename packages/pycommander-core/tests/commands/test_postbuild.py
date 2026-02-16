@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestPostbuild(unittest.TestCase):
