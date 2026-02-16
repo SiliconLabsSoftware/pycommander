@@ -4,10 +4,26 @@ from .device import Device
 from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo
 
 class AdapterBase:
-  def __init__(self, commander: CommanderBase, target: Device):
+  def __init__(self,
+              serial_number: str       | None = None,
+              ip_address: str          | None = None,
+              serial_port: str         | None = None,
+              target_device: str       | None = None,
+              debug_speed: int         | None = None,
+              debug_tif: str           | None = None,
+              debug_irpre: int         | None = None,
+              debug_drpre: int         | None = None,
+              target: Device           | None = None,
+              commander: CommanderBase | None = None):
+
+    if commander is None:
+      raise ValueError("commander must be provided")
+
+    if target is None:
+      raise ValueError("target must be provided")
+
     self._commander : CommanderBase = commander
     self.target : Device = target
-
 
   def info(self) -> AdapterInfo | None:
     """Get information about the adapter.

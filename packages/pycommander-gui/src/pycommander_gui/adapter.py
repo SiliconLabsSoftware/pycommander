@@ -27,16 +27,10 @@ class Adapter(AdapterBase):
       debug_drpre (int): The debug DRPRE of the adapter. Optional.
     """
 
-    if (serial_number and ip_address) or (serial_number and serial_port) or (ip_address and serial_port):
-      raise ValueError("Only one of serial_number, ip_address, or serial_port can be provided")
-
-    if not (serial_number or ip_address or serial_port):
-      raise ValueError("Either serial_number, ip_address, or serial_port must be provided")
-
-    if not target_device:
-      raise ValueError("target_device must be provided")
-
     if commander is None:
+      if not (serial_number or ip_address or serial_port):
+        raise ValueError("Either serial_number, ip_address, or serial_port must be provided")
+
       commander = Commander(
         serial_number=serial_number,
         ip_address=ip_address,
@@ -47,4 +41,9 @@ class Adapter(AdapterBase):
         debug_drpre=debug_drpre,
       )
 
-    super().__init__(commander=commander, target=Device(part_number=target_device, commander=commander))
+    if not target_device:
+      raise ValueError("target_device must be provided")
+
+    target = Device(part_number=target_device, commander=commander)
+
+    super().__init__(commander=commander, target=target)
