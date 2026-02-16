@@ -1,11 +1,9 @@
-from abc import ABC
-
 from .commander_base import CommanderBase
 from .device import Device
 
 from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo
 
-class AdapterBase(ABC):
+class AdapterBase:
   def __init__(self, commander: CommanderBase, target: Device):
     self._commander : CommanderBase = commander
     self.target : Device = target
