@@ -17,35 +17,46 @@ def ensure_commander(cli: bool = True) -> bool:
   if not PYCOMMANDER_DIR.exists():
     PYCOMMANDER_DIR.mkdir(parents=True, exist_ok=True)
 
-  executable_path = EXECUTABLE_PATH_CLI if cli else EXECUTABLE_PATH_GUI
-
-  package_name = "pycommander_cli._archive" if cli else "pycommander_gui._archive"
+  if cli:
+    executable_root_dir = ROOT_DIR_CLI
+    executable_path     = EXECUTABLE_PATH_CLI
+    stamp_file_path     = STAMP_FILE_PATH_CLI
+    version_file_path   = VERSION_FILE_PATH_CLI
+    package_name        = "pycommander_cli._archive"
+  else:
+    executable_root_dir = ROOT_DIR_GUI
+    executable_path     = EXECUTABLE_PATH_GUI
+    stamp_file_path     = STAMP_FILE_PATH_GUI
+    version_file_path   = VERSION_FILE_PATH_GUI
+    package_name        = "pycommander_gui._archive"
 
   # Look for the executable zip in the packages
-  if executable_path.exists() and STAMP_FILE_PATH.exists():
+  if executable_path.exists() and stamp_file_path.exists():
     # Check if the executable is up to date. We do this by computing the hash of the archive directory and comparing it to the hash stored in the stamp file.
     expected_hash = _compute_hash_of_resource(package_name, _find_executable_archive_resource(package_name))
-    stored_hash   = _read_hash_from_file(STAMP_FILE_PATH)
+    stored_hash   = _read_hash_from_file(stamp_file_path)
     if expected_hash == stored_hash:
       # All good, nothing to be done.
       return True
     else:
       # The executable is not up to date, so we need to extract it from the archive
-      _extract_commander(package_name)
+      _extract_commander(package_name, executable_root_dir, version_file_path, stamp_file_path)
   else:
     # The executable is not present, or the stamp file is missing. Extract Commander.
-    _extract_commander(package_name)
+    _extract_commander(package_name, executable_root_dir, version_file_path, stamp_file_path)
 
   return True
 
-def _extract_commander(package: str) -> None:
-  # Nuke the existing executable and stamp files, if need be.
-  if EXECUTABLE_ROOT_DIR.exists():
-    shutil.rmtree(EXECUTABLE_ROOT_DIR, ignore_errors=True)
-  if STAMP_FILE_PATH.exists():
-    STAMP_FILE_PATH.unlink()
+def _extract_commander(package_name: str, executable_root_dir: Path, version_file_path: Path, stamp_file_path: Path) -> None:
+  # Remove the existing executable, version, and stamp files, if they exist.
+  if executable_root_dir.exists():
+    shutil.rmtree(executable_root_dir, ignore_errors=True)
+  if version_file_path.exists():
+    version_file_path.unlink()
+  if stamp_file_path.exists():
+    stamp_file_path.unlink()
 
-  resource = _find_executable_archive_resource(package)
+  resource = _find_executable_archive_resource(package_name)
 
   # Get the version of the executable from the archive name
   pattern = r"Commander(?:.+)_(\d+v\d+p\d+b\d+)\.(?:zip|tar\.bz)"
@@ -56,18 +67,18 @@ def _extract_commander(package: str) -> None:
     raise ValueError(f"Could not determine version from Commander archive name: {resource}")
 
   # Find the filename of the executable in the archive
-  with ir.as_file(ir.files(package) / resource) as zip_file:
+  with ir.as_file(ir.files(package_name) / resource) as zip_file:
     if sys.platform == "darwin":
-      _extract_commander_macos(zip_file, EXECUTABLE_ROOT_DIR)
+      _extract_commander_macos(zip_file, executable_root_dir)
     elif sys.platform == "linux":
-      _extract_commander_linux(zip_file, EXECUTABLE_ROOT_DIR)
+      _extract_commander_linux(zip_file, executable_root_dir)
     elif sys.platform == "win32":
-      _extract_commander_windows(zip_file, EXECUTABLE_ROOT_DIR)
+      _extract_commander_windows(zip_file, executable_root_dir)
     else:
       raise ValueError(f"Unsupported platform: {sys.platform}")
 
-  _write_hash_to_file(STAMP_FILE_PATH, _compute_hash_of_resource(package, resource))
-  _write_version_to_file(VERSION_FILE_PATH, version)
+  _write_hash_to_file(stamp_file_path, _compute_hash_of_resource(package_name, resource))
+  _write_version_to_file(version_file_path, version)
 
 def _extract_commander_macos(zip_file: Path, destination: Path) -> None:
   if not zip_file.exists():
