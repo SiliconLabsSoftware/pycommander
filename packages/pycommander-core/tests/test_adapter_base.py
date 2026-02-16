@@ -1,13 +1,9 @@
-from re import A
 import unittest
 
-
-from pycommander_core.device import Device
 from pycommander_core.runner import RunnerResult
 from pycommander_core.types import AdapterInfo, AdapterBoardInfo, AdapterFwInfo
 
-from tests.mock_adapter import MockAdapter
-from tests.mock_commander import MockCommander
+from .mock_adapter import MockAdapter
 
 class TestAdapterBase(unittest.TestCase):
   def test_adapter_base_info(self):

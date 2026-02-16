@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestLittlefs(unittest.TestCase):
@@ -38,6 +38,25 @@ class TestLittlefs(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_littlefs_extract_command_with_zip_dirs_range_infile(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.littlefs.extract(
+      zip_dir="archive.zip",
+      dir_paths=["mydir"],
+      range=(0x08000000, 0x08010000),
+      infile="fs.bin",
+    )
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "littlefs", "extract",
+      "--serialno", "123456789",
+      "--range", "0x08000000:0x08010000", "--infile", "fs.bin",
+      "--dir", "mydir",
+      "--zip", "archive.zip",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_littlefs_info_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.littlefs.info(address=0x08000000)
@@ -53,6 +72,18 @@ class TestLittlefs(unittest.TestCase):
       "mock", "littlefs", "init",
       "--serialno", "123456789",
       "--address", "0x08000000", "--size", "65536", "--device", "EFR32MG12", "--outfile", "fs.bin",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_littlefs_init_command_with_range(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.littlefs.init("fs.bin", "EFR32MG12", range=(0x08000000, 0x08010000))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "littlefs", "init",
+      "--serialno", "123456789",
+      "--range", "0x08000000:0x08010000", "--device", "EFR32MG12", "--outfile", "fs.bin",
       "--json",
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)

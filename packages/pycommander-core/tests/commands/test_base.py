@@ -1,7 +1,7 @@
 import unittest
 
 from pycommander_core.commands._base import BaseCommand, CommandResult
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 class TestBase(unittest.TestCase):
 

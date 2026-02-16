@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestFlash(unittest.TestCase):
@@ -21,8 +21,11 @@ class TestFlash(unittest.TestCase):
       reset=False,
       close=False,
       verify=False,
+      patches=[(0x100, 0xAB, 1)],
       tokens=["TOKEN_X:1"],
+      tokenfiles=["tokens.json"],
       tokengroup="zigbee",
+      tokendefs="defs.json",
       binary=True,
       include_sections=[".text"],
       exclude_sections=[".debug"],
@@ -33,7 +36,9 @@ class TestFlash(unittest.TestCase):
       "mock", "flash", "app.s37", "bootloader.s37",
       "--serialno", "123456789",
       "--address", "0x08000000", "--halt", "--masserase", "--noreset", "--noclose", "--noverify",
-      "--token", "TOKEN_X:1", "--tokengroup", "zigbee",
+      "--patch", "0x00000100:0x000000AB:1",
+      "--token", "TOKEN_X:1", "--tokenfile", "tokens.json", "--tokengroup", "zigbee",
+      "--tokendefs", "defs.json",
       "--binary",
       "--include-section", ".text", "--exclude-section", ".debug",
       "--vtor", "0x08000000",

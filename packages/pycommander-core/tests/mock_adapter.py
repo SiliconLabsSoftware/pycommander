@@ -1,7 +1,7 @@
 from pycommander_core.adapter_base import AdapterBase
 from pycommander_core.device import Device
 
-from tests.mock_commander import MockCommander
+from .mock_commander import MockCommander
 
 class MockAdapter(AdapterBase):
   def __init__(self,

@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestSerial(unittest.TestCase):
@@ -42,11 +42,11 @@ class TestSerial(unittest.TestCase):
 
   def test_serial_unlock_command(self):
     commander = MockCommander(serial_number="123456789")
-    commander.serial.unlock(token_file="t.dat", key_file="k.dat", userdata="ud")
+    commander.serial.unlock(token_file="t.dat", key_file="k.dat", userdata="ud", serialport="COM3")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "serial", "unlock",
-      "--serialno", "123456789", "--token", "t.dat", "--key", "k.dat", "--userdata", "ud",
+      "--serialno", "123456789", "--token", "t.dat", "--key", "k.dat", "--userdata", "ud", "--serialport", "COM3",
       "--json",
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)

@@ -44,3 +44,7 @@ src/pycommander/_archive/*
 #code convention tool gitignore
 code-convention-tool/
 **/venv/
+
+# Coverage
+.coverage
+htmlcov/

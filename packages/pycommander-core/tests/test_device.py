@@ -4,7 +4,7 @@ from pycommander_core.device import Device
 from pycommander_core.runner import RunnerResult
 from pycommander_core.types import DeviceInfo, CtuneValue
 
-from tests.mock_commander import MockCommander
+from .mock_commander import MockCommander
 
 class TestDevice(unittest.TestCase):
   

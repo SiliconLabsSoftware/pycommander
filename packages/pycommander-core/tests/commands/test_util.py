@@ -1,6 +1,6 @@
 import unittest
 
-from tests.mock_commander import MockCommander
+from ..mock_commander import MockCommander
 
 
 class TestUtil(unittest.TestCase):
@@ -87,6 +87,17 @@ class TestUtil(unittest.TestCase):
     expected = [
       "mock", "util", "signcert", "cert.der",
       "--signature", "sig.der", "--cert-type", "gbl", "--outfile", "signed.der", "--verify", "pub.pem",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_util_genkeyconfig_command(self):
+    commander = MockCommander()
+    commander.util.genkeyconfig("keyconfig.json")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "util", "genkeyconfig",
+      "--outfile", "keyconfig.json",
       "--json",
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
