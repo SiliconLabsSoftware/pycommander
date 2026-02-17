@@ -91,6 +91,7 @@ jobs:
         with:
           name: coverage-data-${{ matrix.platform }}
           path: .coverage*
+          include-hidden-files: true
 
       - name: Generate local coverage report
         shell: bash
