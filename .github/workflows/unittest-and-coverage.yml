@@ -125,6 +125,7 @@ jobs:
       - name: Generate combined coverage report
         shell: bash
         run: |
+          ls -la
           coverage combine coverage-data
           coverage report
           coverage html
