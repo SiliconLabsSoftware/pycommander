@@ -1,4 +1,5 @@
 [run]
+parallel = true
 source =
   packages/pycommander-core
   packages/pycommander-cli
