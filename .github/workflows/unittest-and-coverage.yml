@@ -84,6 +84,7 @@ jobs:
         shell: bash
         run: |
           coverage run --parallel-mode run_tests.py
+          ls -la
 
       - name: Upload raw coverage data
         uses: actions/upload-artifact@v4
@@ -91,16 +92,17 @@ jobs:
           name: coverage-data-${{ matrix.platform }}
           path: .coverage*
 
-      - name: Generate coverage report
+      - name: Generate local coverage report
         shell: bash
         run: |
+          coverage run run_tests.py
           coverage report
           coverage html
 
-      - name: Upload coverage report
+      - name: Upload local coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report-${{ matrix.platform }}
+          name: local-coverage-report-${{ matrix.platform }}
           path: htmlcov/
 
   generate-coverage-report:
