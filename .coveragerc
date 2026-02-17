@@ -19,5 +19,6 @@ source =
   */packages
 
 [report]
-show_missing = true
 sort = Cover
+show_missing = true
+skip_covered = true

@@ -80,7 +80,7 @@ jobs:
           python -m pip install coverage
           python -m pip install -e packages/pycommander-core -e packages/pycommander-cli -e packages/pycommander-gui -e packages/pycommander --force-reinstall
 
-      - name: Run unit tests
+      - name: Run unit tests for total coverage
         shell: bash
         run: |
           coverage run --parallel-mode run_tests.py
