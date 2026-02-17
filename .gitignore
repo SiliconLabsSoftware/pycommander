@@ -46,5 +46,5 @@ code-convention-tool/
 **/venv/
 
 # Coverage
-.coverage
+.coverage*
 htmlcov/
