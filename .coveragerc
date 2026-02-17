@@ -12,6 +12,12 @@ omit =
   */mock_*.py
   */build_hook.py
 
+[paths]
+source =
+  packages
+  *\packages
+  */packages
+
 [report]
 show_missing = true
 sort = Cover
