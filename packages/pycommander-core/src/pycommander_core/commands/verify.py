@@ -19,7 +19,7 @@ class VerifyCommand(BaseCommand):
              filenames: list[str] | None = None,
              address: int | None = None,
              patches: list[tuple[int | str, int | str, int | str | None]] = [],
-             tokens: list[str] = [],
+             tokens: list[tuple[str, str]] = [],
              tokenfiles: list[str] = [],
              tokengroup: str | None = None,
              tokendefs: str | None = None,
@@ -34,7 +34,7 @@ class VerifyCommand(BaseCommand):
       filenames (list[str]): File(s) to verify against. Omit with blank=True to check blank.
       address (int): Address for .bin comparison; not for hex/s37.
       patches (list[tuple[int | str, int | str, int | str | None]]): Patch memory; each entry (address, data[, length (up to 8 bytes)]).
-      tokens (list[str]): Token overrides as TOKEN_NAME:value.
+      tokens (list[tuple[str, str]]): Token overrides as (TOKEN_NAME, value).
       tokenfiles (list[str]): Files describing tokens.
       tokengroup (str): Token set: common, zigbee, or znet.
       tokendefs (str): Path to JSON token definitions.

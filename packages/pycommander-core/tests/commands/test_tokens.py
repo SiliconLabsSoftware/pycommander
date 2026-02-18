@@ -20,7 +20,7 @@ class TestTokens(unittest.TestCase):
     commander.tokens.erase(
       securerange=(0x08000000, 0x08001000),
       type="secure",
-      tokens=["TOKEN_A:1"],
+      tokens=["TOKEN_A", "TOKEN_B"],
       tokengroup="common",
       tokendefs="defs.json",
     )
@@ -28,7 +28,7 @@ class TestTokens(unittest.TestCase):
     expected = [
       "mock", "tokens", "erase",
       "--serialno", "123456789",
-      "--securerange", "0x08000000:0x08001000", "--type", "secure", "--token", "TOKEN_A:1", "--tokengroup", "common",
+      "--securerange", "0x08000000:0x08001000", "--type", "secure", "--token", "TOKEN_A", "--token", "TOKEN_B", "--tokengroup", "common",
       "--tokendefs", "defs.json",
       "--json",
     ]
@@ -40,7 +40,7 @@ class TestTokens(unittest.TestCase):
       filenames=[],
       outfile="out.txt",
       showoverrides=True,
-      tokens=["T1"],
+      tokens=["T1", "T2"],
       tokengroup="zigbee",
       tokendefs="defs.json",
       range=(0x0, 0x1000),
@@ -53,7 +53,7 @@ class TestTokens(unittest.TestCase):
     expected = [
       "mock", "tokens", "read",
       "--serialno", "123456789",
-      "--outfile", "out.txt", "--token", "T1", "--tokengroup", "zigbee",
+      "--outfile", "out.txt", "--token", "T1", "--token", "T2", "--tokengroup", "zigbee",
       "--tokendefs", "defs.json",
       "--range", "0x00000000:0x00001000", "--showoverrides",
       "--securerange", "0x08000000:0x08001000",
@@ -77,7 +77,7 @@ class TestTokens(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     commander.tokens.write(
       tokenfiles=["tokens.json"],
-      tokens=["TOKEN_X:1"],
+      tokens=[("TOKEN_X", "1")],
       tokengroup="znet",
       tokendefs="defs.json",
       securerange=(0x08000000, 0x08002000),

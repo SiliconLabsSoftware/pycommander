@@ -19,7 +19,7 @@ class ConvertCommand(BaseCommand):
               address: int | None = None,
               patches: list[tuple[int | str, int | str, int | str | None]] = [],
               ranges: list[tuple[int | str, int | str]] = [],
-              tokens: list[str] = [],
+              tokens: list[tuple[str, str]] = [],
               tokenfiles: list[str] = [],
               tokengroup: str | None = None,
               tokendefs: str | None = None,
@@ -42,7 +42,7 @@ class ConvertCommand(BaseCommand):
       address (int): Start address when a .bin file is given as input.
       patches (list[tuple[int | str, int | str, int | str | None]]): Patch memory; each entry (address, data[, length (up to 8 bytes)]).
       ranges (list[tuple[int | str, int | str]]): Limit output to these memory ranges (start, end).
-      tokens (list[str]): Token overrides as TOKEN_NAME:value.
+      tokens (list[tuple[str, str]]): Token overrides as (TOKEN_NAME, value).
       tokenfiles (list[str]): Files describing tokens to write.
       tokengroup (str): Token set to use: common, zigbee, or znet.
       tokendefs (str): Path to JSON file defining the token set (alternative to tokengroup).

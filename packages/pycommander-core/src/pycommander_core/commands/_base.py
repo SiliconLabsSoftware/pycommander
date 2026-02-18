@@ -154,10 +154,18 @@ class BaseCommand:
       args += ["--patch", f"{start}:{end}{f':{length}' if length is not None else ''}"]
     return args
 
-  def _get_tokens(self, tokens: list[str]) -> list[str]:
+  def _get_tokens(self, tokens: list[tuple[str, str]]) -> list[str]:
     args = []
     for token in tokens:
-      args += ["--token", token]
+      token_name = token[0]
+      token_value = token[1]
+      args += ["--token", f"{token_name}:{token_value}"]
+    return args
+
+  def _get_token_names(self, tokens: list[str]) -> list[str]:
+    args = []
+    for token_name in tokens:
+      args += ["--token", token_name]
     return args
 
   def _get_tokenfiles(self, tokenfiles: list[str]) -> list[str]:

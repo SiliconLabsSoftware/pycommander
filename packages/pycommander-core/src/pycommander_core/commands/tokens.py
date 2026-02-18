@@ -49,7 +49,7 @@ class TokensCommand(BaseCommand):
     Args:
       securerange (tuple[int | str, int | str]): Memory range for secure tokens.
       type (str): secure or device (static tokens only).
-      tokens (list[str]): Token names to erase (TOKEN_NAME:value format for overrides).
+      tokens (list[str]): Token names to erase.
       tokengroup (str): common, zigbee, or znet.
       tokendefs (str): Path to JSON token definitions.
 
@@ -62,7 +62,7 @@ class TokensCommand(BaseCommand):
     if type is not None:
       args += ["--type", type]
     if tokens:
-      args += self._get_tokens(tokens)
+      args += self._get_token_names(tokens)
     if tokengroup is not None:
       args += ["--tokengroup", tokengroup]
     if tokendefs is not None:
@@ -106,7 +106,7 @@ class TokensCommand(BaseCommand):
     if outfile is not None:
       args += ["--outfile", outfile]
     if tokens:
-      args += self._get_tokens(tokens)
+      args += self._get_token_names(tokens)
     if tokengroup is not None:
       args += ["--tokengroup", tokengroup]
     if tokendefs is not None:
@@ -127,7 +127,7 @@ class TokensCommand(BaseCommand):
 
   def write(self,
             tokenfiles: list[str] = [],
-            tokens: list[str] = [],
+            tokens: list[tuple[str, str]] = [],
             tokengroup: str | None = None,
             tokendefs: str | None = None,
             securerange: tuple[int | str, int | str] | None = None,
@@ -136,7 +136,7 @@ class TokensCommand(BaseCommand):
 
     Args:
       tokenfiles (list[str]): Files describing tokens to write.
-      tokens (list[str]): Token overrides as TOKEN_NAME:value.
+      tokens (list[tuple[str, str]]): Token overrides as (TOKEN_NAME, value (hex string)).
       tokengroup (str): common, zigbee, or znet.
       tokendefs (str): Path to JSON token definitions.
       securerange (tuple[int | str, int | str]): Range for secure tokens.

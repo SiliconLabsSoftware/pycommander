@@ -11,7 +11,7 @@ class TestConvert(unittest.TestCase):
       outfile="out.s37",
       address=0x08000000,
       ranges=[(0x0, 0x1000)],
-      tokens=["TOKEN_A:1"],
+      tokens=[("TOKEN_A", "1")],
       tokengroup="zigbee",
       secureboot=True,
       keyfile="key.pem",

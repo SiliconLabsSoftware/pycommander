@@ -22,7 +22,7 @@ class TestFlash(unittest.TestCase):
       close=False,
       verify=False,
       patches=[(0x100, 0xAB, 1)],
-      tokens=["TOKEN_X:1"],
+      tokens=[("TOKEN_X", "1")],
       tokenfiles=["tokens.json"],
       tokengroup="zigbee",
       tokendefs="defs.json",
