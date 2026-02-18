@@ -10,7 +10,7 @@ class TestVerify(unittest.TestCase):
       ["app.s37", "boot.s37"],
       address=0x08000000,
       patches=[(0x100, 0xAB, 1)],
-      tokens=["TOKEN_A:1"],
+      tokens=[("TOKEN_A", "1")],
       tokenfiles=["tokens.json"],
       tokengroup="zigbee",
       tokendefs="defs.json",

@@ -208,8 +208,14 @@ class TestBase(unittest.TestCase):
   def test_base_get_tokens(self):
     base_command = BaseCommand(MockCommander())
     self.assertEqual(base_command._get_tokens([]), [])
-    self.assertEqual(base_command._get_tokens(["TOKEN_NAME:value"]), ["--token", "TOKEN_NAME:value"])
-    self.assertEqual(base_command._get_tokens(["TOKEN_NAME:value", "TOKEN_NAME2:value2"]), ["--token", "TOKEN_NAME:value", "--token", "TOKEN_NAME2:value2"])
+    self.assertEqual(base_command._get_tokens([("TOKEN_NAME", "value")]), ["--token", "TOKEN_NAME:value"])
+    self.assertEqual(base_command._get_tokens([("TOKEN_NAME", "value"), ("TOKEN_NAME2", "value2")]), ["--token", "TOKEN_NAME:value", "--token", "TOKEN_NAME2:value2"])
+
+  def test_base_get_token_names(self):
+    base_command = BaseCommand(MockCommander())
+    self.assertEqual(base_command._get_token_names([]), [])
+    self.assertEqual(base_command._get_token_names(["TOKEN_NAME"]), ["--token", "TOKEN_NAME"])
+    self.assertEqual(base_command._get_token_names(["TOKEN_NAME", "TOKEN_NAME2"]), ["--token", "TOKEN_NAME", "--token", "TOKEN_NAME2"])
 
   def test_base_get_tokenfiles(self):
     base_command = BaseCommand(MockCommander())
