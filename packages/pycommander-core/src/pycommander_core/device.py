@@ -54,6 +54,56 @@ class Device:
     result = self._commander.device.masserase(device=self.part_number)
     return result["success"]
 
+  def writeManufacturingTokens(self,
+                  tokenfiles: list[Path] = [],
+                  tokens: list[tuple[str, str]] = [],
+                  tokengroup: str | None = None,
+                  tokendefs: Path | None = None,
+                  securerange: tuple[int | str, int | str] | None = None) -> bool:
+    """Write manufacturing tokens to the device. This command is only applicable to Series 1 and 2 devices.
+    Args:
+      tokenfiles (list[Path]): The paths to the token files to write.
+      tokens (list[tuple[str, str]]): The tokens to write (TOKEN_NAME, value).
+      tokengroup (str | None): The token group to write.
+      tokendefs (Path | None): The path to the token definitions file.
+      securerange (tuple[int | str, int | str] | None): The secure range to write the tokens to.
+
+    Returns:
+      True if the manufacturing tokens were written successfully, False otherwise.
+    """
+    for tokenfile in tokenfiles:
+      if not tokenfile.exists():
+        raise FileNotFoundError(f"Token file {tokenfile} does not exist")
+
+    result = self._commander.tokens.write(
+      tokenfiles=[str(tokenfile) for tokenfile in tokenfiles],
+      tokens=tokens,
+      tokengroup=tokengroup,
+      tokendefs=str(tokendefs) if tokendefs is not None else None,
+      securerange=securerange,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def writeStaticTokens(self,
+                        tokenfiles: list[Path] = [],
+                        tokens: list[tuple[str, str]] = [],
+                        tokengroup: str | None = None,
+                        tokendefs: Path | None = None,
+                        securerange: tuple[int | str, int | str] | None = None) -> bool:
+    """Write static tokens to the device. This command is only applicable to Series 3 devices.
+    Args:
+      tokenfiles (list[Path]): The paths to the token files to write.
+      tokens (list[tuple[str, str]]): The tokens to write (TOKEN_NAME, value).
+      tokengroup (str | None): The token group to write.
+      tokendefs (Path | None): The path to the token definitions file.
+      securerange (tuple[int | str, int | str] | None): The secure range to write the tokens to.
+
+    Returns:
+      True if the static tokens were written successfully, False otherwise.
+    """
+    return self.writeManufacturingTokens(tokenfiles, tokens, tokengroup, tokendefs, securerange)
+
 
   def getCTUNE(self) -> CtuneValue | None:
     """Get the CTUNE values from the DI, board and token on the device.
