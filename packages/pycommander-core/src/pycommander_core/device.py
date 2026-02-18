@@ -104,6 +104,79 @@ class Device:
     """
     return self.writeManufacturingTokens(tokenfiles, tokens, tokengroup, tokendefs, securerange)
 
+  def flashApplication(self,
+                       filenames: list[Path],
+                       address: int | None = None,
+                       include_sections: list[str] = [],
+                       exclude_sections: list[str] = [],
+                       treat_as_binary: bool = False,
+                       masserase: bool = False,
+                       force: bool = False,
+                       reset: bool = True,
+                       halt: bool = False,
+                       close: bool = True,
+                       verify: bool = True) -> bool:
+    """Flash a binary file (.bin, .s37, .hex, .gbl, or .rps) to the device.
+
+    Args:
+      filenames (list[Path]): The paths to the binary files to flash.
+      address (int): The address to flash the binary file to. If the file is a .hex or .s37 file, the address will be ignored.
+      include_sections (list[str]): The ELF sections to include in the flashing.
+      exclude_sections (list[str]): The ELF sections to exclude in the flashing.
+      treat_as_binary (bool): Treat the file as a flat binary file, regardless of the file extension.
+      masserase (bool): Mass erase the device before flashing.
+      force (bool): Whether to force the flash.
+      reset (bool): Reset the device after flashing.
+      halt (bool): Halt the device after flashing.
+      close (bool): Close the code regions after flashing (Series 3 only).
+      verify (bool): Verify the contents of the flash after flashing.
+
+    Returns:
+      True if the flashing was successful, False otherwise.
+    """
+
+    for filename in filenames:
+      if not filename.exists():
+        raise FileNotFoundError(f"File {filename} does not exist")
+
+    result = self._commander.flash.flash(
+      filenames=[str(filename) for filename in filenames],
+      address=address,
+      include_sections=include_sections,
+      exclude_sections=exclude_sections,
+      binary=treat_as_binary,
+      force=force,
+      masserase=masserase,
+      reset=reset,
+      halt=halt,
+      close=close,
+      verify=verify,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def flashPatches(self,
+                   patches: list[tuple[int | str, int | str, int | str | None]],
+                   force: bool = False,
+                   reset: bool = True,
+                   halt: bool = False) -> bool:
+    """Flash patches to the device.
+    Args:
+      patches (list[tuple[int | str, int | str, int | str | None]]): The patches to flash.
+      force (bool): Whether to force the flash.
+      reset (bool): Whether to reset the device after flashing.
+      halt (bool): Halt the device after flashing.
+    Returns:
+      True if the patches were flashed successfully, False otherwise.
+    """
+    result = self._commander.flash.flash(
+      patches=patches,
+      force=force,
+      reset=reset,
+      halt=halt,
+      device=self.part_number,
+    )
+    return result["success"]
 
   def getCTUNE(self) -> CtuneValue | None:
     """Get the CTUNE values from the DI, board and token on the device.
