@@ -102,7 +102,7 @@ class TestRunner(unittest.TestCase):
     if command is None:
       self.fail("echo command not found")
 
-    with tempfile.NamedTemporaryFile(suffix=".log") as tf:
+    with tempfile.NamedTemporaryFile(dir=".", suffix=".log") as tf:
       runner = Runner(executable=command, log_file_path=Path(tf.name))
       runner.run("command", "arg1", "arg2", json_format=False)
       with open(tf.name, "r") as f:
@@ -113,7 +113,7 @@ class TestRunner(unittest.TestCase):
     if command is None:
       self.fail("bash command not found")
 
-    with tempfile.NamedTemporaryFile(suffix=".log") as tf:
+    with tempfile.NamedTemporaryFile(dir=".", suffix=".log") as tf:
       runner = Runner(executable=command, log_file_path=Path(tf.name))
       with self.assertRaises(PyCommanderInputError):
         runner.run("-c", "exit 255", json_format=False)
@@ -125,7 +125,7 @@ class TestRunner(unittest.TestCase):
     if command is None:
       self.fail("sleep command not found")
 
-    with tempfile.NamedTemporaryFile(suffix=".log") as tf:
+    with tempfile.NamedTemporaryFile(dir=".", suffix=".log") as tf:
       runner = Runner(executable=command, timeout_s=1, log_file_path=Path(tf.name))
       with self.assertRaises(TimeoutError):
         runner.run("3", json_format=False)
