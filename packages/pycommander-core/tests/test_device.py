@@ -1,4 +1,6 @@
+import tempfile
 import unittest
+from pathlib import Path
 
 from pycommander_core.device import Device
 from pycommander_core.runner import RunnerResult
@@ -605,3 +607,249 @@ class TestDevice(unittest.TestCase):
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to disable read protection"}'))
 
     self.assertEqual(device.disableReadProtection(), False)
+
+  def test_device_info_no_device_info_key(self):
+    """Result is successful but the 'device_info' key is missing from the response."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {}, "success": true}')
+    )
+
+    self.assertIsNone(device.info())
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
+
+  # --- writeManufacturingTokens ---
+
+  def test_device_writeManufacturingTokens(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
+      ])
+
+  def test_device_writeManufacturingTokens_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.writeManufacturingTokens(tokenfiles=[Path("/nonexistent/file.txt")])
+
+  def test_device_writeManufacturingTokens_with_options(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.writeManufacturingTokens(
+        tokenfiles=[Path(tf.name)],
+        tokens=[("MFG_TOKEN", "0xAB")],
+        tokengroup="zigbee",
+        tokendefs=Path("/path/to/tokendefs.json"),
+        securerange=(0x0, 0x8000),
+      ))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "tokens", "write",
+         "--serialno", "123456789",
+         "--device", "EFR32MG24B020F1536IM48",
+         "--tokenfile", tf.name,
+         "--token", "MFG_TOKEN:0xAB",
+         "--tokengroup", "zigbee",
+         "--tokendefs", "/path/to/tokendefs.json",
+         "--securerange", "0x00000000:0x00008000",
+         "--json"]
+      ])
+
+  def test_device_writeManufacturingTokens_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
+      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Token write failed"}'))
+
+      self.assertFalse(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
+
+  # --- writeStaticTokens ---
+
+  def test_device_writeStaticTokens(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.writeStaticTokens(tokenfiles=[Path(tf.name)]))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
+      ])
+
+  def test_device_writeStaticTokens_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.writeStaticTokens(tokenfiles=[Path("/nonexistent/file.txt")])
+
+  # --- flashApplication ---
+
+  def test_device_flashApplication(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".s37") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.flashApplication(filenames=[Path(tf.name)]))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "flash", tf.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+      ])
+
+  def test_device_flashApplication_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.flashApplication(filenames=[Path("/nonexistent/firmware.s37")])
+
+  def test_device_flashApplication_multiple_files(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".s37") as tf1, \
+         tempfile.NamedTemporaryFile(suffix=".hex") as tf2:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.flashApplication(filenames=[Path(tf1.name), Path(tf2.name)]))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "flash", tf1.name, tf2.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+      ])
+
+  def test_device_flashApplication_multiple_files_one_missing(self):
+    """One file exists and one doesn't -- should raise before running the command."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".s37") as tf:
+      with self.assertRaises(FileNotFoundError):
+        device.flashApplication(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
+      self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_device_flashApplication_with_options(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.flashApplication(
+        filenames=[Path(tf.name)],
+        address=0x08000000,
+        treat_as_binary=True,
+        masserase=True,
+        force=True,
+        reset=False,
+        halt=True,
+        close=False,
+        verify=False,
+        include_sections=[".text"],
+        exclude_sections=[".debug"],
+      ))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "flash", tf.name,
+         "--serialno", "123456789",
+         "--device", "EFR32MG24B020F1536IM48",
+         "--force",
+         "--address", "0x08000000",
+         "--halt",
+         "--masserase",
+         "--noreset",
+         "--noclose",
+         "--noverify",
+         "--binary",
+         "--include-section", ".text",
+         "--exclude-section", ".debug",
+         "--json"]
+      ])
+
+  def test_device_flashApplication_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".s37") as tf:
+      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Flash failed"}'))
+
+      self.assertFalse(device.flashApplication(filenames=[Path(tf.name)]))
+
+  def test_device_flashPatches(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashPatches(patches=[(0x08000000, 0xABCD, 2)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash",
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--patch", "0x08000000:0x0000ABCD:2",
+       "--json"]
+    ])
+
+  def test_device_flashPatches_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Patching failed"}'))
+
+    self.assertFalse(device.flashPatches(patches=[(0x08000000, 0xABCD, 2)]))
+
+  def test_device_getCTUNE_alternate_validity(self):
+    """Board invalid, DI valid, token invalid -- covers the branches missed by the main test."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "result": {
+        "ctune": {
+            "board": {
+                "status_str": "Not set",
+                "valid": false,
+                "value": 0
+            },
+            "di": {
+                "status_str": "OK",
+                "valid": true,
+                "value": 140
+            },
+            "token": {
+                "status_str": "Not set",
+                "valid": false,
+                "value": 0
+            }
+        }
+    },
+    "success": true
+}
+"""
+      )
+    )
+
+    expected_ctune_value = CtuneValue(
+      di=140,
+      board=None,
+      token=None,
+    )
+
+    self.assertEqual(device.getCTUNE(), expected_ctune_value)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
