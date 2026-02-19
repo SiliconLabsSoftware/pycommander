@@ -1,5 +1,6 @@
 import unittest
 
+import os
 import sys
 import subprocess
 import tempfile
@@ -29,10 +30,10 @@ class TestRunner(unittest.TestCase):
       runner.run("command")
 
   def test_runner_run_not_a_file(self):
-    temp_dir = Path(tempfile.mkdtemp())
+    temp_dir = Path(tempfile.mkdtemp(dir="."))
 
     runner = Runner(executable=temp_dir)
-    with self.assertRaisesRegex(ValueError, f"Commander executable is not a file: {str(temp_dir)}"):
+    with self.assertRaisesRegex(ValueError, f"Commander executable is not a file: {re.escape(str(temp_dir))}"):
       runner.run("command")
 
     temp_dir.rmdir()
@@ -102,32 +103,39 @@ class TestRunner(unittest.TestCase):
     if command is None:
       self.fail("echo command not found")
 
-    with tempfile.NamedTemporaryFile(dir=".", suffix=".log") as tf:
-      runner = Runner(executable=command, log_file_path=Path(tf.name))
-      runner.run("command", "arg1", "arg2", json_format=False)
-      with open(tf.name, "r") as f:
-        self.assertIn("command arg1 arg2", f.read())
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".log", delete=False)
+    self.addCleanup(os.remove, tf.name)
+
+    runner = Runner(executable=command, log_file_path=Path(tf.name))
+    runner.run("command", "arg1", "arg2", json_format=False)
+    with open(tf.name, "r") as f:
+      self.assertIn("command arg1 arg2", f.read())
+
 
   def test_runner_log_file_on_error(self):
     command = shutil.which("bash")
     if command is None:
       self.fail("bash command not found")
 
-    with tempfile.NamedTemporaryFile(dir=".", suffix=".log") as tf:
-      runner = Runner(executable=command, log_file_path=Path(tf.name))
-      with self.assertRaises(PyCommanderInputError):
-        runner.run("-c", "exit 255", json_format=False)
-      with open(tf.name, "r") as f:
-        self.assertIn("Command failed with return code 255:", f.read())
+    tf =  tempfile.NamedTemporaryFile(dir=".", suffix=".log", delete=False)
+    self.addCleanup(os.remove, tf.name)
+
+    runner = Runner(executable=command, log_file_path=Path(tf.name))
+    with self.assertRaises(PyCommanderInputError):
+      runner.run("-c", "exit 255", json_format=False)
+    with open(tf.name, "r") as f:
+      self.assertIn("Command failed with return code 255:", f.read())
 
   def test_runner_log_file_on_timeout(self):
     command = shutil.which("sleep")
     if command is None:
       self.fail("sleep command not found")
 
-    with tempfile.NamedTemporaryFile(dir=".", suffix=".log") as tf:
-      runner = Runner(executable=command, timeout_s=1, log_file_path=Path(tf.name))
-      with self.assertRaises(TimeoutError):
-        runner.run("3", json_format=False)
-      with open(tf.name, "r") as f:
-        self.assertIn("Command timed out:", f.read())
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".log", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    
+    runner = Runner(executable=command, timeout_s=1, log_file_path=Path(tf.name))
+    with self.assertRaises(TimeoutError):
+      runner.run("3", json_format=False)
+    with open(tf.name, "r") as f:
+      self.assertIn("Command timed out:", f.read())
