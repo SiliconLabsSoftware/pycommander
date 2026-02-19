@@ -13,8 +13,8 @@ from pycommander_core.errors import PyCommanderInputError, PyCommanderRuntimeErr
 
 class TestRunner(unittest.TestCase):
   def test_runner_init(self):
-    runner = Runner(executable=Path("mock"))
-    self.assertEqual(runner._executable, Path("mock"))
+    runner = Runner(executable="mock")
+    self.assertEqual(runner._executable, "mock")
     self.assertEqual(runner._log_file_path, None)
     self.assertEqual(runner._timeout_s, 300)
 
