@@ -19,7 +19,7 @@ class Runner:
 
     self._subprocess_flags : int = 0
 
-    if sys.platform == "Windows":
+    if sys.platform == "win32":
       self._subprocess_flags |= subprocess.CREATE_NO_WINDOW
 
       # Don't display the Windows GPF dialog if commander crashes
