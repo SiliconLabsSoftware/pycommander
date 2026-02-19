@@ -54,6 +54,17 @@ class Device:
     result = self._commander.device.masserase(device=self.part_number)
     return result["success"]
 
+  def pageerase(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
+    """Erase selected flash pages.
+    Args:
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to erase (start, end); extended to page boundaries.
+      regions (list[str]): Named memory regions (@region).
+    Returns:
+      True if the page erase was successful, False otherwise.
+    """
+    result = self._commander.device.pageerase(ranges=ranges, regions=regions, device=self.part_number)
+    return result["success"]
+
   def writeManufacturingTokens(self,
                   tokenfiles: list[Path] = [],
                   tokens: list[tuple[str, str]] = [],
