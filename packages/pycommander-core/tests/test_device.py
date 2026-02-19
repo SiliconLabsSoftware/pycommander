@@ -621,8 +621,6 @@ class TestDevice(unittest.TestCase):
     self.assertIsNone(device.info())
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
 
-  # --- writeManufacturingTokens ---
-
   def test_device_writeManufacturingTokens(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -677,8 +675,6 @@ class TestDevice(unittest.TestCase):
 
       self.assertFalse(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
 
-  # --- writeStaticTokens ---
-
   def test_device_writeStaticTokens(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -697,8 +693,6 @@ class TestDevice(unittest.TestCase):
 
     with self.assertRaises(FileNotFoundError):
       device.writeStaticTokens(tokenfiles=[Path("/nonexistent/file.txt")])
-
-  # --- flashApplication ---
 
   def test_device_flashApplication(self):
     commander = MockCommander(serial_number="123456789")
