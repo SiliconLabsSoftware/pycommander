@@ -177,18 +177,18 @@ class AdapterCommand(BaseCommand):
     """
     return self._run("adapter", "reset", *self._get_general_args(**kwargs)).output
 
-  def voltage(self, voltage: str | None = None, calibrate: bool = True, **kwargs: Any) -> dict:
+  def voltage(self, voltage: float | None = None, calibrate: bool = True, **kwargs: Any) -> dict:
     """Get or set the voltage of the target device.
 
     Args:
-      voltage (str): Voltage to set. If not provided, gets current target voltage.
+      voltage (float): Voltage to set. If not provided, gets current target voltage.
       calibrate (bool): If True, automatically calibrate if voltage has changed.
 
     Returns:
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    voltage_string = voltage if voltage is not None else ""
+    voltage_string = f"{voltage}" if voltage is not None else ""
     if not calibrate:
       args += ["--nocalibrate"]
     return self._run("adapter", "voltage", voltage_string, *args).output
