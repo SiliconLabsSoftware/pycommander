@@ -677,7 +677,7 @@ class TestDevice(unittest.TestCase):
          "--tokenfile", tf.name,
          "--token", "MFG_TOKEN:0xAB",
          "--tokengroup", "zigbee",
-         "--tokendefs", "/path/to/tokendefs.json",
+         "--tokendefs", str(Path("/path/to/tokendefs.json")),
          "--securerange", "0x00000000:0x00008000",
          "--json"]
       ])
