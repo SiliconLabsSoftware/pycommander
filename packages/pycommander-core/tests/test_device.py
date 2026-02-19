@@ -92,6 +92,22 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.masserase(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "masserase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
+  def test_device_pageerase(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "pageerase", "--range", "0x00000000:0x00008000", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_pageerase_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to erase the pages"}'))
+    self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "pageerase", "--range", "0x00000000:0x00008000", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
   def test_device_getCTUNE(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
