@@ -848,3 +848,92 @@ class TestDevice(unittest.TestCase):
 
     self.assertEqual(device.getCTUNE(), expected_ctune_value)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_device_flashRamCode(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.flashRamCode(filenames=[Path(tf.name)]))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "flash", tf.name,
+         "--serialno", "123456789",
+         "--device", "EFR32MG24B020F1536IM48",
+         "--noreset",
+         "--json"]
+      ])
+
+  def test_device_flashRamCode_multiple_files(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".bin") as tf1, \
+         tempfile.NamedTemporaryFile(suffix=".hex") as tf2:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.flashRamCode(filenames=[Path(tf1.name), Path(tf2.name)]))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "flash", tf1.name, tf2.name,
+         "--serialno", "123456789",
+         "--device", "EFR32MG24B020F1536IM48",
+         "--noreset",
+         "--json"]
+      ])
+
+  def test_device_flashRamCode_with_options(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.flashRamCode(
+        filenames=[Path(tf.name)],
+        address=0x20000000,
+        include_sections=[".text"],
+        exclude_sections=[".debug"],
+        vtor=0x20000000,
+        force=True,
+        halt=True,
+      ))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "flash", tf.name,
+         "--serialno", "123456789",
+         "--device", "EFR32MG24B020F1536IM48",
+         "--force",
+         "--address", "0x20000000",
+         "--halt",
+         "--noreset",
+         "--include-section", ".text",
+         "--exclude-section", ".debug",
+         "--vtor", "0x20000000",
+         "--json"]
+      ])
+
+  def test_device_flashRamCode_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
+      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "RAM flash failed"}'))
+
+      self.assertFalse(device.flashRamCode(filenames=[Path(tf.name)]))
+
+  def test_device_flashRamCode_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.flashRamCode(filenames=[Path("/nonexistent/firmware.bin")])
+
+  def test_device_flashRamCode_multiple_files_one_missing(self):
+    """One file exists and one doesn't -- should raise before running the command."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
+      with self.assertRaises(FileNotFoundError):
+        device.flashRamCode(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
+      self.assertEqual(commander._runner.logged_commands, [])
