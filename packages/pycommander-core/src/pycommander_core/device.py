@@ -155,6 +155,43 @@ class Device:
     )
     return result["success"]
 
+  def flashRamCode(self,
+                   filenames: list[Path],
+                   address: int | None = None,
+                   include_sections: list[str] = [],
+                   exclude_sections: list[str] = [],
+                   vtor: int | None = None,
+                   force: bool = False,
+                   halt: bool = False) -> bool:
+    """Flash RAM code to the device.
+    Args:
+      filenames (list[Path]): The paths to the binary files to flash.
+      address (int): The address to flash the binary file to. If the file is a .hex or .s37 file, the address will be ignored.
+      include_sections (list[str]): The ELF sections to include in the flashing.
+      exclude_sections (list[str]): The ELF sections to exclude in the flashing.
+      vtor (int): The vector table address to flash the binary file to. If the file is a .hex or .s37 file, the vtor will be ignored.
+      force (bool): Whether to force the flash.
+      halt (bool): Halt the device after flashing.
+    Returns:
+      True if the RAM code was flashed successfully, False otherwise.
+    """
+    for filename in filenames:
+      if not filename.exists():
+        raise FileNotFoundError(f"File {filename} does not exist")
+
+    result = self._commander.flash.flash(
+      filenames=[str(filename) for filename in filenames],
+      address=address,
+      include_sections=include_sections,
+      exclude_sections=exclude_sections,
+      vtor=vtor,
+      force=force,
+      reset=False,
+      halt=halt,
+      device=self.part_number,
+    )
+    return result["success"]
+
   def flashPatches(self,
                    patches: list[tuple[int | str, int | str, int | str | None]],
                    force: bool = False,
