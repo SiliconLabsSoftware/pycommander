@@ -607,6 +607,7 @@ class TestDevice(unittest.TestCase):
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to disable read protection"}'))
 
     self.assertEqual(device.disableReadProtection(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_device_info_no_device_info_key(self):
     """Result is successful but the 'device_info' key is missing from the response."""
