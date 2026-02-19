@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 def load_tests():
   loader = unittest.TestLoader()
@@ -11,4 +12,5 @@ def load_tests():
 
 if __name__ == "__main__":
   runner = unittest.TextTestRunner(verbosity=2)
-  runner.run(load_tests())
+  result = runner.run(load_tests())
+  sys.exit(not result.wasSuccessful())
