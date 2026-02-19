@@ -30,6 +30,12 @@ class AdapterInfo:
   debug_part:          str                    | None = None
 
 @dataclass
+class AdapterVoltageInfo:
+  configured_voltage_v: float | None = None
+  measured_voltage_v: float | None = None
+  rail_powered: bool | None = None
+
+@dataclass
 class CtuneValue:
   di:    int | None = None # Value from the Device Info page
   board: int | None = None # Value from the EEPROM on the board
