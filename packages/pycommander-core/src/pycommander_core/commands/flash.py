@@ -16,7 +16,7 @@ class FlashCommand(BaseCommand):
     return args
 
   def flash(self,
-            filenames: list[str],
+            filenames: list[str] = [],
             address: int | None = None,
             halt: bool = False,
             masserase: bool = False,
