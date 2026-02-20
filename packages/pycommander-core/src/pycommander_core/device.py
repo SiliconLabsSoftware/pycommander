@@ -1,7 +1,10 @@
+import tempfile
+import yaml
+
 from pathlib import Path
 
 from .commander_base import CommanderBase
-from .types import CtuneValue, DeviceInfo
+from .types import *
 
 class Device:
   def __init__(self, part_number: str, commander: CommanderBase):
@@ -363,4 +366,174 @@ class Device:
     """
 
     result = self._commander.device.protect(read=True, disable=True, device=self.part_number)
+    return result["success"]
+
+  def readRegionConfig(self, allow_reset: bool = True) -> RegionConfig | None:
+    """Read the region configuration from the device. Series 3 only.
+    Args:
+      allow_reset (bool): Allow the device to be reset during the operation.
+    Returns:
+      A RegionConfig object containing the region configuration, or None if the region configuration could not be retrieved.
+    """
+    result = self._commander.security.readregionconfig(reset=allow_reset, device=self.part_number)
+
+    if not result["success"]:
+      return None
+
+    if "regions" not in result["result"]:
+      return None
+
+    if "data_region" not in result["result"]:
+      return None
+
+    code_regions : list[CodeRegionConfig] = []
+    for code_region in result["result"]["regions"]:
+
+      raw_protection_mode = code_region["protection_mode"]
+
+      if raw_protection_mode == "Encrypted and authenticated":
+        protection_mode = CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED
+      elif raw_protection_mode == "Encrypted":
+        protection_mode = CodeRegionProtectionMode.ENCRYPTED
+      elif raw_protection_mode == "None":
+        protection_mode = CodeRegionProtectionMode.NONE
+
+      code_regions.append(CodeRegionConfig(
+        index=code_region["index"],
+        size_kb=code_region["size_kb"],
+        protection_mode=protection_mode,
+        closed=code_region["closed"],
+      ))
+
+    data_region : DataRegionConfig = DataRegionConfig(
+      location=result["result"]["data_region"]["location"],
+      size=result["result"]["data_region"]["size"],
+    )
+
+    region_config = RegionConfig(
+      code_regions=code_regions,
+      data_region=data_region,
+    )
+
+    return region_config
+
+  def readRegionConfigToFile(self, outfile: Path, allow_reset: bool = True) -> bool:
+    """Read the region configuration from the device and write it to a file. Series 3 only.
+    Args:
+      outfile (Path): The path to the output file.
+      allow_reset (bool): Allow the device to be reset during the operation.
+    Returns:
+      True if the region configuration was read successfully and written to the file, False otherwise.
+    """
+    result = self._commander.security.readregionconfig(outfile=str(outfile), reset=allow_reset, device=self.part_number)
+
+    return result["success"]
+
+  def writeRegionConfig(self, config: RegionConfig, allow_reset: bool = True, force: bool = False) -> bool:
+    """Write the region configuration to the device. Series 3 only.
+    Args:
+      config (RegionConfig): The region configuration to write.
+      allow_reset (bool): Allow the device to be reset during the operation.
+      force (bool): Force the region configuration to be written, even if the desired configuration is already set.
+    Returns:
+      True if the region configuration was written successfully, False otherwise.
+    """
+
+    config_dict = {}
+    config_dict["regions"] = []
+    for code_region in config.code_regions:
+
+      # Validate the protection mode
+      if code_region.protection_mode not in [
+        CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED,
+        CodeRegionProtectionMode.ENCRYPTED,
+        CodeRegionProtectionMode.NONE]:
+        raise ValueError(f"Invalid protection mode: {code_region.protection_mode}")
+
+      code_region_dict = {
+        "size_kb": code_region.size_kb,
+        "protection_mode": code_region.protection_mode.value,
+      }
+      config_dict["regions"].append(code_region_dict)
+
+    if not force:
+      configs_are_equal = True
+      # Check if the desired configuration is already set
+      existing_config = self.readRegionConfig(allow_reset=allow_reset)
+      if not existing_config:
+        return False
+
+      # Check if the data region is the same
+      if existing_config.data_region.location != config.data_region.location:
+        configs_are_equal = False
+
+      # Check if the code regions are the same
+      for existing_code_region, new_code_region in zip(existing_config.code_regions, config.code_regions):
+        if existing_code_region.index != new_code_region.index:
+          configs_are_equal = False
+        if existing_code_region.size_kb != new_code_region.size_kb:
+          configs_are_equal = False
+        if existing_code_region.protection_mode != new_code_region.protection_mode:
+          configs_are_equal = False
+        if existing_code_region.closed != new_code_region.closed:
+          configs_are_equal = False
+
+      if configs_are_equal:
+        # Don't write anything to the device, we're already set up as desired
+        return True
+
+    # Write the region configuration to a temporary YAML file, then write it to the device
+    with tempfile.NamedTemporaryFile(dir=".", suffix=".yaml") as tf:
+      tf.write(yaml.dump(config_dict, indent=2).encode())
+      tf.flush()
+      result = self._commander.security.writeregionconfig(file=str(Path(tf.name)), reset=allow_reset, device=self.part_number)
+      return result["success"]
+
+  def writeRegionConfigFromFile(self, config_file: Path, allow_reset: bool = True, force: bool = False) -> bool:
+    """Write the region configuration to the device. Series 3 only.
+    Args:
+      config_file (Path): The path to the configuration file.
+      allow_reset (bool): Allow the device to be reset during the operation.
+      force (bool): Force the region configuration to be written, even if the desired configuration is already set.
+    Returns:
+      True if the region configuration was written successfully, False otherwise.
+    """
+    if not config_file.exists():
+      raise FileNotFoundError(f"Configuration file {config_file} does not exist")
+
+    # Validate the required fields are present in the provided configuration file
+    with config_file.open("r") as f:
+      config_dict = yaml.safe_load(f)
+
+    if "regions" not in config_dict:
+      raise ValueError("Regions are required in the configuration file")
+    for region in config_dict["regions"]:
+      if "size_kb" not in region:
+        raise ValueError("Size KB is required in the region configuration")
+      if "protection_mode" not in region:
+        raise ValueError("Protection mode is required in the region configuration")
+      if region["protection_mode"] not in (
+        CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED.value,
+        CodeRegionProtectionMode.ENCRYPTED.value,
+        CodeRegionProtectionMode.NONE.value):
+        raise ValueError(f"Invalid protection mode: {region['protection_mode']}")
+    
+    if not force:
+      configs_are_equal = True
+      existing_config = self.readRegionConfig(allow_reset=allow_reset)
+      if not existing_config:
+        return False
+
+      for existing_region, new_region in zip(existing_config.code_regions, config_dict["regions"]):
+        if existing_region.size_kb != new_region["size_kb"]:
+          configs_are_equal = False
+        if existing_region.protection_mode.value != new_region["protection_mode"]:
+          configs_are_equal = False
+
+      if configs_are_equal:
+        # Don't write anything to the device, we're already set up as desired
+        return True
+
+    # Write the region configuration to the device
+    result = self._commander.security.writeregionconfig(file=str(config_file), reset=allow_reset, device=self.part_number)
     return result["success"]

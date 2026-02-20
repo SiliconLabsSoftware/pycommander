@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pycommander_core.device import Device
 from pycommander_core.runner import RunnerResult
-from pycommander_core.types import DeviceInfo, CtuneValue
+from pycommander_core.types import *
 
 from .mock_commander import MockCommander
 
@@ -953,3 +953,596 @@ class TestDevice(unittest.TestCase):
       with self.assertRaises(FileNotFoundError):
         device.flashRamCode(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
       self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_device_readRegionConfig(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+  "result": {
+    "data_region": {
+      "location": 18546688,
+      "size": 2007040
+    },
+    "regions": [
+      {
+        "closed": false,
+        "index": 0,
+        "protection_mode": "Encrypted and authenticated",
+        "size_kb": 32
+      },
+      {
+        "closed": false,
+        "index": 1,
+        "protection_mode": "Encrypted and authenticated",
+        "size_kb": 1696
+      }
+    ]
+  },
+  "success": true
+}
+"""
+    ))
+
+    actual_config = device.readRegionConfig(allow_reset=False)
+    self.assertIsNotNone(actual_config)
+
+    expected_config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=False),
+        CodeRegionConfig(index=1, size_kb=1696, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=18546688, size=2007040),
+    )
+    self.assertEqual(actual_config, expected_config)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]])
+
+  def test_device_readRegionConfig_allow_reset(self):
+    """Default allow_reset=True should not add --noreset."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+  "result": {
+    "data_region": { 
+      "location": 0,
+      "size": 0
+    },
+    "regions": [
+      { 
+        "closed": true,
+        "index": 0,
+        "protection_mode": "None",
+        "size_kb": 64
+      }
+    ]
+  },
+  "success": true
+}
+"""
+    ))
+
+    result = device.readRegionConfig()
+    self.assertIsNotNone(result)
+    self.assertEqual(result.code_regions[0].protection_mode, CodeRegionProtectionMode.NONE)
+    self.assertTrue(result.code_regions[0].closed)
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--json"]
+    ])
+
+  def test_device_readRegionConfig_all_protection_modes(self):
+    """Cover the Encrypted and None protection mode branches."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+  "result": {
+    "data_region": {
+      "location": 100,
+      "size": 200
+    },
+    "regions": [
+      { 
+        "closed": false,
+        "index": 0,
+        "protection_mode": "Encrypted and authenticated",
+        "size_kb": 32 
+      },
+      { 
+        "closed": false,
+        "index": 1,
+        "protection_mode": "Encrypted",
+        "size_kb": 64 
+      },
+      { 
+        "closed": true,
+        "index": 2,
+        "protection_mode": "None",
+        "size_kb": 128
+      }
+    ]
+  },
+  "success": true
+}
+"""
+    ))
+
+    result = device.readRegionConfig()
+    self.assertEqual(result.code_regions[0].protection_mode, CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED)
+    self.assertEqual(result.code_regions[1].protection_mode, CodeRegionProtectionMode.ENCRYPTED)
+    self.assertEqual(result.code_regions[2].protection_mode, CodeRegionProtectionMode.NONE)
+
+  def test_device_readRegionConfig_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertIsNone(device.readRegionConfig())
+
+  def test_device_readRegionConfig_missing_regions(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+  "result": {
+    "data_region": {
+      "location": 0,
+      "size": 0
+    }
+  },
+  "success": true
+}
+"""
+    ))
+
+    self.assertIsNone(device.readRegionConfig())
+
+  def test_device_readRegionConfig_missing_data_region(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"regions": []}, "success": true}')
+    )
+
+    self.assertIsNone(device.readRegionConfig())
+
+  def test_device_readRegionConfigToFile(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.readRegionConfigToFile(outfile=Path("/tmp/output.yaml")))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", "/tmp/output.yaml", "--json"]
+    ])
+
+  def test_device_readRegionConfigToFile_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.readRegionConfigToFile(outfile=Path("/tmp/output.yaml"), allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", "/tmp/output.yaml", "--noreset", "--json"]
+    ])
+
+  def test_device_readRegionConfigToFile_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertFalse(device.readRegionConfigToFile(outfile=Path("/tmp/output.yaml")))
+
+  def test_device_writeRegionConfig_force(self):
+    """force=True skips comparison, writes directly."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=0, size=0),
+    )
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeRegionConfig(config, force=True))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertEqual(commander._runner.logged_commands[0][0:3], ["mock", "security", "writeregionconfig"])
+
+  def test_device_writeRegionConfig_force_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=0, size=0),
+    )
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write failed"}'))
+
+    self.assertFalse(device.writeRegionConfig(config, force=True))
+
+  def test_device_writeRegionConfig_no_force_configs_equal(self):
+    """Existing config matches desired -- should return True without writing."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=18546688, size=2007040),
+    )
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 18546688, "size": 2007040 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    self.assertTrue(device.writeRegionConfig(config, force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+
+  def test_device_writeRegionConfig_no_force_configs_differ(self):
+    """Existing config differs -- should write the new config."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=64, protection_mode=CodeRegionProtectionMode.ENCRYPTED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=18546688, size=2007040),
+    )
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 18546688, "size": 2007040 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeRegionConfig(config, force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 2)
+    self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+    self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
+
+  def test_device_writeRegionConfig_no_force_data_region_differs(self):
+    """Existing data_region location differs -- should write."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=99999, size=2007040),
+    )
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 18546688, "size": 2007040 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeRegionConfig(config, force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 2)
+
+  def test_device_writeRegionConfig_no_force_closed_differs(self):
+    """Existing closed state differs -- should write."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=True),
+      ],
+      data_region=DataRegionConfig(location=18546688, size=2007040),
+    )
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 18546688, "size": 2007040 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeRegionConfig(config, force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 2)
+
+  def test_device_writeRegionConfig_no_force_read_fails(self):
+    """readRegionConfig fails -- should return False without writing."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=0, size=0),
+    )
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read failed"}'))
+
+    self.assertFalse(device.writeRegionConfig(config, force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+
+  def test_device_writeRegionConfig_no_force_index_differs(self):
+    """Existing index differs -- should write."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=1, size_kb=32, protection_mode=CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED, closed=False),
+      ],
+      data_region=DataRegionConfig(location=18546688, size=2007040),
+    )
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 18546688, "size": 2007040 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeRegionConfig(config, force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 2)
+
+  def test_device_writeRegionConfig_invalid_protection_mode(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    config = RegionConfig(
+      code_regions=[
+        CodeRegionConfig(index=0, size_kb=32, protection_mode="bogus", closed=False),
+      ],
+      data_region=DataRegionConfig(location=0, size=0),
+    )
+
+    with self.assertRaises(ValueError) as ctx:
+      device.writeRegionConfig(config, force=True)
+    self.assertIn("Invalid protection mode", str(ctx.exception))
+
+  def test_device_writeRegionConfigFromFile_force(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
+      tf.flush()
+
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--json"]
+      ])
+
+  def test_device_writeRegionConfigFromFile_force_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
+      tf.flush()
+
+      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write failed"}'))
+
+      self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
+
+  def test_device_writeRegionConfigFromFile_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n    protection_mode: none\n")
+      tf.flush()
+
+      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), allow_reset=False, force=True))
+      self.assertEqual(commander._runner.logged_commands, [
+        ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]
+      ])
+
+  def test_device_writeRegionConfigFromFile_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.writeRegionConfigFromFile(config_file=Path("/nonexistent/config.yaml"))
+
+  def test_device_writeRegionConfigFromFile_missing_regions(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("something_else: true\n")
+      tf.flush()
+
+      with self.assertRaises(ValueError) as ctx:
+        device.writeRegionConfigFromFile(config_file=Path(tf.name))
+      self.assertIn("Regions are required", str(ctx.exception))
+
+  def test_device_writeRegionConfigFromFile_missing_size_kb(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - protection_mode: encrypted\n")
+      tf.flush()
+
+      with self.assertRaises(ValueError) as ctx:
+        device.writeRegionConfigFromFile(config_file=Path(tf.name))
+      self.assertIn("Size KB is required", str(ctx.exception))
+
+  def test_device_writeRegionConfigFromFile_missing_protection_mode(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n")
+      tf.flush()
+
+      with self.assertRaises(ValueError) as ctx:
+        device.writeRegionConfigFromFile(config_file=Path(tf.name))
+      self.assertIn("Protection mode is required", str(ctx.exception))
+
+  def test_device_writeRegionConfigFromFile_invalid_protection_mode(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n    protection_mode: bogus_mode\n")
+      tf.flush()
+
+      with self.assertRaises(ValueError) as ctx:
+        device.writeRegionConfigFromFile(config_file=Path(tf.name))
+      self.assertIn("Invalid protection mode", str(ctx.exception))
+
+  def test_device_writeRegionConfigFromFile_no_force_configs_equal(self):
+    """Existing config matches file config -- returns True without writing."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 0, "size": 0 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
+      tf.flush()
+
+      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
+      self.assertEqual(len(commander._runner.logged_commands), 1)
+      self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+
+  def test_device_writeRegionConfigFromFile_no_force_configs_differ(self):
+    """Existing config differs from file config -- should write."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+    "result": {
+        "data_region": { "location": 0, "size": 0 },
+        "regions": [
+            { "closed": false, "index": 0, "protection_mode": "Encrypted and authenticated", "size_kb": 32 }
+        ]
+    },
+    "success": true
+}
+"""
+    ))
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 64\n    protection_mode: none\n")
+      tf.flush()
+
+      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
+      self.assertEqual(len(commander._runner.logged_commands), 2)
+      self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+      self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
+
+  def test_device_writeRegionConfigFromFile_no_force_read_fails(self):
+    """readRegionConfig fails -- returns False without writing."""
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read failed"}'))
+
+    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
+      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted\n")
+      tf.flush()
+
+      self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
+      self.assertEqual(len(commander._runner.logged_commands), 1)
