@@ -518,7 +518,7 @@ class SecurityCommand(BaseCommand):
                        outfile: str | None = None,
                        reset: bool = True,
                        **kwargs: Any) -> dict:
-    """Read Secure Engine region config.
+    """Read code region configuration from the device. Series 3 only.
 
     Args:
       outfile (str): Output file path.
@@ -715,7 +715,7 @@ class SecurityCommand(BaseCommand):
     return self._run("security", "writekey", *args).output
 
   def writeregionconfig(self, file: str, reset: bool = True, **kwargs: Any) -> dict:
-    """Write Secure Engine region config from file.
+    """Write code region configuration to the device. Series 3 only.
 
     Args:
       file (str): Region config file path.
