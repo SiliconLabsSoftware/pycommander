@@ -79,6 +79,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install coverage
           python -m pip install -e packages/pycommander-core -e packages/pycommander-cli -e packages/pycommander-gui -e packages/pycommander --force-reinstall
+          python -m pip install -r packages/*/tests/requirements.txt
 
       - name: Run unit tests for total coverage
         shell: bash
