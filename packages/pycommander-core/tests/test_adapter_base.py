@@ -3,7 +3,7 @@ import unittest
 from pycommander_core.device import Device
 from pycommander_core.adapter_base import AdapterBase
 from pycommander_core.runner import RunnerResult
-from pycommander_core.types import AdapterInfo, AdapterBoardInfo, AdapterFwInfo, AdapterVoltageInfo
+from pycommander_core.types import *
 
 from .mock_adapter import MockAdapter
 from .mock_commander import MockCommander
@@ -433,3 +433,46 @@ class TestAdapterBase(unittest.TestCase):
     )
     self.assertEqual(adapter.setVoltage(3.3), False)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "voltage", "3.3", "--serialno", "123456789", "--json"]])
+
+  def test_adapter_base_setVcomConfig(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+    
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "success": true
+}
+"""
+      )
+    )
+    self.assertEqual(adapter.setVcomConfig(baudrate=115200, handshake=VcomHandshake.RTSCTS, store=True), True)
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "vcom", "config", "--serialno", "123456789", "--baudrate", "115200", "--handshake", "rtscts", "--store", "--json"]
+    ])
+
+  def test_adapter_base_setVcomConfig_failed(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+    
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        254,
+"""
+{
+    "success": false
+}
+"""
+      )
+    )
+    self.assertEqual(adapter.setVcomConfig(baudrate=115200, handshake=VcomHandshake.RTSCTS, store=True), False)
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "vcom", "config", "--serialno", "123456789", "--baudrate", "115200", "--handshake", "rtscts", "--store", "--json"]
+    ])
+
+  def test_adapter_base_setVcomConfig_invalid_handshake(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+    
+    with self.assertRaises(ValueError):
+      adapter.setVcomConfig(baudrate=115200, handshake="invalid", store=True)
+    self.assertEqual(adapter._commander._runner.logged_commands, [])

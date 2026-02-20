@@ -1,7 +1,7 @@
 from .commander_base import CommanderBase
 from .device import Device
 
-from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo, AdapterVoltageInfo
+from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo, AdapterVoltageInfo, VcomHandshake
 
 class AdapterBase:
   def __init__(self,
@@ -121,4 +121,19 @@ class AdapterBase:
       True if the voltage was set successfully, False otherwise.
     """
     result : dict = self._commander.adapter.voltage(voltage=voltage, calibrate=calibrate)
+    return result["success"]
+
+  def setVcomConfig(self, baudrate: int, handshake: VcomHandshake, store: bool = False) -> bool:
+    """Set the VCOM configuration for the adapter.
+    Args:
+      baudrate (int): VCOM baudrate.
+      handshake (VcomHandshake): VCOM handshake.
+      store (bool): Store the VCOM configuration.
+    Returns:
+      True if the VCOM configuration was set successfully, False otherwise.
+    """
+    if handshake not in VcomHandshake.__members__.values():
+      raise ValueError(f"Invalid handshake: {handshake}")
+
+    result : dict = self._commander.vcom.config(baudrate=baudrate, handshake=handshake.value, store=store)
     return result["success"]
