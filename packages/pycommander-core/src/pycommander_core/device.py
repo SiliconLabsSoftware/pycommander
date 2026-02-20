@@ -444,10 +444,7 @@ class Device:
     for code_region in config.code_regions:
 
       # Validate the protection mode
-      if code_region.protection_mode not in [
-        CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED,
-        CodeRegionProtectionMode.ENCRYPTED,
-        CodeRegionProtectionMode.NONE]:
+      if code_region.protection_mode not in CodeRegionProtectionMode.__members__.values():
         raise ValueError(f"Invalid protection mode: {code_region.protection_mode}")
 
       code_region_dict = {
@@ -536,4 +533,35 @@ class Device:
 
     # Write the region configuration to the device
     result = self._commander.security.writeregionconfig(file=str(config_file), reset=allow_reset, device=self.part_number)
+    return result["success"]
+
+  def closeCodeRegion(self, index: int, code_version: int | None = None, allow_reset: bool = True, force: bool = False) -> bool:
+    """Close a code region by index. Series 3 only.
+    Args:
+      index (int): The index of the code region to close.
+      code_version (int | None): The code version to set (32 bits unsigned integer).
+      allow_reset (bool): Allow the device to be reset during the operation.
+      force (bool): Force the code region to be closed, even if it is already closed.
+    Returns:
+      True if the code region was closed successfully, False otherwise.
+    """
+    if code_version is not None:
+      if code_version < 0 or code_version > 0xFFFFFFFF:
+        raise ValueError("Code version must be a 32 bits unsigned integer")
+
+    # Get the current region configuration
+    existing_config = self.readRegionConfig(allow_reset=allow_reset)
+    if not existing_config:
+      return False
+
+    # Check if the index is valid
+    if index < 0 or index >= len(existing_config.code_regions):
+      raise ValueError(f"Invalid index: {index}. Valid indices are 0 to {len(existing_config.code_regions) - 1}.")
+
+    # Check if the desired configuration is already set
+    if not force:
+      if existing_config.code_regions[index].closed:
+        return True
+
+    result = self._commander.security.closeregion(index=index, codeversion=code_version, reset=allow_reset, device=self.part_number)
     return result["success"]

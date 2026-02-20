@@ -1606,3 +1606,87 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
     self.assertEqual(len(commander._runner.logged_commands), 1)
+
+  def test_device_closeCodeRegion(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+  "result": {
+    "data_region": {
+      "location": 0,
+      "size": 0
+    },
+    "regions": [
+      { 
+        "closed": false,
+        "index": 0,
+        "protection_mode": "Encrypted and authenticated",
+        "size_kb": 32
+      }
+    ]
+  },
+  "success": true
+}
+"""
+    ))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.closeCodeRegion(index=0, code_version=1, allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"],
+      ["mock", "security", "closeregion", "0", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--codeversion", "1", "--json"]
+    ])
+
+  def test_device_closeCodeRegion_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0,
+"""
+{
+  "result": {
+    "data_region": {
+      "location": 0,
+      "size": 0
+    },
+    "regions": [
+      { 
+        "closed": false,
+        "index": 0,
+        "protection_mode": "Encrypted and authenticated",
+        "size_kb": 32
+      }
+    ]
+  },
+  "success": true
+}
+"""
+    ))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Close failed"}'))
+
+    self.assertFalse(device.closeCodeRegion(index=0, code_version=1, allow_reset=False, force=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"],
+      ["mock", "security", "closeregion", "0", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--codeversion", "1", "--json"]
+    ])
+
+  def test_device_closeCodeRegion_invalid_code_version(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with self.assertRaises(ValueError):
+      device.closeCodeRegion(index=0, code_version=-1, allow_reset=False)
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_device_closeCodeRegion_code_version_too_large(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Device(part_number="SiMG301", commander=commander)
+
+    with self.assertRaises(ValueError):
+      device.closeCodeRegion(index=0, code_version=0xFFFFFFFF + 1, allow_reset=False)
+    self.assertEqual(commander._runner.logged_commands, [])
