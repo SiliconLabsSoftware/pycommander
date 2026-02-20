@@ -73,3 +73,8 @@ class DataRegionConfig:
 class RegionConfig:
   code_regions: list[CodeRegionConfig]
   data_region: DataRegionConfig
+
+class VcomHandshake(enum.Enum):
+  NONE = "none"
+  RTSCTS = "rtscts"
+  AUX = "aux"
