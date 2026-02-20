@@ -1,3 +1,5 @@
+import enum
+
 from dataclasses import dataclass
 
 @dataclass
@@ -49,3 +51,25 @@ class DeviceInfo:
   flash_size_kb:      int | None = None
   sram_size_kb:       int | None = None
   unique_id:          str | None = None
+
+class CodeRegionProtectionMode(enum.Enum):
+  ENCRYPTED_AND_AUTHENTICATED = "encrypted_authenticated"
+  ENCRYPTED = "encrypted"
+  NONE = "none"
+
+@dataclass
+class CodeRegionConfig:
+  index: int
+  size_kb: int
+  protection_mode: CodeRegionProtectionMode
+  closed: bool
+
+@dataclass
+class DataRegionConfig:
+  location: int
+  size: int
+
+@dataclass
+class RegionConfig:
+  code_regions: list[CodeRegionConfig]
+  data_region: DataRegionConfig
