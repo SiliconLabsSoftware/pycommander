@@ -75,6 +75,7 @@ jobs:
           ls -la "$GUI_TARGET_DIR"
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           python -m pip install coverage
