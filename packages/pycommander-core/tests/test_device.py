@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -641,13 +642,16 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
+    ])
 
   def test_device_writeManufacturingTokens_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
@@ -660,48 +664,57 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.writeManufacturingTokens(
-        tokenfiles=[Path(tf.name)],
-        tokens=[("MFG_TOKEN", "0xAB")],
-        tokengroup="zigbee",
-        tokendefs=Path("/path/to/tokendefs.json"),
-        securerange=(0x0, 0x8000),
-      ))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "tokens", "write",
-         "--serialno", "123456789",
-         "--device", "EFR32MG24B020F1536IM48",
-         "--tokenfile", tf.name,
-         "--token", "MFG_TOKEN:0xAB",
-         "--tokengroup", "zigbee",
-         "--tokendefs", str(Path("/path/to/tokendefs.json")),
-         "--securerange", "0x00000000:0x00008000",
-         "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeManufacturingTokens(
+      tokenfiles=[Path(tf.name)],
+      tokens=[("MFG_TOKEN", "0xAB")],
+      tokengroup="zigbee",
+      tokendefs=Path("/path/to/tokendefs.json"),
+      securerange=(0x0, 0x8000),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "tokens", "write",
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--tokenfile", tf.name,
+       "--token", "MFG_TOKEN:0xAB",
+       "--tokengroup", "zigbee",
+       "--tokendefs", str(Path("/path/to/tokendefs.json")),
+       "--securerange", "0x00000000:0x00008000",
+       "--json"]
+    ])
 
   def test_device_writeManufacturingTokens_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
-      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Token write failed"}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertFalse(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Token write failed"}'))
+
+    self.assertFalse(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
 
   def test_device_writeStaticTokens(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".txt") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.writeStaticTokens(tokenfiles=[Path(tf.name)]))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeStaticTokens(tokenfiles=[Path(tf.name)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
+    ])
 
   def test_device_writeStaticTokens_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
@@ -714,13 +727,16 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".s37") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.flashApplication(filenames=[Path(tf.name)]))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "flash", tf.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashApplication(filenames=[Path(tf.name)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash", tf.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
 
   def test_device_flashApplication_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
@@ -733,70 +749,84 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".s37") as tf1, \
-         tempfile.NamedTemporaryFile(suffix=".hex") as tf2:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf1 = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
+    self.addCleanup(os.remove, tf1.name)
+    tf1.close()
+    tf2 = tempfile.NamedTemporaryFile(dir=".", suffix=".hex", delete=False)
+    self.addCleanup(os.remove, tf2.name)
+    tf2.close()
 
-      self.assertTrue(device.flashApplication(filenames=[Path(tf1.name), Path(tf2.name)]))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "flash", tf1.name, tf2.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashApplication(filenames=[Path(tf1.name), Path(tf2.name)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash", tf1.name, tf2.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
 
   def test_device_flashApplication_multiple_files_one_missing(self):
     """One file exists and one doesn't -- should raise before running the command."""
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".s37") as tf:
-      with self.assertRaises(FileNotFoundError):
-        device.flashApplication(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
-      self.assertEqual(commander._runner.logged_commands, [])
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    with self.assertRaises(FileNotFoundError):
+      device.flashApplication(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
+    self.assertEqual(commander._runner.logged_commands, [])
 
   def test_device_flashApplication_with_options(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.flashApplication(
-        filenames=[Path(tf.name)],
-        address=0x08000000,
-        treat_as_binary=True,
-        masserase=True,
-        force=True,
-        reset=False,
-        halt=True,
-        close=False,
-        verify=False,
-        include_sections=[".text"],
-        exclude_sections=[".debug"],
-      ))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "flash", tf.name,
-         "--serialno", "123456789",
-         "--device", "EFR32MG24B020F1536IM48",
-         "--force",
-         "--address", "0x08000000",
-         "--halt",
-         "--masserase",
-         "--noreset",
-         "--noclose",
-         "--noverify",
-         "--binary",
-         "--include-section", ".text",
-         "--exclude-section", ".debug",
-         "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashApplication(
+      filenames=[Path(tf.name)],
+      address=0x08000000,
+      treat_as_binary=True,
+      masserase=True,
+      force=True,
+      reset=False,
+      halt=True,
+      close=False,
+      verify=False,
+      include_sections=[".text"],
+      exclude_sections=[".debug"],
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash", tf.name,
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--force",
+       "--address", "0x08000000",
+       "--halt",
+       "--masserase",
+       "--noreset",
+       "--noclose",
+       "--noverify",
+       "--binary",
+       "--include-section", ".text",
+       "--exclude-section", ".debug",
+       "--json"]
+    ])
 
   def test_device_flashApplication_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".s37") as tf:
-      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Flash failed"}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertFalse(device.flashApplication(filenames=[Path(tf.name)]))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Flash failed"}'))
+
+    self.assertFalse(device.flashApplication(filenames=[Path(tf.name)]))
 
   def test_device_flashPatches(self):
     commander = MockCommander(serial_number="123456789")
@@ -869,73 +899,87 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.flashRamCode(filenames=[Path(tf.name)]))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "flash", tf.name,
-         "--serialno", "123456789",
-         "--device", "EFR32MG24B020F1536IM48",
-         "--noreset",
-         "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashRamCode(filenames=[Path(tf.name)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash", tf.name,
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--noreset",
+       "--json"]
+    ])
 
   def test_device_flashRamCode_multiple_files(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".bin") as tf1, \
-         tempfile.NamedTemporaryFile(suffix=".hex") as tf2:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf1 = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    self.addCleanup(os.remove, tf1.name)
+    tf1.close()
+    tf2 = tempfile.NamedTemporaryFile(dir=".", suffix=".hex", delete=False)
+    self.addCleanup(os.remove, tf2.name)
+    tf2.close()
 
-      self.assertTrue(device.flashRamCode(filenames=[Path(tf1.name), Path(tf2.name)]))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "flash", tf1.name, tf2.name,
-         "--serialno", "123456789",
-         "--device", "EFR32MG24B020F1536IM48",
-         "--noreset",
-         "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashRamCode(filenames=[Path(tf1.name), Path(tf2.name)]))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash", tf1.name, tf2.name,
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--noreset",
+       "--json"]
+    ])
 
   def test_device_flashRamCode_with_options(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertTrue(device.flashRamCode(
-        filenames=[Path(tf.name)],
-        address=0x20000000,
-        include_sections=[".text"],
-        exclude_sections=[".debug"],
-        vtor=0x20000000,
-        force=True,
-        halt=True,
-      ))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "flash", tf.name,
-         "--serialno", "123456789",
-         "--device", "EFR32MG24B020F1536IM48",
-         "--force",
-         "--address", "0x20000000",
-         "--halt",
-         "--noreset",
-         "--include-section", ".text",
-         "--exclude-section", ".debug",
-         "--vtor", "0x20000000",
-         "--json"]
-      ])
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.flashRamCode(
+      filenames=[Path(tf.name)],
+      address=0x20000000,
+      include_sections=[".text"],
+      exclude_sections=[".debug"],
+      vtor=0x20000000,
+      force=True,
+      halt=True,
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "flash", tf.name,
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--force",
+       "--address", "0x20000000",
+       "--halt",
+       "--noreset",
+       "--include-section", ".text",
+       "--exclude-section", ".debug",
+       "--vtor", "0x20000000",
+       "--json"]
+    ])
 
   def test_device_flashRamCode_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
-      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "RAM flash failed"}'))
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
 
-      self.assertFalse(device.flashRamCode(filenames=[Path(tf.name)]))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "RAM flash failed"}'))
+
+    self.assertFalse(device.flashRamCode(filenames=[Path(tf.name)]))
 
   def test_device_flashRamCode_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
@@ -949,10 +993,13 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".bin") as tf:
-      with self.assertRaises(FileNotFoundError):
-        device.flashRamCode(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
-      self.assertEqual(commander._runner.logged_commands, [])
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    with self.assertRaises(FileNotFoundError):
+      device.flashRamCode(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
+    self.assertEqual(commander._runner.logged_commands, [])
 
   def test_device_readRegionConfig(self):
     commander = MockCommander(serial_number="123456789")
@@ -1126,9 +1173,10 @@ class TestDevice(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
-    self.assertTrue(device.readRegionConfigToFile(outfile=Path("/tmp/output.yaml")))
+    file_path = Path("/tmp/output.yaml")
+    self.assertTrue(device.readRegionConfigToFile(outfile=file_path))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", "/tmp/output.yaml", "--json"]
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", str(file_path), "--json"]
     ])
 
   def test_device_readRegionConfigToFile_noreset(self):
@@ -1136,10 +1184,11 @@ class TestDevice(unittest.TestCase):
     device = Device(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
-
-    self.assertTrue(device.readRegionConfigToFile(outfile=Path("/tmp/output.yaml"), allow_reset=False))
+   
+    file_path = Path("/tmp/output.yaml")
+    self.assertTrue(device.readRegionConfigToFile(outfile=file_path, allow_reset=False))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", "/tmp/output.yaml", "--noreset", "--json"]
+      ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", str(file_path), "--noreset", "--json"]
     ])
 
   def test_device_readRegionConfigToFile_failed(self):
@@ -1148,7 +1197,8 @@ class TestDevice(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
 
-    self.assertFalse(device.readRegionConfigToFile(outfile=Path("/tmp/output.yaml")))
+    file_path = Path("/tmp/output.yaml")
+    self.assertFalse(device.readRegionConfigToFile(outfile=file_path))
 
   def test_device_writeRegionConfig_force(self):
     """force=True skips comparison, writes directly."""
@@ -1381,43 +1431,46 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
+    tf.close()
 
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
-      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--json"]
-      ])
+    self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--json"]
+    ])
 
   def test_device_writeRegionConfigFromFile_force_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
+    tf.close()
 
-      device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write failed"}'))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write failed"}'))
 
-      self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
+    self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
 
   def test_device_writeRegionConfigFromFile_noreset(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n    protection_mode: none\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n    protection_mode: none\n")
+    tf.close()
 
-      device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
-      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), allow_reset=False, force=True))
-      self.assertEqual(commander._runner.logged_commands, [
-        ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]
-      ])
+    self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), allow_reset=False, force=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]
+    ])
 
   def test_device_writeRegionConfigFromFile_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
@@ -1430,49 +1483,53 @@ class TestDevice(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("something_else: true\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("something_else: true\n")
+    tf.close()
 
-      with self.assertRaises(ValueError) as ctx:
-        device.writeRegionConfigFromFile(config_file=Path(tf.name))
-      self.assertIn("Regions are required", str(ctx.exception))
+    with self.assertRaises(ValueError) as ctx:
+      device.writeRegionConfigFromFile(config_file=Path(tf.name))
+    self.assertIn("Regions are required", str(ctx.exception))
 
   def test_device_writeRegionConfigFromFile_missing_size_kb(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - protection_mode: encrypted\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - protection_mode: encrypted\n")
+    tf.close()
 
-      with self.assertRaises(ValueError) as ctx:
-        device.writeRegionConfigFromFile(config_file=Path(tf.name))
-      self.assertIn("Size KB is required", str(ctx.exception))
+    with self.assertRaises(ValueError) as ctx:
+      device.writeRegionConfigFromFile(config_file=Path(tf.name))
+    self.assertIn("Size KB is required", str(ctx.exception))
 
   def test_device_writeRegionConfigFromFile_missing_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n")
+    tf.close()
 
-      with self.assertRaises(ValueError) as ctx:
-        device.writeRegionConfigFromFile(config_file=Path(tf.name))
-      self.assertIn("Protection mode is required", str(ctx.exception))
+    with self.assertRaises(ValueError) as ctx:
+      device.writeRegionConfigFromFile(config_file=Path(tf.name))
+    self.assertIn("Protection mode is required", str(ctx.exception))
 
   def test_device_writeRegionConfigFromFile_invalid_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
     device = Device(part_number="SiMG301", commander=commander)
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n    protection_mode: bogus_mode\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n    protection_mode: bogus_mode\n")
+    tf.close()
 
-      with self.assertRaises(ValueError) as ctx:
-        device.writeRegionConfigFromFile(config_file=Path(tf.name))
-      self.assertIn("Invalid protection mode", str(ctx.exception))
+    with self.assertRaises(ValueError) as ctx:
+      device.writeRegionConfigFromFile(config_file=Path(tf.name))
+    self.assertIn("Invalid protection mode", str(ctx.exception))
 
   def test_device_writeRegionConfigFromFile_no_force_configs_equal(self):
     """Existing config matches file config -- returns True without writing."""
@@ -1494,13 +1551,14 @@ class TestDevice(unittest.TestCase):
 """
     ))
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted_authenticated\n")
+    tf.close()
 
-      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
-      self.assertEqual(len(commander._runner.logged_commands), 1)
-      self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+    self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
   def test_device_writeRegionConfigFromFile_no_force_configs_differ(self):
     """Existing config differs from file config -- should write."""
@@ -1524,14 +1582,15 @@ class TestDevice(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 64\n    protection_mode: none\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 64\n    protection_mode: none\n")
+    tf.close()
 
-      self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
-      self.assertEqual(len(commander._runner.logged_commands), 2)
-      self.assertIn("readregionconfig", commander._runner.logged_commands[0])
-      self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
+    self.assertTrue(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 2)
+    self.assertIn("readregionconfig", commander._runner.logged_commands[0])
+    self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
 
   def test_device_writeRegionConfigFromFile_no_force_read_fails(self):
     """readRegionConfig fails -- returns False without writing."""
@@ -1540,9 +1599,10 @@ class TestDevice(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read failed"}'))
 
-    with tempfile.NamedTemporaryFile(suffix=".yaml", mode="w") as tf:
-      tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted\n")
-      tf.flush()
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.write("regions:\n  - size_kb: 32\n    protection_mode: encrypted\n")
+    tf.close()
 
-      self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
-      self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
