@@ -34,7 +34,7 @@ class SecurityCommand(BaseCommand):
                   reset: bool = True,
                   codeversion: int | None = None,
                   **kwargs: Any) -> dict:
-    """Close a Secure Engine region by index.
+    """Close a code region by index. Series 3 only.
 
     Args:
       index (int): Region index to close.
