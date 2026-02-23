@@ -389,25 +389,25 @@ class Target:
     code_regions : list[CodeRegionConfig] = []
     for code_region in result["result"]["regions"]:
 
-      raw_protection_mode = code_region["protection_mode"]
+      raw_protection_mode = code_region.get("protection_mode", None)
 
       if raw_protection_mode == "Encrypted and authenticated":
         protection_mode = CodeRegionProtectionMode.ENCRYPTED_AND_AUTHENTICATED
       elif raw_protection_mode == "Encrypted":
         protection_mode = CodeRegionProtectionMode.ENCRYPTED
-      elif raw_protection_mode == "None":
+      else:
         protection_mode = CodeRegionProtectionMode.NONE
 
       code_regions.append(CodeRegionConfig(
-        index=code_region["index"],
-        size_kb=code_region["size_kb"],
+        index=code_region.get("index", None),
+        size_kb=code_region.get("size_kb", None),
         protection_mode=protection_mode,
-        closed=code_region["closed"],
+        closed=code_region.get("closed", None),
       ))
 
     data_region : DataRegionConfig = DataRegionConfig(
-      location=result["result"]["data_region"]["location"],
-      size=result["result"]["data_region"]["size"],
+      location=result["result"]["data_region"].get("location", None),
+      size=result["result"]["data_region"].get("size", None),
     )
 
     region_config = RegionConfig(
