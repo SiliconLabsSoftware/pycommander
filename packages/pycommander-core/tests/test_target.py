@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pycommander_core.device import Device
+from pycommander_core.target import Target
 from pycommander_core.runner import RunnerResult
 from pycommander_core.types import *
 
@@ -13,7 +13,7 @@ class TestDevice(unittest.TestCase):
   
   def test_device_info(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(
@@ -36,7 +36,7 @@ class TestDevice(unittest.TestCase):
       )
     )
 
-    expected_device_info = DeviceInfo(
+    expected_device_info = TargetInfo(
       part_number="EFR32MG24B020F1536IM48",
       die_revision="A0",
       production_version="0",
@@ -50,7 +50,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_info_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to get device information"}'))
     
@@ -59,7 +59,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_reset(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -68,7 +68,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_reset_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to reset the device"}'))
 
@@ -77,7 +77,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_masserase(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -86,7 +86,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_masserase_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to mass erase the device"}'))
 
@@ -95,7 +95,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_pageerase(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
     self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), True)
@@ -103,7 +103,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_pageerase_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to erase the pages"}'))
     self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), False)
@@ -111,7 +111,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_getCTUNE(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(
@@ -162,7 +162,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to get CTUNE value from the board"}'))
     
@@ -176,7 +176,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     # We get the CTUNE value from the board first
     device._commander._runner.queue_result(
@@ -222,7 +222,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     # We get the CTUNE value from the board first
     device._commander._runner.queue_result(
@@ -275,7 +275,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     # We get the CTUNE value from the board first
     device._commander._runner.queue_result(
@@ -328,7 +328,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     # We get the CTUNE value from the board first
     device._commander._runner.queue_result(
@@ -374,7 +374,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     # We get the CTUNE value from the board first
     device._commander._runner.queue_result(
@@ -427,7 +427,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     # We get the CTUNE value from the board first
     device._commander._runner.queue_result(
@@ -479,7 +479,7 @@ class TestDevice(unittest.TestCase):
     """
 
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to get CTUNE value from the board"}'))
     
@@ -488,7 +488,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_lockDebugAccess(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -497,7 +497,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_lockDebugAccess_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to lock the device"}'))
 
@@ -506,7 +506,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_unlockDebugAccess(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -515,7 +515,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_unlockDebugAccess_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to unlock the device"}'))
 
@@ -524,14 +524,14 @@ class TestDevice(unittest.TestCase):
 
   def test_device_enableWriteProtection_requires_range_or_region(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     with self.assertRaises(ValueError) as ctx:
       device.enableWriteProtection()
     self.assertIn("At least one range or region must be specified", str(ctx.exception))
 
   def test_device_enableWriteProtection_with_range(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -540,7 +540,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_enableWriteProtection_with_region(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -549,7 +549,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_enableWriteProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to enable write protection"}'))
 
@@ -558,14 +558,14 @@ class TestDevice(unittest.TestCase):
 
   def test_device_enableReadProtection_requires_range_or_region(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     with self.assertRaises(ValueError) as ctx:
       device.enableReadProtection()
     self.assertIn("At least one range or region must be specified", str(ctx.exception))
 
   def test_device_enableReadProtection_with_range(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -574,7 +574,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_enableReadProtection_with_region(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -583,7 +583,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_enableReadProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to enable read protection"}'))
 
@@ -592,7 +592,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_disableWriteProtection(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -601,7 +601,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_disableWriteProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to disable write protection"}'))
 
@@ -610,7 +610,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_disableReadProtection(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -619,7 +619,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_disableReadProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to disable read protection"}'))
 
@@ -629,7 +629,7 @@ class TestDevice(unittest.TestCase):
   def test_device_info_no_device_info_key(self):
     """Result is successful but the 'device_info' key is missing from the response."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0, '{"result": {}, "success": true}')
@@ -640,7 +640,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeManufacturingTokens(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -655,14 +655,14 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeManufacturingTokens_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.writeManufacturingTokens(tokenfiles=[Path("/nonexistent/file.txt")])
 
   def test_device_writeManufacturingTokens_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -691,7 +691,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeManufacturingTokens_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -703,7 +703,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeStaticTokens(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".txt", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -718,14 +718,14 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeStaticTokens_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.writeStaticTokens(tokenfiles=[Path("/nonexistent/file.txt")])
 
   def test_device_flashApplication(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -740,14 +740,14 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashApplication_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.flashApplication(filenames=[Path("/nonexistent/firmware.s37")])
 
   def test_device_flashApplication_multiple_files(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf1 = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
     self.addCleanup(os.remove, tf1.name)
@@ -766,7 +766,7 @@ class TestDevice(unittest.TestCase):
   def test_device_flashApplication_multiple_files_one_missing(self):
     """One file exists and one doesn't -- should raise before running the command."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -778,7 +778,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashApplication_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -818,7 +818,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashApplication_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".s37", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -830,7 +830,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashPatches(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -845,7 +845,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashPatches_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Patching failed"}'))
 
@@ -854,7 +854,7 @@ class TestDevice(unittest.TestCase):
   def test_device_getCTUNE_alternate_validity(self):
     """Board invalid, DI valid, token invalid -- covers the branches missed by the main test."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(
@@ -897,7 +897,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashRamCode(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -916,7 +916,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashRamCode_multiple_files(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf1 = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
     self.addCleanup(os.remove, tf1.name)
@@ -938,7 +938,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashRamCode_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -971,7 +971,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashRamCode_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -983,7 +983,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_flashRamCode_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.flashRamCode(filenames=[Path("/nonexistent/firmware.bin")])
@@ -991,7 +991,7 @@ class TestDevice(unittest.TestCase):
   def test_device_flashRamCode_multiple_files_one_missing(self):
     """One file exists and one doesn't -- should raise before running the command."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="EFR32MG24B020F1536IM48", commander=commander)
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1003,7 +1003,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfig(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1050,7 +1050,7 @@ class TestDevice(unittest.TestCase):
   def test_device_readRegionConfig_allow_reset(self):
     """Default allow_reset=True should not add --noreset."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1086,7 +1086,7 @@ class TestDevice(unittest.TestCase):
   def test_device_readRegionConfig_all_protection_modes(self):
     """Cover the Encrypted and None protection mode branches."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1130,7 +1130,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfig_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
 
@@ -1138,7 +1138,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfig_missing_regions(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1159,7 +1159,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfig_missing_data_region(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0, '{"result": {"regions": []}, "success": true}')
@@ -1169,7 +1169,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfigToFile(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
@@ -1181,7 +1181,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfigToFile_noreset(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
    
@@ -1193,7 +1193,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_readRegionConfigToFile_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
 
@@ -1203,7 +1203,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_force(self):
     """force=True skips comparison, writes directly."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1220,7 +1220,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfig_force_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1236,7 +1236,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_no_force_configs_equal(self):
     """Existing config matches desired -- should return True without writing."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1267,7 +1267,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_no_force_configs_differ(self):
     """Existing config differs -- should write the new config."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1301,7 +1301,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_no_force_data_region_differs(self):
     """Existing data_region location differs -- should write."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1333,7 +1333,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_no_force_closed_differs(self):
     """Existing closed state differs -- should write."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1365,7 +1365,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_no_force_read_fails(self):
     """readRegionConfig fails -- should return False without writing."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1383,7 +1383,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfig_no_force_index_differs(self):
     """Existing index differs -- should write."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1414,7 +1414,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfig_invalid_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     config = RegionConfig(
       code_regions=[
@@ -1429,7 +1429,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_force(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1445,7 +1445,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_force_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1458,7 +1458,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_noreset(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1474,14 +1474,14 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.writeRegionConfigFromFile(config_file=Path("/nonexistent/config.yaml"))
 
   def test_device_writeRegionConfigFromFile_missing_regions(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1494,7 +1494,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_missing_size_kb(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1507,7 +1507,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_missing_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1520,7 +1520,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_writeRegionConfigFromFile_invalid_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     tf = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", mode="w", delete=False)
     self.addCleanup(os.remove, tf.name)
@@ -1534,7 +1534,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfigFromFile_no_force_configs_equal(self):
     """Existing config matches file config -- returns True without writing."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1563,7 +1563,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfigFromFile_no_force_configs_differ(self):
     """Existing config differs from file config -- should write."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1595,7 +1595,7 @@ class TestDevice(unittest.TestCase):
   def test_device_writeRegionConfigFromFile_no_force_read_fails(self):
     """readRegionConfig fails -- returns False without writing."""
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read failed"}'))
 
@@ -1609,7 +1609,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1643,7 +1643,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_failed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1677,7 +1677,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_already_closed(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1709,7 +1709,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_already_closed_force(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1743,7 +1743,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_read_fails(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read failed"}'))
 
@@ -1754,7 +1754,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_invalid_index(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     device._commander._runner.queue_result(
       RunnerResult(0,
@@ -1787,7 +1787,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_invalid_code_version(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     with self.assertRaises(ValueError):
       device.closeCodeRegion(index=0, code_version=-1, allow_reset=False)
@@ -1795,7 +1795,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_closeCodeRegion_code_version_too_large(self):
     commander = MockCommander(serial_number="123456789")
-    device = Device(part_number="SiMG301", commander=commander)
+    device = Target(part_number="SiMG301", commander=commander)
 
     with self.assertRaises(ValueError):
       device.closeCodeRegion(index=0, code_version=0xFFFFFFFF + 1, allow_reset=False)

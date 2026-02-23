@@ -1,6 +1,6 @@
 import unittest
 
-from pycommander_core.device import Device
+from pycommander_core.target import Target
 from pycommander_core.adapter_base import AdapterBase
 from pycommander_core.runner import RunnerResult
 from pycommander_core.types import *
@@ -11,7 +11,7 @@ from .mock_commander import MockCommander
 class TestAdapterBase(unittest.TestCase):
   def test_adapter_base_init(self):
     mock_commander = MockCommander(serial_number="123456789")
-    mock_device = Device(part_number="EFR32MG24B020F1536IM48", commander=mock_commander)
+    mock_device = Target(part_number="EFR32MG24B020F1536IM48", commander=mock_commander)
     adapter = AdapterBase(commander=mock_commander, target=mock_device)
 
     self.assertEqual(adapter._commander, mock_commander)
@@ -23,7 +23,7 @@ class TestAdapterBase(unittest.TestCase):
     with self.assertRaises(ValueError):
       AdapterBase(commander=MockCommander(serial_number="123456789"), target=None)
     with self.assertRaises(ValueError):
-      AdapterBase(commander=None, target=Device(part_number="EFR32MG24B020F1536IM48", commander=MockCommander(serial_number="123456789")))
+      AdapterBase(commander=None, target=Target(part_number="EFR32MG24B020F1536IM48", commander=MockCommander(serial_number="123456789")))
 
   def test_adapter_base_info(self):
     adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")

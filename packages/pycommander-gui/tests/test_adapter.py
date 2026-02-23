@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pycommander_gui.adapter import Adapter
 from pycommander_gui.commander import Commander
-from pycommander_core.device import Device
+from pycommander_core.target import Target
 
 class TestAdapter(unittest.TestCase):
   def test_adapter_no_commander_missing_connection_arguments(self):
@@ -46,4 +46,4 @@ class TestAdapter(unittest.TestCase):
     adapter = Adapter(commander=commander, target_device="EFR32MG24")
 
     self.assertTrue(isinstance(adapter._commander, Commander))
-    self.assertTrue(isinstance(adapter.target, Device))
+    self.assertTrue(isinstance(adapter.target, Target))

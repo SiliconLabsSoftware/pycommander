@@ -44,7 +44,7 @@ class CtuneValue:
   token: int | None = None # Value from the MFG token
 
 @dataclass
-class DeviceInfo:
+class TargetInfo:
   part_number:        str | None = None
   die_revision:       str | None = None
   production_version: str | None = None

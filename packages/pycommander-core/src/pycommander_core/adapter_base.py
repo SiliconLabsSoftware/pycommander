@@ -1,5 +1,5 @@
 from .commander_base import CommanderBase
-from .device import Device
+from .target import Target
 
 from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo, AdapterVoltageInfo, VcomHandshake
 
@@ -13,7 +13,7 @@ class AdapterBase:
               debug_tif: str           | None = None,
               debug_irpre: int         | None = None,
               debug_drpre: int         | None = None,
-              target: Device           | None = None,
+              target: Target           | None = None,
               commander: CommanderBase | None = None):
 
     if commander is None:
@@ -23,7 +23,7 @@ class AdapterBase:
       raise ValueError("target must be provided")
 
     self._commander : CommanderBase = commander
-    self.target : Device = target
+    self.target : Target = target
 
   def info(self) -> AdapterInfo | None:
     """Get information about the adapter.

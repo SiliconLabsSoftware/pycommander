@@ -14,12 +14,12 @@ sections of the MSLA applicable to Source Code.
 from .commander import Commander
 from .adapter import Adapter
 
-from pycommander_core.device import Device
+from pycommander_core.target import Target
 from pycommander_core._version import __version__
 
 __all__ = [
   "Commander",
   "Adapter",
-  "Device",
+  "Target",
   "__version__",
 ]
