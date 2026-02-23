@@ -565,3 +565,53 @@ class Target:
 
     result = self._commander.security.closeregion(index=index, codeversion=code_version, reset=allow_reset, device=self.part_number)
     return result["success"]
+
+  def getSecurityStatus(self, show_trustzone_status: bool = False, allow_reset: bool = True) -> SecurityStatus | None:
+    """Get the security status of the target device.
+    Returns:
+      A SecurityStatus object containing the security status of the target device, or None if the security status could not be retrieved.
+    """
+    result = self._commander.security.status(reset=allow_reset, trustzone=show_trustzone_status, device=self.part_number)
+    if not result["success"]:
+      return None
+
+    if not "security" in result["result"]:
+      return None
+
+    security_status = SecurityStatus(
+      boot_status=result["result"]["security"].get("boot_status", None),
+      boot_status_str=result["result"]["security"].get("boot_status_str", None),
+      command_key_installed=result["result"]["security"].get("command_key_installed", None),
+      debug_lock_enabled=result["result"]["security"].get("debug_lock", "Disabled") == "Enabled",
+      device_erase_enabled=result["result"]["security"].get("device_erase", "Disabled") == "Enabled",
+      se_firmware_version=result["result"]["security"].get("se_firmware_version", None),
+      secure_boot_enabled=result["result"]["security"].get("secure_boot_enabled", None),
+      secure_debug_unlock_enabled=result["result"]["security"].get("secure_debug_unlock", "Disabled") == "Enabled",
+      serial_number=result["result"]["security"].get("serial_number", None),
+      sign_key_installed=result["result"]["security"].get("sign_key_installed", None),
+      tamper_ok=result["result"]["security"].get("tamper_ok", None),
+    )
+
+    if show_trustzone_status:
+      if "trustzone" not in result["result"]:
+        return None
+
+      trustzone_config = TrustzoneConfig(
+        debug_lock_locked=result["result"]["trustzone_config"].get("dbglock_locked", False),
+        debug_port_locked=result["result"]["trustzone_config"].get("debug_port_locked", False),
+        nidlock_locked=result["result"]["trustzone_config"].get("nidlock_locked", False),
+        spidlock_locked=result["result"]["trustzone_config"].get("spidlock_locked", False),
+        spnidlock_locked=result["result"]["trustzone_config"].get("spnidlock_locked", False),
+      )
+
+      trustzone_state = TrustzoneState(
+        debug_lock_locked=result["result"]["trustzone_state"].get("dbglock_locked", False),
+        nidlock_locked=result["result"]["trustzone_state"].get("nidlock_locked", False),
+        spidlock_locked=result["result"]["trustzone_state"].get("spidlock_locked", False),
+        spnidlock_locked=result["result"]["trustzone_state"].get("spnidlock_locked", False),
+      )
+
+      security_status.trustzone_config = trustzone_config
+      security_status.trustzone_state = trustzone_state
+
+    return security_status

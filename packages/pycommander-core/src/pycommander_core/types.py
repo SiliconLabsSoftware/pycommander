@@ -78,3 +78,34 @@ class VcomHandshake(enum.Enum):
   NONE = "none"
   RTSCTS = "rtscts"
   AUX = "aux"
+
+@dataclass
+class TrustzoneConfig:
+  debug_lock_locked: bool
+  debug_port_locked: bool
+  nidlock_locked: bool
+  spidlock_locked: bool
+  spnidlock_locked: bool
+
+@dataclass
+class TrustzoneState:
+  debug_lock_locked: bool
+  nidlock_locked: bool
+  spidlock_locked: bool
+  spnidlock_locked: bool
+
+@dataclass
+class SecurityStatus:
+  boot_status: int
+  boot_status_str: str
+  command_key_installed: bool
+  debug_lock_enabled: bool
+  device_erase_enabled: bool
+  se_firmware_version: str
+  secure_boot_enabled: bool
+  secure_debug_unlock_enabled: bool
+  serial_number: str
+  sign_key_installed: bool
+  tamper_ok: bool
+  trustzone_config: TrustzoneConfig | None = None
+  trustzone_state: TrustzoneState | None = None
