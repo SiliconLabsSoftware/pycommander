@@ -9,9 +9,9 @@ from pycommander_core.types import *
 
 from .mock_commander import MockCommander
 
-class TestDevice(unittest.TestCase):
+class TestTarget(unittest.TestCase):
   
-  def test_device_info(self):
+  def test_target_info(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -48,7 +48,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.info(), expected_device_info)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
 
-  def test_device_info_failed(self):
+  def test_target_info_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     
@@ -57,7 +57,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.info(), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
 
-  def test_device_reset(self):
+  def test_target_reset(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -66,7 +66,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.reset(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "reset", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_reset_failed(self):
+  def test_target_reset_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -75,7 +75,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.reset(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "reset", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_masserase(self):
+  def test_target_masserase(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -84,7 +84,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.masserase(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "masserase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_masserase_failed(self):
+  def test_target_masserase_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -93,7 +93,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.masserase(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "masserase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_pageerase(self):
+  def test_target_pageerase(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -101,7 +101,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "pageerase", "--range", "0x00000000:0x00008000", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_pageerase_failed(self):
+  def test_target_pageerase_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -109,7 +109,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "pageerase", "--range", "0x00000000:0x00008000", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_getCTUNE(self):
+  def test_target_getCTUNE(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -155,7 +155,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.getCTUNE(), expected_ctune_value)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_getCTUNE_failed(self):
+  def test_target_getCTUNE_failed(self):
     """
     Test the device getCTUNE method when getting the CTUNE value from the board fails.
     The method should return None.
@@ -169,7 +169,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.getCTUNE(), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_setCTUNE_autoset_same_value(self):
+  def test_target_setCTUNE_autoset_same_value(self):
     """
     Test the device setCTUNE method with autoset, no force, and the desired value is the same as the current value in the board EEPROM.
     The method should return True and *not* call the autoset command.
@@ -215,7 +215,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.setCTUNE(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_setCTUNE_autoset_same_value_force(self):
+  def test_target_setCTUNE_autoset_same_value_force(self):
     """
     Test the device setCTUNE method with autoset, force, and the desired value is the same as the current value in the board EEPROM.
     The method should return True and call the autoset command.
@@ -268,7 +268,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "ctune", "autoset", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
     ])
 
-  def test_device_setCTUNE_autoset_different_value(self):
+  def test_target_setCTUNE_autoset_different_value(self):
     """
     Test the device setCTUNE method with autoset, no force, and the desired value is different from the current value in the board EEPROM.
     The method should return True and call the autoset command.
@@ -321,7 +321,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "ctune", "autoset", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
     ])
 
-  def test_device_setCTUNE_set_same_value(self):
+  def test_target_setCTUNE_set_same_value(self):
     """
     Test the device setCTUNE method with set, no force, and the desired value is the same as the current value in the board EEPROM.
     The method should return True and *not* call the set command.
@@ -367,7 +367,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.setCTUNE(value=92, force=False), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_setCTUNE_set_same_value_force(self):
+  def test_target_setCTUNE_set_same_value_force(self):
     """
     Test the device setCTUNE method with set, force, and the desired value is the same as the current value in the board EEPROM.
     The method should return True and call the set command.
@@ -420,7 +420,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "ctune", "set", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--value", "0x0000005C", "--json"]
     ])
 
-  def test_device_setCTUNE_set_different_value(self):
+  def test_target_setCTUNE_set_different_value(self):
     """
     Test the device setCTUNE method with set, no force, and the desired value is different from the current value in the board EEPROM.
     The method should return True and call the set command.
@@ -472,7 +472,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "ctune", "set", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--value", "0x0000005D", "--json"]
     ])
 
-  def test_device_setCTUNE_get_failed(self):
+  def test_target_setCTUNE_get_failed(self):
     """
     Test the device setCTUNE method when getting the CTUNE value from the board fails.
     The method should return False.
@@ -486,7 +486,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.setCTUNE(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_lockDebugAccess(self):
+  def test_target_lockDebugAccess(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -495,7 +495,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.lockDebugAccess(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_lockDebugAccess_failed(self):
+  def test_target_lockDebugAccess_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -504,7 +504,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.lockDebugAccess(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_unlockDebugAccess(self):
+  def test_target_unlockDebugAccess(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -513,7 +513,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.unlockDebugAccess(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_unlockDebugAccess_failed(self):
+  def test_target_unlockDebugAccess_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -522,14 +522,14 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.unlockDebugAccess(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_enableWriteProtection_requires_range_or_region(self):
+  def test_target_enableWriteProtection_requires_range_or_region(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     with self.assertRaises(ValueError) as ctx:
       device.enableWriteProtection()
     self.assertIn("At least one range or region must be specified", str(ctx.exception))
 
-  def test_device_enableWriteProtection_with_range(self):
+  def test_target_enableWriteProtection_with_range(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -538,7 +538,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.enableWriteProtection(ranges=[(0x0, 0x1000)]), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--range", "0x00000000:0x00001000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_enableWriteProtection_with_region(self):
+  def test_target_enableWriteProtection_with_region(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -547,7 +547,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.enableWriteProtection(regions=["@main"]), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_enableWriteProtection_failed(self):
+  def test_target_enableWriteProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -556,14 +556,14 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.enableWriteProtection(ranges=[(0x0, 0x8000)]), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--range", "0x00000000:0x00008000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_enableReadProtection_requires_range_or_region(self):
+  def test_target_enableReadProtection_requires_range_or_region(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
     with self.assertRaises(ValueError) as ctx:
       device.enableReadProtection()
     self.assertIn("At least one range or region must be specified", str(ctx.exception))
 
-  def test_device_enableReadProtection_with_range(self):
+  def test_target_enableReadProtection_with_range(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -572,7 +572,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.enableReadProtection(ranges=[(0x0, 0x1000)]), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--range", "0x00000000:0x00001000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_enableReadProtection_with_region(self):
+  def test_target_enableReadProtection_with_region(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -581,7 +581,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.enableReadProtection(regions=["@main"]), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_enableReadProtection_failed(self):
+  def test_target_enableReadProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -590,7 +590,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.enableReadProtection(ranges=[(0x0, 0x8000)]), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--range", "0x00000000:0x00008000", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_disableWriteProtection(self):
+  def test_target_disableWriteProtection(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -599,7 +599,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.disableWriteProtection(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_disableWriteProtection_failed(self):
+  def test_target_disableWriteProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -608,7 +608,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.disableWriteProtection(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--write", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_disableReadProtection(self):
+  def test_target_disableReadProtection(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -617,7 +617,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.disableReadProtection(), True)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_disableReadProtection_failed(self):
+  def test_target_disableReadProtection_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -626,7 +626,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.disableReadProtection(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_info_no_device_info_key(self):
+  def test_target_info_no_device_info_key(self):
     """Result is successful but the 'device_info' key is missing from the response."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -638,7 +638,7 @@ class TestDevice(unittest.TestCase):
     self.assertIsNone(device.info())
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
 
-  def test_device_writeManufacturingTokens(self):
+  def test_target_writeManufacturingTokens(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -653,14 +653,14 @@ class TestDevice(unittest.TestCase):
       ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
     ])
 
-  def test_device_writeManufacturingTokens_file_not_found(self):
+  def test_target_writeManufacturingTokens_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.writeManufacturingTokens(tokenfiles=[Path("/nonexistent/file.txt")])
 
-  def test_device_writeManufacturingTokens_with_options(self):
+  def test_target_writeManufacturingTokens_with_options(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -689,7 +689,7 @@ class TestDevice(unittest.TestCase):
        "--json"]
     ])
 
-  def test_device_writeManufacturingTokens_failed(self):
+  def test_target_writeManufacturingTokens_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -701,7 +701,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.writeManufacturingTokens(tokenfiles=[Path(tf.name)]))
 
-  def test_device_writeStaticTokens(self):
+  def test_target_writeStaticTokens(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -716,14 +716,14 @@ class TestDevice(unittest.TestCase):
       ["mock", "tokens", "write", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--tokenfile", tf.name, "--json"]
     ])
 
-  def test_device_writeStaticTokens_file_not_found(self):
+  def test_target_writeStaticTokens_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.writeStaticTokens(tokenfiles=[Path("/nonexistent/file.txt")])
 
-  def test_device_flashApplication(self):
+  def test_target_flashApplication(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -738,14 +738,14 @@ class TestDevice(unittest.TestCase):
       ["mock", "flash", tf.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
     ])
 
-  def test_device_flashApplication_file_not_found(self):
+  def test_target_flashApplication_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.flashApplication(filenames=[Path("/nonexistent/firmware.s37")])
 
-  def test_device_flashApplication_multiple_files(self):
+  def test_target_flashApplication_multiple_files(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -763,7 +763,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "flash", tf1.name, tf2.name, "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
     ])
 
-  def test_device_flashApplication_multiple_files_one_missing(self):
+  def test_target_flashApplication_multiple_files_one_missing(self):
     """One file exists and one doesn't -- should raise before running the command."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -776,7 +776,7 @@ class TestDevice(unittest.TestCase):
       device.flashApplication(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
     self.assertEqual(commander._runner.logged_commands, [])
 
-  def test_device_flashApplication_with_options(self):
+  def test_target_flashApplication_with_options(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -816,7 +816,7 @@ class TestDevice(unittest.TestCase):
        "--json"]
     ])
 
-  def test_device_flashApplication_failed(self):
+  def test_target_flashApplication_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -828,7 +828,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.flashApplication(filenames=[Path(tf.name)]))
 
-  def test_device_flashPatches(self):
+  def test_target_flashPatches(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -843,7 +843,7 @@ class TestDevice(unittest.TestCase):
        "--json"]
     ])
 
-  def test_device_flashPatches_failed(self):
+  def test_target_flashPatches_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -851,7 +851,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.flashPatches(patches=[(0x08000000, 0xABCD, 2)]))
 
-  def test_device_getCTUNE_alternate_validity(self):
+  def test_target_getCTUNE_alternate_validity(self):
     """Board invalid, DI valid, token invalid -- covers the branches missed by the main test."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -895,7 +895,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(device.getCTUNE(), expected_ctune_value)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_device_flashRamCode(self):
+  def test_target_flashRamCode(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -914,7 +914,7 @@ class TestDevice(unittest.TestCase):
        "--json"]
     ])
 
-  def test_device_flashRamCode_multiple_files(self):
+  def test_target_flashRamCode_multiple_files(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -936,7 +936,7 @@ class TestDevice(unittest.TestCase):
        "--json"]
     ])
 
-  def test_device_flashRamCode_with_options(self):
+  def test_target_flashRamCode_with_options(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -969,7 +969,7 @@ class TestDevice(unittest.TestCase):
        "--json"]
     ])
 
-  def test_device_flashRamCode_failed(self):
+  def test_target_flashRamCode_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -981,14 +981,14 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.flashRamCode(filenames=[Path(tf.name)]))
 
-  def test_device_flashRamCode_file_not_found(self):
+  def test_target_flashRamCode_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.flashRamCode(filenames=[Path("/nonexistent/firmware.bin")])
 
-  def test_device_flashRamCode_multiple_files_one_missing(self):
+  def test_target_flashRamCode_multiple_files_one_missing(self):
     """One file exists and one doesn't -- should raise before running the command."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -1001,7 +1001,7 @@ class TestDevice(unittest.TestCase):
       device.flashRamCode(filenames=[Path(tf.name), Path("/nonexistent/firmware.hex")])
     self.assertEqual(commander._runner.logged_commands, [])
 
-  def test_device_readRegionConfig(self):
+  def test_target_readRegionConfig(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1047,7 +1047,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(actual_config, expected_config)
     self.assertEqual(commander._runner.logged_commands, [["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]])
 
-  def test_device_readRegionConfig_allow_reset(self):
+  def test_target_readRegionConfig_allow_reset(self):
     """Default allow_reset=True should not add --noreset."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1083,7 +1083,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--json"]
     ])
 
-  def test_device_readRegionConfig_all_protection_modes(self):
+  def test_target_readRegionConfig_all_protection_modes(self):
     """Cover the Encrypted and None protection mode branches."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1128,7 +1128,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(result.code_regions[1].protection_mode, CodeRegionProtectionMode.ENCRYPTED)
     self.assertEqual(result.code_regions[2].protection_mode, CodeRegionProtectionMode.NONE)
 
-  def test_device_readRegionConfig_failed(self):
+  def test_target_readRegionConfig_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1136,7 +1136,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertIsNone(device.readRegionConfig())
 
-  def test_device_readRegionConfig_missing_regions(self):
+  def test_target_readRegionConfig_missing_regions(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1157,7 +1157,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertIsNone(device.readRegionConfig())
 
-  def test_device_readRegionConfig_missing_data_region(self):
+  def test_target_readRegionConfig_missing_data_region(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1167,7 +1167,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertIsNone(device.readRegionConfig())
 
-  def test_device_readRegionConfigToFile(self):
+  def test_target_readRegionConfigToFile(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1179,7 +1179,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", str(file_path), "--json"]
     ])
 
-  def test_device_readRegionConfigToFile_noreset(self):
+  def test_target_readRegionConfigToFile_noreset(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1191,7 +1191,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--outfile", str(file_path), "--noreset", "--json"]
     ])
 
-  def test_device_readRegionConfigToFile_failed(self):
+  def test_target_readRegionConfigToFile_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1200,7 +1200,7 @@ class TestDevice(unittest.TestCase):
     file_path = Path("/tmp/output.yaml")
     self.assertFalse(device.readRegionConfigToFile(outfile=file_path))
 
-  def test_device_writeRegionConfig_force(self):
+  def test_target_writeRegionConfig_force(self):
     """force=True skips comparison, writes directly."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1218,7 +1218,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     self.assertEqual(commander._runner.logged_commands[0][0:3], ["mock", "security", "writeregionconfig"])
 
-  def test_device_writeRegionConfig_force_failed(self):
+  def test_target_writeRegionConfig_force_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1233,7 +1233,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.writeRegionConfig(config, force=True))
 
-  def test_device_writeRegionConfig_no_force_configs_equal(self):
+  def test_target_writeRegionConfig_no_force_configs_equal(self):
     """Existing config matches desired -- should return True without writing."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1264,7 +1264,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
-  def test_device_writeRegionConfig_no_force_configs_differ(self):
+  def test_target_writeRegionConfig_no_force_configs_differ(self):
     """Existing config differs -- should write the new config."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1298,7 +1298,7 @@ class TestDevice(unittest.TestCase):
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
     self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
 
-  def test_device_writeRegionConfig_no_force_data_region_differs(self):
+  def test_target_writeRegionConfig_no_force_data_region_differs(self):
     """Existing data_region location differs -- should write."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1330,7 +1330,7 @@ class TestDevice(unittest.TestCase):
     self.assertTrue(device.writeRegionConfig(config, force=False))
     self.assertEqual(len(commander._runner.logged_commands), 2)
 
-  def test_device_writeRegionConfig_no_force_closed_differs(self):
+  def test_target_writeRegionConfig_no_force_closed_differs(self):
     """Existing closed state differs -- should write."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1362,7 +1362,7 @@ class TestDevice(unittest.TestCase):
     self.assertTrue(device.writeRegionConfig(config, force=False))
     self.assertEqual(len(commander._runner.logged_commands), 2)
 
-  def test_device_writeRegionConfig_no_force_read_fails(self):
+  def test_target_writeRegionConfig_no_force_read_fails(self):
     """readRegionConfig fails -- should return False without writing."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1380,7 +1380,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
-  def test_device_writeRegionConfig_no_force_index_differs(self):
+  def test_target_writeRegionConfig_no_force_index_differs(self):
     """Existing index differs -- should write."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1412,7 +1412,7 @@ class TestDevice(unittest.TestCase):
     self.assertTrue(device.writeRegionConfig(config, force=False))
     self.assertEqual(len(commander._runner.logged_commands), 2)
 
-  def test_device_writeRegionConfig_invalid_protection_mode(self):
+  def test_target_writeRegionConfig_invalid_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1427,7 +1427,7 @@ class TestDevice(unittest.TestCase):
       device.writeRegionConfig(config, force=True)
     self.assertIn("Invalid protection mode", str(ctx.exception))
 
-  def test_device_writeRegionConfigFromFile_force(self):
+  def test_target_writeRegionConfigFromFile_force(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1443,7 +1443,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--json"]
     ])
 
-  def test_device_writeRegionConfigFromFile_force_failed(self):
+  def test_target_writeRegionConfigFromFile_force_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1456,7 +1456,7 @@ class TestDevice(unittest.TestCase):
 
     self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=True))
 
-  def test_device_writeRegionConfigFromFile_noreset(self):
+  def test_target_writeRegionConfigFromFile_noreset(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1472,14 +1472,14 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "writeregionconfig", tf.name, "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]
     ])
 
-  def test_device_writeRegionConfigFromFile_file_not_found(self):
+  def test_target_writeRegionConfigFromFile_file_not_found(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
     with self.assertRaises(FileNotFoundError):
       device.writeRegionConfigFromFile(config_file=Path("/nonexistent/config.yaml"))
 
-  def test_device_writeRegionConfigFromFile_missing_regions(self):
+  def test_target_writeRegionConfigFromFile_missing_regions(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1492,7 +1492,7 @@ class TestDevice(unittest.TestCase):
       device.writeRegionConfigFromFile(config_file=Path(tf.name))
     self.assertIn("Regions are required", str(ctx.exception))
 
-  def test_device_writeRegionConfigFromFile_missing_size_kb(self):
+  def test_target_writeRegionConfigFromFile_missing_size_kb(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1505,7 +1505,7 @@ class TestDevice(unittest.TestCase):
       device.writeRegionConfigFromFile(config_file=Path(tf.name))
     self.assertIn("Size KB is required", str(ctx.exception))
 
-  def test_device_writeRegionConfigFromFile_missing_protection_mode(self):
+  def test_target_writeRegionConfigFromFile_missing_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1518,7 +1518,7 @@ class TestDevice(unittest.TestCase):
       device.writeRegionConfigFromFile(config_file=Path(tf.name))
     self.assertIn("Protection mode is required", str(ctx.exception))
 
-  def test_device_writeRegionConfigFromFile_invalid_protection_mode(self):
+  def test_target_writeRegionConfigFromFile_invalid_protection_mode(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1531,7 +1531,7 @@ class TestDevice(unittest.TestCase):
       device.writeRegionConfigFromFile(config_file=Path(tf.name))
     self.assertIn("Invalid protection mode", str(ctx.exception))
 
-  def test_device_writeRegionConfigFromFile_no_force_configs_equal(self):
+  def test_target_writeRegionConfigFromFile_no_force_configs_equal(self):
     """Existing config matches file config -- returns True without writing."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1560,7 +1560,7 @@ class TestDevice(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
-  def test_device_writeRegionConfigFromFile_no_force_configs_differ(self):
+  def test_target_writeRegionConfigFromFile_no_force_configs_differ(self):
     """Existing config differs from file config -- should write."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1592,7 +1592,7 @@ class TestDevice(unittest.TestCase):
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
     self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
 
-  def test_device_writeRegionConfigFromFile_no_force_read_fails(self):
+  def test_target_writeRegionConfigFromFile_no_force_read_fails(self):
     """readRegionConfig fails -- returns False without writing."""
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
@@ -1607,7 +1607,7 @@ class TestDevice(unittest.TestCase):
     self.assertFalse(device.writeRegionConfigFromFile(config_file=Path(tf.name), force=False))
     self.assertEqual(len(commander._runner.logged_commands), 1)
 
-  def test_device_closeCodeRegion(self):
+  def test_target_closeCodeRegion(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1641,7 +1641,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "closeregion", "0", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--codeversion", "1", "--json"]
     ])
 
-  def test_device_closeCodeRegion_failed(self):
+  def test_target_closeCodeRegion_failed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1675,7 +1675,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "closeregion", "0", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--codeversion", "1", "--json"]
     ])
 
-  def test_device_closeCodeRegion_already_closed(self):
+  def test_target_closeCodeRegion_already_closed(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1707,7 +1707,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"],
     ])
 
-  def test_device_closeCodeRegion_already_closed_force(self):
+  def test_target_closeCodeRegion_already_closed_force(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1741,7 +1741,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "closeregion", "0", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--codeversion", "1", "--json"]
     ])
 
-  def test_device_closeCodeRegion_read_fails(self):
+  def test_target_closeCodeRegion_read_fails(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1752,7 +1752,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]
     ])
 
-  def test_device_closeCodeRegion_invalid_index(self):
+  def test_target_closeCodeRegion_invalid_index(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1785,7 +1785,7 @@ class TestDevice(unittest.TestCase):
       ["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]
     ])
 
-  def test_device_closeCodeRegion_invalid_code_version(self):
+  def test_target_closeCodeRegion_invalid_code_version(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1793,7 +1793,7 @@ class TestDevice(unittest.TestCase):
       device.closeCodeRegion(index=0, code_version=-1, allow_reset=False)
     self.assertEqual(commander._runner.logged_commands, [])
 
-  def test_device_closeCodeRegion_code_version_too_large(self):
+  def test_target_closeCodeRegion_code_version_too_large(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
