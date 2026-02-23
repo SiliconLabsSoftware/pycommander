@@ -2181,9 +2181,10 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
-    self.assertTrue(device.generateGblDecryptionKey(outfile=Path("/tmp/gbl_key.txt")))
+    file = Path("/tmp/gbl_key.txt")
+    self.assertTrue(device.generateGblDecryptionKey(outfile=file))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "aes-ccm", "--outfile", "/tmp/gbl_key.txt", "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "aes-ccm", "--outfile", file.name, "--json"]
     ])
 
   def test_target_generateGblDecryptionKey_failed(self):
@@ -2192,7 +2193,8 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Key generation failed"}'))
 
-    self.assertFalse(device.generateGblDecryptionKey(outfile=Path("/tmp/gbl_key.txt")))
+    file = Path("/tmp/gbl_key.txt")
+    self.assertFalse(device.generateGblDecryptionKey(outfile=file))
 
   def test_target_writeGblDecryptionKey(self):
     commander = MockCommander(serial_number="123456789")
@@ -2361,12 +2363,14 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    pubkey_file = Path("/tmp/pubkey.pem")
+    privkey_file = Path("/tmp/privkey.pem")
     self.assertTrue(device.generateSigningKeys(
-      pubkey_file=Path("/tmp/pubkey.pem"),
-      privkey_file=Path("/tmp/privkey.pem"),
+      pubkey_file=pubkey_file,
+      privkey_file=privkey_file,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/pubkey.pem", "--privkey", "/tmp/privkey.pem", "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--json"]
     ])
 
   def test_target_generateSigningKeys_with_tokenfile(self):
@@ -2375,13 +2379,16 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    pubkey_file = Path("/tmp/pubkey.pem")
+    privkey_file = Path("/tmp/privkey.pem")
+    tokenfile = Path("/tmp/token.txt")
     self.assertTrue(device.generateSigningKeys(
-      pubkey_file=Path("/tmp/pubkey.pem"),
-      privkey_file=Path("/tmp/privkey.pem"),
-      tokenfile=Path("/tmp/token.txt"),
+      pubkey_file=pubkey_file,
+      privkey_file=privkey_file,
+      tokenfile=tokenfile,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/pubkey.pem", "--privkey", "/tmp/privkey.pem", "--tokenfile", "/tmp/token.txt", "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--tokenfile", tokenfile.name, "--json"]
     ])
 
   def test_target_generateSigningKeys_failed(self):
@@ -2390,9 +2397,11 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Key generation failed"}'))
 
+    pubkey_file = Path("/tmp/pubkey.pem")
+    privkey_file = Path("/tmp/privkey.pem")
     self.assertFalse(device.generateSigningKeys(
-      pubkey_file=Path("/tmp/pubkey.pem"),
-      privkey_file=Path("/tmp/privkey.pem"),
+      pubkey_file=pubkey_file,
+      privkey_file=privkey_file,
     ))
 
   def test_target_readPublicSigningKey_missing_sign_key(self):
@@ -2415,12 +2424,14 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    pubkey_file = Path("/tmp/cmd_pubkey.pem")
+    privkey_file = Path("/tmp/cmd_privkey.pem")
     self.assertTrue(device.generateCommandKeys(
-      pubkey_file=Path("/tmp/cmd_pubkey.pem"),
-      privkey_file=Path("/tmp/cmd_privkey.pem"),
+      pubkey_file=pubkey_file,
+      privkey_file=privkey_file,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/cmd_pubkey.pem", "--privkey", "/tmp/cmd_privkey.pem", "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--json"]
     ])
 
   def test_target_generateCommandKeys_with_tokenfile(self):
@@ -2429,13 +2440,17 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    pubkey_file = Path("/tmp/cmd_pubkey.pem")
+    privkey_file = Path("/tmp/cmd_privkey.pem")
+    tokenfile = Path("/tmp/cmd_token.txt")
+
     self.assertTrue(device.generateCommandKeys(
-      pubkey_file=Path("/tmp/cmd_pubkey.pem"),
-      privkey_file=Path("/tmp/cmd_privkey.pem"),
-      tokenfile=Path("/tmp/cmd_token.txt"),
+      pubkey_file=pubkey_file,
+      privkey_file=privkey_file,
+      tokenfile=tokenfile,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/cmd_pubkey.pem", "--privkey", "/tmp/cmd_privkey.pem", "--tokenfile", "/tmp/cmd_token.txt", "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--tokenfile", tokenfile.name, "--json"]
     ])
 
   def test_target_generateCommandKeys_failed(self):
@@ -2444,9 +2459,11 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Key generation failed"}'))
 
+    pubkey_file = Path("/tmp/cmd_pubkey.pem")
+    privkey_file = Path("/tmp/cmd_privkey.pem")
     self.assertFalse(device.generateCommandKeys(
-      pubkey_file=Path("/tmp/cmd_pubkey.pem"),
-      privkey_file=Path("/tmp/cmd_privkey.pem"),
+      pubkey_file=pubkey_file,
+      privkey_file=privkey_file,
     ))
 
   def test_target_readPublicCommandKey(self):
