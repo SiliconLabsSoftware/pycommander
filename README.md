@@ -10,7 +10,7 @@ This repository contains the source code for Silicon Labs PyCommander.
 
 - `silabs-pycommander-core`: The package that contains the core functionality, i.e. the Python framework for interacting with Simplicity Commander.
 - `silabs-pycommander-cli`: The package that contains the CLI version of Simplicity Commander. This package depends on `pycommander-core`.
-- `silabs-pycommander-gui`: The package that contains the GUI version of Simplicity Commander. This package depends on `pycommander-core`.
+- `silabs-pycommander-gui`: The package that contains the GUI version of Simplicity Commander. This package depends on `pycommander-core`. It is currently not advertised, but it can be installed if needed. In that case, it should be installed instead of the CLI version, unless you want two versions of Simplicity Commander installed on your system.
 - `silabs-pycommander`: Meta-package for clean UX when installing either the CLI or GUI version of Simplicity Commander. This is the package that should be installed by end users.
 
 ## Installation
@@ -18,11 +18,8 @@ This repository contains the source code for Silicon Labs PyCommander.
 To install `pycommander` on your system, you can use the following command:
 
 ```bash
-pip install silabs-pycommander[cli]
-pip install silabs-pycommander[gui]
+pip install silabs-pycommander
 ```
-
-Please note that the CLI and GUI versions of Simplicity Commander are mutually exclusive. You can only install one or the other. Also, you have to specify which version you want to install by using the `[cli]` or `[gui]` extra.
 
 ## Usage
 
