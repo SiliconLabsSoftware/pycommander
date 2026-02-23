@@ -615,3 +615,139 @@ class Target:
       security_status.trustzone_state = trustzone_state
 
     return security_status
+
+  def generateGblDecryptionKey(self, outfile: Path) -> bool:
+    """Generate a GBL decryption key and write it to a file.
+    Args:
+      outfile (Path): The path to the output file.
+    Returns:
+      True if the GBL decryption key was generated successfully and written to the file, False otherwise.
+    """
+    result = self._commander.util.genkey(type="aes-ccm", outfile=str(outfile), device=self.part_number)
+    return result["success"]
+
+  def writeGblDecryptionKey(self, key_file: Path, confirm: bool = False) -> bool:
+    """Write a GBL decryption key to OTP memory in the target device.
+    Args:
+      key_file (Path): The path to the key file.
+      confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+    Returns:
+      True if the GBL decryption key was written successfully, False otherwise.
+    """
+    if not key_file.exists():
+      raise FileNotFoundError(f"Key file {key_file} does not exist")
+
+    result = self._commander.security.writekey(
+      decrypt_keyfile=str(key_file),
+      prompt=not confirm,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def generateSigningKeys(self, pubkey_file: Path, privkey_file: Path, tokenfile: Path | None = None) -> bool:
+    """Generate a signing key pair and write them to the provided files.
+    Args:
+      pubkey_file (Path): The path to the public key file.
+      privkey_file (Path): The path to the private key file.
+      tokenfile (Path | None): The path to the token file to write the public key to.
+    Returns:
+      True if the signing key pair was generated successfully and written to the files, False otherwise.
+    """
+    result = self._commander.util.genkey(
+      type="ecc-p256",
+      pubkey=str(pubkey_file),
+      privkey=str(privkey_file),
+      tokenfile=str(tokenfile) if tokenfile is not None else None,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def readPublicSigningKey(self) -> bytes | None:
+    """Read the public signing key from the target device.
+    Returns:
+      The public signing key as a bytes object, or None if the public signing key could not be retrieved.
+    """
+    result = self._commander.security.readkey(sign=True, device=self.part_number)
+    if not result["success"]:
+      return None
+
+    if "sign_key" not in result["result"]:
+      return None
+
+    return result["result"]["sign_key"].encode()
+
+  def writePublicSigningKey(self, key_file: Path, confirm: bool = False) -> bool:
+    """Write a public signing key to OTP memory in the target device.
+    Args:
+      key_file (Path): The path to the key file.
+      confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+    Returns:
+      True if the public signing key was written successfully, False otherwise.
+    """
+    if not key_file.exists():
+      raise FileNotFoundError(f"Key file {key_file} does not exist")
+
+    public_signing_key = self.readPublicSigningKey()
+    if public_signing_key is not None:
+      raise RuntimeError("Public signing key already exists in OTP memory")
+
+    result = self._commander.security.writekey(
+      sign_keyfile=str(key_file),
+      prompt=not confirm,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def generateCommandKeys(self, pubkey_file: Path, privkey_file: Path, tokenfile: Path | None = None) -> bool:
+    """Generate a command key pair and write them to the provided files.
+    Args:
+      pubkey_file (Path): The path to the public key file.
+      privkey_file (Path): The path to the private key file.
+      tokenfile (Path | None): The path to the token file to write the public key to.
+    Returns:
+      True if the command key pair was generated successfully and written to the files, False otherwise.
+    """
+    result = self._commander.util.genkey(
+      type="ecc-p256",
+      pubkey=str(pubkey_file),
+      privkey=str(privkey_file),
+      tokenfile=str(tokenfile) if tokenfile is not None else None, 
+      device=self.part_number,
+    )
+    return result["success"]
+  
+  def readPublicCommandKey(self) -> bytes | None:
+    """Read the public command key from the target device.
+    Returns:
+      The public command key as a bytes object, or None if the public command key could not be retrieved.
+    """
+    result = self._commander.security.readkey(command=True, device=self.part_number)
+    if not result["success"]:
+      return None
+
+    if "command_key" not in result["result"]:
+      return None
+
+    return result["result"]["command_key"].encode()
+
+  def writePublicCommandKey(self, key_file: Path, confirm: bool = False) -> bool:
+    """Write a public command key to OTP memory in the target device.
+    Args:
+      key_file (Path): The path to the key file.
+      confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+    Returns:
+      True if the public command key was written successfully, False otherwise.
+    """
+    if not key_file.exists():
+      raise FileNotFoundError(f"Key file {key_file} does not exist")
+
+    public_command_key = self.readPublicCommandKey()
+    if public_command_key is not None:
+      raise RuntimeError("Public command key already exists in OTP memory")
+
+    result = self._commander.security.writekey(
+      command_keyfile=str(key_file),
+      prompt=not confirm,
+      device=self.part_number,
+    )
+    return result["success"]
