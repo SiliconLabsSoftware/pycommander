@@ -1800,3 +1800,379 @@ class TestTarget(unittest.TestCase):
     with self.assertRaises(ValueError):
       device.closeCodeRegion(index=0, code_version=0xFFFFFFFF + 1, allow_reset=False)
     self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_getSecurityStatus(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "result": {
+        "security": {
+            "boot_status": 0,
+            "boot_status_str": "SE_BOOT_OK",
+            "command_key_installed": true,
+            "debug_lock": "Enabled",
+            "device_erase": "Enabled",
+            "se_firmware_version": "2.2.6",
+            "secure_boot_enabled": true,
+            "secure_debug_unlock": "Enabled",
+            "serial_number": "000000000000000014c86ee7a33c3185",
+            "sign_key_installed": true,
+            "tamper_ok": true
+        }
+    },
+    "success": true
+}
+"""
+      )
+    )
+
+    expected = SecurityStatus(
+      boot_status=0,
+      boot_status_str="SE_BOOT_OK",
+      command_key_installed=True,
+      debug_lock_enabled=True,
+      device_erase_enabled=True,
+      se_firmware_version="2.2.6",
+      secure_boot_enabled=True,
+      secure_debug_unlock_enabled=True,
+      serial_number="000000000000000014c86ee7a33c3185",
+      sign_key_installed=True,
+      tamper_ok=True,
+    )
+
+    self.assertEqual(device.getSecurityStatus(), expected)
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_all_disabled(self):
+    """All lock/erase/unlock fields report Disabled -- corresponding bools should be False."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "result": {
+        "security": {
+            "boot_status": 0,
+            "boot_status_str": "OK",
+            "command_key_installed": false,
+            "debug_lock": "Disabled",
+            "device_erase": "Disabled",
+            "se_firmware_version": "2.2.6",
+            "secure_boot_enabled": false,
+            "secure_debug_unlock": "Disabled",
+            "serial_number": "000000000000000014c86ee7a33c3185",
+            "sign_key_installed": false,
+            "tamper_ok": true
+        }
+    },
+    "success": true
+}
+"""
+      )
+    )
+
+    expected = SecurityStatus(
+      boot_status=0,
+      boot_status_str="OK",
+      command_key_installed=False,
+      debug_lock_enabled=False,
+      device_erase_enabled=False,
+      se_firmware_version="2.2.6",
+      secure_boot_enabled=False,
+      secure_debug_unlock_enabled=False,
+      serial_number="000000000000000014c86ee7a33c3185",
+      sign_key_installed=False,
+      tamper_ok=True,
+    )
+
+    self.assertEqual(device.getSecurityStatus(), expected)
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_missing_fields(self):
+    """Security dict is present but individual keys are missing -- .get() defaults apply."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"security": {}}, "success": true}')
+    )
+
+    expected = SecurityStatus(
+      boot_status=None,
+      boot_status_str=None,
+      command_key_installed=None,
+      debug_lock_enabled=False,
+      device_erase_enabled=False,
+      se_firmware_version=None,
+      secure_boot_enabled=None,
+      secure_debug_unlock_enabled=False,
+      serial_number=None,
+      sign_key_installed=None,
+      tamper_ok=None,
+    )
+
+    self.assertEqual(device.getSecurityStatus(), expected)
+
+  def test_target_getSecurityStatus_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(254, '{"success": false, "error": "Failed to get security status"}')
+    )
+
+    self.assertIsNone(device.getSecurityStatus())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_missing_security_key(self):
+    """Result is successful but the 'security' key is missing from the response."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {}, "success": true}')
+    )
+
+    self.assertIsNone(device.getSecurityStatus())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_noreset(self):
+    """allow_reset=False should add --noreset to the command."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"security": {}}, "success": true}')
+    )
+
+    device.getSecurityStatus(allow_reset=False)
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_with_trustzone(self):
+    """show_trustzone_status=True with full trustzone data."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "result": {
+        "security": {
+            "boot_status": 0,
+            "boot_status_str": "SE_BOOT_OK",
+            "command_key_installed": false,
+            "debug_lock": "Disabled",
+            "device_erase": "Enabled",
+            "se_firmware_version": "2.2.6",
+            "secure_boot_enabled": false,
+            "secure_debug_unlock": "Disabled",
+            "serial_number": "000000000000000014c86ee7a33c3185",
+            "sign_key_installed": false,
+            "tamper_ok": true
+        },
+        "trustzone": true,
+        "trustzone_config": {
+            "dbglock_locked": true,
+            "debug_port_locked": true,
+            "nidlock_locked": false,
+            "spidlock_locked": true,
+            "spnidlock_locked": false
+        },
+        "trustzone_state": {
+            "dbglock_locked": true,
+            "nidlock_locked": false,
+            "spidlock_locked": true,
+            "spnidlock_locked": false
+        }
+    },
+    "success": true
+}
+"""
+      )
+    )
+
+    expected = SecurityStatus(
+      boot_status=0,
+      boot_status_str="SE_BOOT_OK",
+      command_key_installed=False,
+      debug_lock_enabled=False,
+      device_erase_enabled=True,
+      se_firmware_version="2.2.6",
+      secure_boot_enabled=False,
+      secure_debug_unlock_enabled=False,
+      serial_number="000000000000000014c86ee7a33c3185",
+      sign_key_installed=False,
+      tamper_ok=True,
+      trustzone_config=TrustzoneConfig(
+        debug_lock_locked=True,
+        debug_port_locked=True,
+        nidlock_locked=False,
+        spidlock_locked=True,
+        spnidlock_locked=False,
+      ),
+      trustzone_state=TrustzoneState(
+        debug_lock_locked=True,
+        nidlock_locked=False,
+        spidlock_locked=True,
+        spnidlock_locked=False,
+      ),
+    )
+
+    self.assertEqual(device.getSecurityStatus(show_trustzone_status=True), expected)
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--trustzone", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_with_trustzone_all_false(self):
+    """show_trustzone_status=True with all trustzone fields false."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "result": {
+        "security": {
+            "boot_status": 0,
+            "boot_status_str": "SE_BOOT_OK",
+            "command_key_installed": false,
+            "debug_lock": "Disabled",
+            "device_erase": "Disabled",
+            "se_firmware_version": "2.2.6",
+            "secure_boot_enabled": false,
+            "secure_debug_unlock": "Disabled",
+            "serial_number": "000000000000000014c86ee7a33c3185",
+            "sign_key_installed": false,
+            "tamper_ok": true
+        },
+        "trustzone": true,
+        "trustzone_config": {
+            "dbglock_locked": false,
+            "debug_port_locked": false,
+            "nidlock_locked": false,
+            "spidlock_locked": false,
+            "spnidlock_locked": false
+        },
+        "trustzone_state": {
+            "dbglock_locked": false,
+            "nidlock_locked": false,
+            "spidlock_locked": false,
+            "spnidlock_locked": false
+        }
+    },
+    "success": true
+}
+"""
+      )
+    )
+
+    result = device.getSecurityStatus(show_trustzone_status=True)
+    self.assertIsNotNone(result)
+    self.assertFalse(result.trustzone_config.debug_lock_locked)
+    self.assertFalse(result.trustzone_config.debug_port_locked)
+    self.assertFalse(result.trustzone_config.nidlock_locked)
+    self.assertFalse(result.trustzone_config.spidlock_locked)
+    self.assertFalse(result.trustzone_config.spnidlock_locked)
+    self.assertFalse(result.trustzone_state.debug_lock_locked)
+    self.assertFalse(result.trustzone_state.nidlock_locked)
+    self.assertFalse(result.trustzone_state.spidlock_locked)
+    self.assertFalse(result.trustzone_state.spnidlock_locked)
+
+  def test_target_getSecurityStatus_with_trustzone_missing_fields(self):
+    """Trustzone dicts present but individual keys missing -- .get() defaults to False."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"security": {}, "trustzone": true, "trustzone_config": {}, "trustzone_state": {}}, "success": true}'
+      )
+    )
+
+    result = device.getSecurityStatus(show_trustzone_status=True)
+    self.assertIsNotNone(result)
+    self.assertFalse(result.trustzone_config.debug_lock_locked)
+    self.assertFalse(result.trustzone_config.debug_port_locked)
+    self.assertFalse(result.trustzone_config.nidlock_locked)
+    self.assertFalse(result.trustzone_config.spidlock_locked)
+    self.assertFalse(result.trustzone_config.spnidlock_locked)
+    self.assertFalse(result.trustzone_state.debug_lock_locked)
+    self.assertFalse(result.trustzone_state.nidlock_locked)
+    self.assertFalse(result.trustzone_state.spidlock_locked)
+    self.assertFalse(result.trustzone_state.spnidlock_locked)
+
+  def test_target_getSecurityStatus_with_trustzone_missing_trustzone_key(self):
+    """show_trustzone_status=True but 'trustzone' key missing from result -- returns None."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+"""
+{
+    "result": {
+        "security": {
+            "boot_status": 0,
+            "boot_status_str": "SE_BOOT_OK",
+            "command_key_installed": false,
+            "debug_lock": "Disabled",
+            "device_erase": "Disabled",
+            "se_firmware_version": "2.2.6",
+            "secure_boot_enabled": false,
+            "secure_debug_unlock": "Disabled",
+            "serial_number": "000000000000000014c86ee7a33c3185",
+            "sign_key_installed": false,
+            "tamper_ok": true
+        }
+    },
+    "success": true
+}
+"""
+      )
+    )
+
+    self.assertIsNone(device.getSecurityStatus(show_trustzone_status=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "status", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--trustzone", "--json"]
+    ])
+
+  def test_target_getSecurityStatus_without_trustzone_omits_flag(self):
+    """show_trustzone_status=False (default) should not pass --trustzone and should leave trustzone fields as None."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"security": {}}, "success": true}')
+    )
+
+    result = device.getSecurityStatus(show_trustzone_status=False)
+    self.assertIsNotNone(result)
+    self.assertIsNone(result.trustzone_config)
+    self.assertIsNone(result.trustzone_state)
+    self.assertNotIn("--trustzone", commander._runner.logged_commands[0])
+
+
