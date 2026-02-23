@@ -10,8 +10,7 @@ This Python package wraps Simplicity Commander functionality and exposes a nativ
 
 This package was developed using Python 3.10. Required PyPI packages are:
 
-- ...
-- ...
+- pyyaml
 
 Additionally, Simplicity Commander requires the SEGGER J-Link drivers to be installed on your system.
 
@@ -38,7 +37,7 @@ pycommander <command> <subcommand> [<options>]
 
 ### Python API
 
-At the lowest level, the `PyCommander` class provides all the CLI commands as methods to the `Commander` class. These methods return a dictionary containing the command output, similarly to what the Simplicity Commander CLI does when the `--json` flag is used.
+At the lowest level, the `Commander` class provides all the CLI commands as methods to the class. These methods return a dictionary containing the command output, similarly to what the Simplicity Commander CLI does when the `--json` flag is used.
 
 ```python
 from pycommander import Commander
@@ -49,7 +48,7 @@ print(commander.util.appinfo(filename="firmware.hex"))
 print(commander.flash.flash(filenames=["firmware.hex"], address=0x08000000))
 ```
 
-`PyCommander` also exposes several convenience methods for common tasks related to the adapter (using the `Adapter` class) and the target device (using the `Target` class). These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module.
+pycommander also exposes several convenience methods for common tasks related to the adapter (using the `Adapter` class) and the target device (using the `Target` class). These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module.
 
 - Locking/unlocking the device for debug access
 - Setting the CTUNE value
