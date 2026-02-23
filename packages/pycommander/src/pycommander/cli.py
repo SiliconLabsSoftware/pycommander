@@ -9,7 +9,7 @@ try:
 
 except ImportError:
   try:
-    import pycommander_cli
+    from pycommander_cli import Commander
     CLI = True
 
   except ImportError:
