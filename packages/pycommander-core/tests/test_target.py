@@ -2184,7 +2184,7 @@ class TestTarget(unittest.TestCase):
     file = Path("/tmp/gbl_key.txt")
     self.assertTrue(device.generateGblDecryptionKey(outfile=file))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "aes-ccm", "--outfile", file.name, "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "aes-ccm", "--outfile", str(file), "--json"]
     ])
 
   def test_target_generateGblDecryptionKey_failed(self):
@@ -2208,7 +2208,7 @@ class TestTarget(unittest.TestCase):
 
     self.assertTrue(device.writeGblDecryptionKey(key_file=Path(tf.name)))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--decrypt", tf.name, "--json"]
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--decrypt", str(tf.name), "--json"]
     ])
 
   def test_target_writeGblDecryptionKey_confirm(self):
@@ -2224,7 +2224,7 @@ class TestTarget(unittest.TestCase):
 
     self.assertTrue(device.writeGblDecryptionKey(key_file=Path(tf.name), confirm=True))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--decrypt", tf.name, "--noprompt", "--json"]
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--decrypt", str(tf.name), "--noprompt", "--json"]
     ])
 
   def test_target_writeGblDecryptionKey_file_not_found(self):
@@ -2294,7 +2294,7 @@ class TestTarget(unittest.TestCase):
     self.assertTrue(device.writePublicSigningKey(key_file=Path(tf.name)))
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"],
-      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", tf.name, "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", str(tf.name), "--json"],
     ])
 
   def test_target_writePublicSigningKey_confirm(self):
@@ -2312,7 +2312,7 @@ class TestTarget(unittest.TestCase):
     self.assertTrue(device.writePublicSigningKey(key_file=Path(tf.name), confirm=True))
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"],
-      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", tf.name, "--noprompt", "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", str(tf.name), "--noprompt", "--json"],
     ])
 
   def test_target_writePublicSigningKey_already_exists(self):
@@ -2370,7 +2370,7 @@ class TestTarget(unittest.TestCase):
       privkey_file=privkey_file,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", str(pubkey_file), "--privkey", str(privkey_file), "--json"]
     ])
 
   def test_target_generateSigningKeys_with_tokenfile(self):
@@ -2388,7 +2388,7 @@ class TestTarget(unittest.TestCase):
       tokenfile=tokenfile,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--tokenfile", tokenfile.name, "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", str(pubkey_file), "--privkey", str(privkey_file), "--tokenfile", str(tokenfile), "--json"]
     ])
 
   def test_target_generateSigningKeys_failed(self):
@@ -2431,7 +2431,7 @@ class TestTarget(unittest.TestCase):
       privkey_file=privkey_file,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", str(pubkey_file), "--privkey", str(privkey_file), "--json"]
     ])
 
   def test_target_generateCommandKeys_with_tokenfile(self):
@@ -2450,7 +2450,7 @@ class TestTarget(unittest.TestCase):
       tokenfile=tokenfile,
     ))
     self.assertEqual(commander._runner.logged_commands, [
-      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", pubkey_file.name, "--privkey", privkey_file.name, "--tokenfile", tokenfile.name, "--json"]
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", str(pubkey_file), "--privkey", str(privkey_file), "--tokenfile", str(tokenfile), "--json"]
     ])
 
   def test_target_generateCommandKeys_failed(self):
@@ -2521,7 +2521,7 @@ class TestTarget(unittest.TestCase):
     self.assertTrue(device.writePublicCommandKey(key_file=Path(tf.name)))
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", "--json"],
-      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", tf.name, "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", str(tf.name), "--json"],
     ])
 
   def test_target_writePublicCommandKey_confirm(self):
@@ -2539,7 +2539,7 @@ class TestTarget(unittest.TestCase):
     self.assertTrue(device.writePublicCommandKey(key_file=Path(tf.name), confirm=True))
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", "--json"],
-      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", tf.name, "--noprompt", "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", str(tf.name), "--noprompt", "--json"],
     ])
 
   def test_target_writePublicCommandKey_already_exists(self):
