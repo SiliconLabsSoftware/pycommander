@@ -2175,4 +2175,394 @@ class TestTarget(unittest.TestCase):
     self.assertIsNone(result.trustzone_state)
     self.assertNotIn("--trustzone", commander._runner.logged_commands[0])
 
+  def test_target_generateGblDecryptionKey(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.generateGblDecryptionKey(outfile=Path("/tmp/gbl_key.txt")))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "aes-ccm", "--outfile", "/tmp/gbl_key.txt", "--json"]
+    ])
+
+  def test_target_generateGblDecryptionKey_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Key generation failed"}'))
+
+    self.assertFalse(device.generateGblDecryptionKey(outfile=Path("/tmp/gbl_key.txt")))
+
+  def test_target_writeGblDecryptionKey(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".key", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeGblDecryptionKey(key_file=Path(tf.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--decrypt", tf.name, "--json"]
+    ])
+
+  def test_target_writeGblDecryptionKey_confirm(self):
+    """confirm=True should add --noprompt to the command."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".key", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeGblDecryptionKey(key_file=Path(tf.name), confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--decrypt", tf.name, "--noprompt", "--json"]
+    ])
+
+  def test_target_writeGblDecryptionKey_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.writeGblDecryptionKey(key_file=Path("/nonexistent/key.key"))
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_writeGblDecryptionKey_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".key", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write key failed"}'))
+
+    self.assertFalse(device.writeGblDecryptionKey(key_file=Path(tf.name)))
+
+  def test_target_readPublicSigningKey(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    sign_key_hex = "fb2470314c0710f5a72e89a30d2af607770187568f80cffa7fc6516f61e0dc258a8606fe664a097eb94d3ea29e1b87262babdb969842da31512bdc7b9c63f4f6"
+
+    device._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"sign_key": "' + sign_key_hex + '"}, "success": true}'
+      )
+    )
+
+    result = device.readPublicSigningKey()
+    self.assertIsNotNone(result)
+    self.assertIsInstance(result, bytes)
+    self.assertEqual(result, sign_key_hex.encode())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"]
+    ])
+
+  def test_target_readPublicSigningKey_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read key failed"}'))
+
+    self.assertIsNone(device.readPublicSigningKey())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"]
+    ])
+
+  def test_target_writePublicSigningKey(self):
+    """No existing key in OTP -- should read first, then write."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writePublicSigningKey(key_file=Path(tf.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", tf.name, "--json"],
+    ])
+
+  def test_target_writePublicSigningKey_confirm(self):
+    """confirm=True should add --noprompt to the writekey command."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writePublicSigningKey(key_file=Path(tf.name), confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", tf.name, "--noprompt", "--json"],
+    ])
+
+  def test_target_writePublicSigningKey_already_exists(self):
+    """Existing signing key in OTP -- should raise RuntimeError without writing."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    sign_key_hex = "fb2470314c0710f5a72e89a30d2af607770187568f80cffa7fc6516f61e0dc258a8606fe664a097eb94d3ea29e1b87262babdb969842da31512bdc7b9c63f4f6"
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"sign_key": "' + sign_key_hex + '"}, "success": true}')
+    )
+
+    with self.assertRaises(RuntimeError) as ctx:
+      device.writePublicSigningKey(key_file=Path(tf.name))
+    self.assertIn("already exists", str(ctx.exception))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertIn("readkey", commander._runner.logged_commands[0])
+
+  def test_target_writePublicSigningKey_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.writePublicSigningKey(key_file=Path("/nonexistent/key.pem"))
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_writePublicSigningKey_failed(self):
+    """No existing key, but writekey command fails."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write key failed"}'))
+
+    self.assertFalse(device.writePublicSigningKey(key_file=Path(tf.name)))
+
+  def test_target_generateSigningKeys(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.generateSigningKeys(
+      pubkey_file=Path("/tmp/pubkey.pem"),
+      privkey_file=Path("/tmp/privkey.pem"),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/pubkey.pem", "--privkey", "/tmp/privkey.pem", "--json"]
+    ])
+
+  def test_target_generateSigningKeys_with_tokenfile(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.generateSigningKeys(
+      pubkey_file=Path("/tmp/pubkey.pem"),
+      privkey_file=Path("/tmp/privkey.pem"),
+      tokenfile=Path("/tmp/token.txt"),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/pubkey.pem", "--privkey", "/tmp/privkey.pem", "--tokenfile", "/tmp/token.txt", "--json"]
+    ])
+
+  def test_target_generateSigningKeys_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Key generation failed"}'))
+
+    self.assertFalse(device.generateSigningKeys(
+      pubkey_file=Path("/tmp/pubkey.pem"),
+      privkey_file=Path("/tmp/privkey.pem"),
+    ))
+
+  def test_target_readPublicSigningKey_missing_sign_key(self):
+    """Result is successful but the 'sign_key' key is missing from the response."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {}, "success": true}')
+    )
+
+    self.assertIsNone(device.readPublicSigningKey())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sign", "--json"]
+    ])
+
+  def test_target_generateCommandKeys(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.generateCommandKeys(
+      pubkey_file=Path("/tmp/cmd_pubkey.pem"),
+      privkey_file=Path("/tmp/cmd_privkey.pem"),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/cmd_pubkey.pem", "--privkey", "/tmp/cmd_privkey.pem", "--json"]
+    ])
+
+  def test_target_generateCommandKeys_with_tokenfile(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.generateCommandKeys(
+      pubkey_file=Path("/tmp/cmd_pubkey.pem"),
+      privkey_file=Path("/tmp/cmd_privkey.pem"),
+      tokenfile=Path("/tmp/cmd_token.txt"),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "util", "genkey", "--device", "EFR32MG24B020F1536IM48", "--type", "ecc-p256", "--pubkey", "/tmp/cmd_pubkey.pem", "--privkey", "/tmp/cmd_privkey.pem", "--tokenfile", "/tmp/cmd_token.txt", "--json"]
+    ])
+
+  def test_target_generateCommandKeys_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Key generation failed"}'))
+
+    self.assertFalse(device.generateCommandKeys(
+      pubkey_file=Path("/tmp/cmd_pubkey.pem"),
+      privkey_file=Path("/tmp/cmd_privkey.pem"),
+    ))
+
+  def test_target_readPublicCommandKey(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    command_key_hex = "a218c9615321567527e94ac1f01230604e231f1eabe699fb1d751af3e28d00feaa3dd823540a2452baa40dfb3475d3bb786b41e7880881b5a5427e71542694a2"
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"command_key": "' + command_key_hex + '"}, "success": true}')
+    )
+
+    result = device.readPublicCommandKey()
+    self.assertIsNotNone(result)
+    self.assertIsInstance(result, bytes)
+    self.assertEqual(result, command_key_hex.encode())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", "--json"]
+    ])
+
+  def test_target_readPublicCommandKey_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Read key failed"}'))
+
+    self.assertIsNone(device.readPublicCommandKey())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", "--json"]
+    ])
+
+  def test_target_readPublicCommandKey_missing_command_key(self):
+    """Result is successful but the 'command_key' key is missing from the response."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {}, "success": true}')
+    )
+
+    self.assertIsNone(device.readPublicCommandKey())
+
+  def test_target_writePublicCommandKey(self):
+    """No existing key in OTP -- should read first, then write."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writePublicCommandKey(key_file=Path(tf.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", tf.name, "--json"],
+    ])
+
+  def test_target_writePublicCommandKey_confirm(self):
+    """confirm=True should add --noprompt to the writekey command."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writePublicCommandKey(key_file=Path(tf.name), confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readkey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", "--json"],
+      ["mock", "security", "writekey", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--command", tf.name, "--noprompt", "--json"],
+    ])
+
+  def test_target_writePublicCommandKey_already_exists(self):
+    """Existing command key in OTP -- should raise RuntimeError without writing."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    command_key_hex = "a218c9615321567527e94ac1f01230604e231f1eabe699fb1d751af3e28d00feaa3dd823540a2452baa40dfb3475d3bb786b41e7880881b5a5427e71542694a2"
+    device._commander._runner.queue_result(
+      RunnerResult(0, '{"result": {"command_key": "' + command_key_hex + '"}, "success": true}')
+    )
+
+    with self.assertRaises(RuntimeError) as ctx:
+      device.writePublicCommandKey(key_file=Path(tf.name))
+    self.assertIn("already exists", str(ctx.exception))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertIn("readkey", commander._runner.logged_commands[0])
+
+  def test_target_writePublicCommandKey_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(FileNotFoundError):
+      device.writePublicCommandKey(key_file=Path("/nonexistent/key.pem"))
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_writePublicCommandKey_failed(self):
+    """No existing key, but writekey command fails."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    tf = tempfile.NamedTemporaryFile(dir=".", suffix=".pem", delete=False)
+    self.addCleanup(os.remove, tf.name)
+    tf.close()
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write key failed"}'))
+
+    self.assertFalse(device.writePublicCommandKey(key_file=Path(tf.name)))
