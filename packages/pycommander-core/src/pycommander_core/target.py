@@ -6,17 +6,17 @@ from pathlib import Path
 from .commander_base import CommanderBase
 from .types import *
 
-class Device:
+class Target:
   def __init__(self, part_number: str, commander: CommanderBase):
     self._commander : CommanderBase = commander
     self.part_number : str = part_number
 
 
-  def info(self) -> DeviceInfo | None:
-    """Get information about the device.
+  def info(self) -> TargetInfo | None:
+    """Get information about the target device.
 
     Returns:
-      A DeviceInfo object containing the information about the device, or None if the information could not be retrieved.
+      A TargetInfo object containing the information about the target device, or None if the information could not be retrieved.
     """
 
     result : dict = self._commander.device.info(target_device=self.part_number)
@@ -26,7 +26,7 @@ class Device:
     if "device_info" not in result["result"]:
       return None
 
-    device_info = DeviceInfo(
+    target_info = TargetInfo(
       part_number=result["result"]["device_info"].get("part_number", None),
       die_revision=result["result"]["device_info"].get("die_revision", None),
       production_version=result["result"]["device_info"].get("production_version", None),
@@ -35,10 +35,10 @@ class Device:
       unique_id=result["result"]["device_info"].get("unique_id", None),
     )
 
-    return device_info
+    return target_info
 
   def reset(self) -> bool:
-    """Reset the device.
+    """Reset the target device.
 
     Returns:
       True if the reset was successful, False otherwise.
@@ -48,7 +48,7 @@ class Device:
     return result["success"]
 
   def masserase(self) -> bool:
-    """Mass erase the device.
+    """Mass erase the target device.
 
     Returns:
       True if the mass erase was successful, False otherwise.
@@ -58,7 +58,7 @@ class Device:
     return result["success"]
 
   def pageerase(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
-    """Erase selected flash pages.
+    """Erase selected flash pages from the target device.
     Args:
       ranges (list[tuple[int | str, int | str]]): Memory ranges to erase (start, end); extended to page boundaries.
       regions (list[str]): Named memory regions (@region).
@@ -263,7 +263,7 @@ class Device:
 
 
   def setCTUNE(self, value: int | None = None, force: bool = False) -> bool:
-    """Set the value to the CTUNE token on the device.
+    """Set the value to the CTUNE token on the target device.
 
     Args:
       value (int): The value to assign to the CTUNE token. If None, the CTUNE value will be set from the value stored in the board EEPROM.
@@ -295,7 +295,7 @@ class Device:
     return result["success"]
 
   def lockDebugAccess(self) -> bool:
-    """Lock the device for debug access.
+    """Lock the target device for debug access.
 
     Returns:
       True if the debug lock was successful, False otherwise.
@@ -305,7 +305,7 @@ class Device:
     return result["success"]
 
   def unlockDebugAccess(self) -> bool:
-    """Unlock the device for debug access.
+    """Unlock the target device for debug access.
 
     Returns:
       True if the debug unlock was successful, False otherwise.
@@ -315,7 +315,7 @@ class Device:
     return result["success"]
 
   def enableWriteProtection(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
-    """Enable write protection for the specified ranges and/or regions.
+    """Enable write protection for the specified ranges and/or regions on the target device.
 
     Args:
       ranges (list[tuple[int | str, int | str]]): The ranges to write protect (start, end).
@@ -332,7 +332,7 @@ class Device:
     return result["success"]
 
   def enableReadProtection(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
-    """Read protect the specified ranges and/or regions.
+    """Read protect the specified ranges and/or regions on the target device.
 
     Args:
       ranges (list[tuple[int | str, int | str]]): The ranges to read protect (start, end).
@@ -349,7 +349,7 @@ class Device:
     return result["success"]
 
   def disableWriteProtection(self) -> bool:
-    """Disable write protection for the entire flash.
+    """Disable write protection for the entire flash on the target device.
 
     Returns:
       True if the write protection was disabled successfully, False otherwise.
@@ -359,7 +359,7 @@ class Device:
     return result["success"]
 
   def disableReadProtection(self) -> bool:
-    """Disable read protection for the entire flash.
+    """Disable read protection for the entire flash on the target device.
 
     Returns:
       True if the read protection was disabled successfully, False otherwise.
@@ -369,7 +369,7 @@ class Device:
     return result["success"]
 
   def readRegionConfig(self, allow_reset: bool = True) -> RegionConfig | None:
-    """Read the region configuration from the device. Series 3 only.
+    """Read the region configuration from the target device. Series 3 only.
     Args:
       allow_reset (bool): Allow the device to be reset during the operation.
     Returns:
@@ -418,10 +418,10 @@ class Device:
     return region_config
 
   def readRegionConfigToFile(self, outfile: Path, allow_reset: bool = True) -> bool:
-    """Read the region configuration from the device and write it to a file. Series 3 only.
+    """Read the region configuration from the target device and write it to a file. Series 3 only.
     Args:
       outfile (Path): The path to the output file.
-      allow_reset (bool): Allow the device to be reset during the operation.
+      allow_reset (bool): Allow the target device to be reset during the operation.
     Returns:
       True if the region configuration was read successfully and written to the file, False otherwise.
     """
@@ -430,10 +430,10 @@ class Device:
     return result["success"]
 
   def writeRegionConfig(self, config: RegionConfig, allow_reset: bool = True, force: bool = False) -> bool:
-    """Write the region configuration to the device. Series 3 only.
+    """Write the region configuration to the target device. Series 3 only.
     Args:
       config (RegionConfig): The region configuration to write.
-      allow_reset (bool): Allow the device to be reset during the operation.
+      allow_reset (bool): Allow the target device to be reset during the operation.
       force (bool): Force the region configuration to be written, even if the desired configuration is already set.
     Returns:
       True if the region configuration was written successfully, False otherwise.
@@ -487,10 +487,10 @@ class Device:
       return result["success"]
 
   def writeRegionConfigFromFile(self, config_file: Path, allow_reset: bool = True, force: bool = False) -> bool:
-    """Write the region configuration to the device. Series 3 only.
+    """Write the region configuration to the target device. Series 3 only.
     Args:
       config_file (Path): The path to the configuration file.
-      allow_reset (bool): Allow the device to be reset during the operation.
+      allow_reset (bool): Allow the target device to be reset during the operation.
       force (bool): Force the region configuration to be written, even if the desired configuration is already set.
     Returns:
       True if the region configuration was written successfully, False otherwise.
@@ -528,10 +528,10 @@ class Device:
           configs_are_equal = False
 
       if configs_are_equal:
-        # Don't write anything to the device, we're already set up as desired
+        # Don't write anything to the target device, we're already set up as desired
         return True
 
-    # Write the region configuration to the device
+    # Write the region configuration to the target device
     result = self._commander.security.writeregionconfig(file=str(config_file), reset=allow_reset, device=self.part_number)
     return result["success"]
 
@@ -540,7 +540,7 @@ class Device:
     Args:
       index (int): The index of the code region to close.
       code_version (int | None): The code version to set (32 bits unsigned integer).
-      allow_reset (bool): Allow the device to be reset during the operation.
+      allow_reset (bool): Allow the target device to be reset during the operation.
       force (bool): Force the code region to be closed, even if it is already closed.
     Returns:
       True if the code region was closed successfully, False otherwise.

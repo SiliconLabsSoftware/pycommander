@@ -1,5 +1,5 @@
 from pycommander_core.adapter_base import AdapterBase
-from pycommander_core.device import Device
+from pycommander_core.target import Target
 
 from .mock_commander import MockCommander
 
@@ -32,6 +32,6 @@ class MockAdapter(AdapterBase):
     if not target_device:
       raise ValueError("target_device must be provided")
 
-    target = Device(part_number=target_device, commander=commander)
+    target = Target(part_number=target_device, commander=commander)
 
     super().__init__(commander=commander, target=target)

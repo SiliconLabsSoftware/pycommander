@@ -1,8 +1,8 @@
 try:
-  from pycommander_gui import Commander, Adapter, Device, __version__
+  from pycommander_gui import Commander, Adapter, Target, __version__
 except ImportError:
   try:
-    from pycommander_cli import Commander, Adapter, Device, __version__
+    from pycommander_cli import Commander, Adapter, Target, __version__
   except ImportError:
     raise ImportError(
       "No version of Simplicity Commander is installed.\n\n"
@@ -14,6 +14,6 @@ except ImportError:
 __all__ = [
   "Commander",
   "Adapter",
-  "Device",
+  "Target",
   "__version__",
 ]

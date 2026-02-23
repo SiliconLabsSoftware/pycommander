@@ -49,7 +49,7 @@ print(commander.util.appinfo(filename="firmware.hex"))
 print(commander.flash.flash(filenames=["firmware.hex"], address=0x08000000))
 ```
 
-`PyCommander` also exposes several convenience methods for common tasks related to the adapter (using the `Adapter` class) and the target device (using the `Device` class). These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module.
+`PyCommander` also exposes several convenience methods for common tasks related to the adapter (using the `Adapter` class) and the target device (using the `Target` class). These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module.
 
 - Locking/unlocking the device for debug access
 - Setting the CTUNE value
@@ -61,7 +61,7 @@ print(commander.flash.flash(filenames=["firmware.hex"], address=0x08000000))
 - +++
 
 ```python
-from pycommander import Adapter
+from pycommander import Adapter, Target
 from pycommander_core.types import AdapterInfo, AdapterVoltageInfo, VcomHandshake, CtuneValue
 
 adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
