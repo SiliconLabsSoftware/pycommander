@@ -2698,20 +2698,25 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    cert_file = Path("/path/to/cert.pem")
+    cert_privkey_file = Path("/path/to/cert_privkey.pem")
+    cert_pubkey_file = Path("/path/to/cert_pubkey.pem")
+    cert_signature_file = Path("/path/to/cert_sig.bin")
+
     self.assertTrue(device.unlockDebugAccess(
-      certificate_file=Path("/path/to/cert.pem"),
-      certificate_private_key=Path("/path/to/cert_privkey.pem"),
-      certificate_public_key=Path("/path/to/cert_pubkey.pem"),
-      certificate_signature=Path("/path/to/cert_sig.bin"),
+      certificate_file=cert_file,
+      certificate_private_key=cert_privkey_file,
+      certificate_public_key=cert_pubkey_file,
+      certificate_signature=cert_signature_file,
     ))
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "unlock",
        "--serialno", "123456789",
        "--device", "EFR32MG24B020F1536IM48",
-       "--cert", "/path/to/cert.pem",
-       "--cert-privkey", "/path/to/cert_privkey.pem",
-       "--cert-signature", "/path/to/cert_sig.bin",
-       "--cert-pubkey", "/path/to/cert_pubkey.pem",
+       "--cert", str(cert_file),
+       "--cert-privkey", str(cert_privkey_file),
+       "--cert-signature", str(cert_signature_file),
+       "--cert-pubkey", str(cert_pubkey_file),
        "--json"]
     ])
 
@@ -2721,16 +2726,19 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    command_key_file = Path("/path/to/command_key.pem")
+    command_signature_file = Path("/path/to/command_sig.bin")
+
     self.assertTrue(device.unlockDebugAccess(
-      command_key=Path("/path/to/command_key.pem"),
-      command_signature=Path("/path/to/command_sig.bin"),
+      command_key=command_key_file,
+      command_signature=command_signature_file,
     ))
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "unlock",
        "--serialno", "123456789",
        "--device", "EFR32MG24B020F1536IM48",
-       "--command-key", "/path/to/command_key.pem",
-       "--command-signature", "/path/to/command_sig.bin",
+       "--command-key", str(command_key_file),
+       "--command-signature", str(command_signature_file),
        "--json"]
     ])
 
@@ -2759,14 +2767,21 @@ class TestTarget(unittest.TestCase):
 
     device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
 
+    cert_file = Path("/cert.pem")
+    cert_privkey_file = Path("/cert_privkey.pem")
+    cert_pubkey_file = Path("/cert_pubkey.pem")
+    cert_signature_file = Path("/cert_sig.bin")
+    command_key_file = Path("/cmd_key.pem")
+    command_signature_file = Path("/cmd_sig.bin")
+
     self.assertTrue(device.unlockDebugAccess(
       allow_reset=False,
-      certificate_file=Path("/cert.pem"),
-      certificate_private_key=Path("/cert_privkey.pem"),
-      certificate_public_key=Path("/cert_pubkey.pem"),
-      certificate_signature=Path("/cert_sig.bin"),
-      command_key=Path("/cmd_key.pem"),
-      command_signature=Path("/cmd_sig.bin"),
+      certificate_file=cert_file,
+      certificate_private_key=cert_privkey_file,
+      certificate_public_key=cert_pubkey_file,
+      certificate_signature=cert_signature_file,
+      command_key=command_key_file,
+      command_signature=command_signature_file,
       authorization="auth_data",
       unlock_param="unlock_data",
     ))
@@ -2775,13 +2790,13 @@ class TestTarget(unittest.TestCase):
        "--serialno", "123456789",
        "--device", "EFR32MG24B020F1536IM48",
        "--noreset",
-       "--cert", "/cert.pem",
-       "--cert-privkey", "/cert_privkey.pem",
-       "--command-key", "/cmd_key.pem",
-       "--cert-signature", "/cert_sig.bin",
-       "--command-signature", "/cmd_sig.bin",
+       "--cert", str(cert_file),
+       "--cert-privkey", str(cert_privkey_file),
+       "--command-key", str(command_key_file),
+       "--cert-signature", str(cert_signature_file),
+       "--command-signature", str(command_signature_file),
        "--authorization", "auth_data",
-       "--cert-pubkey", "/cert_pubkey.pem",
+       "--cert-pubkey", str(cert_pubkey_file),
        "--unlock-param", "unlock_data",
        "--json"]
     ])
