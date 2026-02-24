@@ -677,7 +677,7 @@ class Target:
     return result["result"]["sign_key"].encode()
 
   def writePublicSigningKey(self, key_file: Path, confirm: bool = False) -> bool:
-    """Write a public signing key to OTP memory in the target device.
+    """Write a public signing key to OTP memory in the target device. If a public signing key already exists in OTP memory, an exception will be raised.
     Args:
       key_file (Path): The path to the key file.
       confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
@@ -731,7 +731,7 @@ class Target:
     return result["result"]["command_key"].encode()
 
   def writePublicCommandKey(self, key_file: Path, confirm: bool = False) -> bool:
-    """Write a public command key to OTP memory in the target device.
+    """Write a public command key to OTP memory in the target device. If a public command key already exists in OTP memory, an exception will be raised.
     Args:
       key_file (Path): The path to the key file.
       confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
