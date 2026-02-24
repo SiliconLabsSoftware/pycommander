@@ -294,26 +294,6 @@ class Target:
 
     return result["success"]
 
-  def lockDebugAccess(self) -> bool:
-    """Lock the target device for debug access.
-
-    Returns:
-      True if the debug lock was successful, False otherwise.
-    """
-
-    result = self._commander.device.lock(device=self.part_number)
-    return result["success"]
-
-  def unlockDebugAccess(self) -> bool:
-    """Unlock the target device for debug access.
-
-    Returns:
-      True if the debug unlock was successful, False otherwise.
-    """
-
-    result = self._commander.device.unlock(device=self.part_number)
-    return result["success"]
-
   def enableWriteProtection(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
     """Enable write protection for the specified ranges and/or regions on the target device.
 
@@ -748,6 +728,114 @@ class Target:
     result = self._commander.security.writekey(
       command_keyfile=str(key_file),
       prompt=not confirm,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def enableSecureDebugUnlock(self, allow_reset: bool = True) -> bool:
+    """Enable secure debug unlock.
+    Args:
+      allow_reset (bool): Allow the target device to be reset during the operation.
+    Returns:
+      True if the secure debug unlock was enabled successfully, False otherwise.
+    """
+    result = self._commander.security.lockconfig(
+      secure_debug_unlock="enable",
+      reset=allow_reset,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def disableSecureDebugUnlock(self, confirm: bool = False, allow_reset: bool = True) -> bool:
+    """Disable secure debug unlock.
+    Args:
+      confirm (bool): Confirm the disable operation. If device erase is disabled and the device is locked, debug access will be PERMANENTLY disabled.
+      allow_reset (bool): Allow the target device to be reset during the operation.
+    Returns:
+      True if the secure debug unlock was disabled successfully, False otherwise.
+    """
+    result = self._commander.security.lockconfig(
+      secure_debug_unlock="disable",
+      reset=allow_reset,
+      prompt=not confirm,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def lockDebugAccess(self, trustzone: str | None = None, allow_reset: bool = True, disable_device_erase: bool = False, confirm: bool = False) -> bool:
+    """Lock the debug interface using the Secure Engine.
+
+    Args:
+      trustzone (str | None): The trustzone to use.
+      allow_reset (bool): Allow the target device to be reset during the operation.
+      disable_device_erase (bool): Disable device erase. Requires confirmation.
+      confirm (bool): Confirm the disable device erase operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+
+    Returns:
+      True if the debug lock was successful, False otherwise.
+    """
+
+    # Validate the trustzone arg
+    if trustzone is not None:
+      if len(trustzone) != 4:
+        raise ValueError(f"Invalid trustzone argument: {len(trustzone)}. Must be 4 bits.")
+      for bit in trustzone:
+        if bit not in ("0", "1"):
+          raise ValueError(f"Invalid trustzone bit: {bit}")
+
+    result = self._commander.security.lock(
+      trustzone=trustzone,
+      reset=allow_reset,
+      device=self.part_number,
+    )
+
+    if not result["success"]:
+      return False
+
+    if disable_device_erase:
+      # Disable device erase
+      result = self._commander.security.disabledeviceerase(
+        reset=allow_reset,
+        prompt=not confirm,
+        device=self.part_number,
+      )
+
+    return result["success"]
+
+  def unlockDebugAccess(self,
+      allow_reset: bool = True,
+      certificate_file: Path | None = None,
+      certificate_private_key: Path | None = None,
+      certificate_public_key: Path | None = None,
+      certificate_signature: Path | None = None,
+      command_key: Path | None = None,
+      command_signature: Path | None = None,
+      authorization: str | None = None,
+      unlock_param: str | None = None) -> bool:
+    """Unlock the debug interface using the Secure Engine.
+
+    Args:
+      allow_reset (bool): Allow the target device to be reset during the operation.
+      certificate_file (Path | None): The path to the certificate file.
+      certificate_private_key (Path | None): The path to the certificate private key.
+      certificate_public_key (Path | None): The path to the certificate public key.
+      certificate_signature (Path | None): The path to the certificate signature.
+      command_key (Path | None): The path to the command key.
+      command_signature (Path | None): The path to the command signature.
+    Returns:
+      True if the debug unlock was successful, False otherwise.
+    """
+
+    result = self._commander.security.unlock(
+      reset=allow_reset,
+      cert=str(certificate_file) if certificate_file is not None else None,
+      cert_privkey=str(certificate_private_key) if certificate_private_key is not None else None,
+      cert_pubkey=str(certificate_public_key) if certificate_public_key is not None else None,
+      cert_signature=str(certificate_signature) if certificate_signature is not None else None,
+      command_key=str(command_key) if command_key is not None else None,
+      command_signature=str(command_signature) if command_signature is not None else None,
+      authorization=authorization,
+      unlock_param=unlock_param,
       device=self.part_number,
     )
     return result["success"]

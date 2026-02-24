@@ -486,42 +486,6 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(device.setCTUNE(), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
-  def test_target_lockDebugAccess(self):
-    commander = MockCommander(serial_number="123456789")
-    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
-
-    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
-
-    self.assertEqual(device.lockDebugAccess(), True)
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
-
-  def test_target_lockDebugAccess_failed(self):
-    commander = MockCommander(serial_number="123456789")
-    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
-
-    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to lock the device"}'))
-
-    self.assertEqual(device.lockDebugAccess(), False)
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
-
-  def test_target_unlockDebugAccess(self):
-    commander = MockCommander(serial_number="123456789")
-    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
-
-    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
-
-    self.assertEqual(device.unlockDebugAccess(), True)
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
-
-  def test_target_unlockDebugAccess_failed(self):
-    commander = MockCommander(serial_number="123456789")
-    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
-
-    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to unlock the device"}'))
-
-    self.assertEqual(device.unlockDebugAccess(), False)
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
-
   def test_target_enableWriteProtection_requires_range_or_region(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -2583,3 +2547,312 @@ class TestTarget(unittest.TestCase):
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Write key failed"}'))
 
     self.assertFalse(device.writePublicCommandKey(key_file=Path(tf.name)))
+
+  def test_target_lockDebugAccess(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.lockDebugAccess(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_target_lockDebugAccess_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to lock the device"}'))
+
+    self.assertEqual(device.lockDebugAccess(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_target_lockDebugAccess_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.lockDebugAccess(allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--json"]
+    ])
+
+  def test_target_lockDebugAccess_with_trustzone(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.lockDebugAccess(trustzone="0101"))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--trustzone", "0101", "--json"]
+    ])
+
+  def test_target_lockDebugAccess_with_invalid_trustzone(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaises(ValueError):
+      device.lockDebugAccess(trustzone="0") # Too short
+    with self.assertRaises(ValueError):
+      device.lockDebugAccess(trustzone="01010") # Too long
+    with self.assertRaises(ValueError):
+      device.lockDebugAccess(trustzone="nope") # Invalid character
+
+  def test_target_lockDebugAccess_disable_device_erase(self):
+    """Lock succeeds, then disabledeviceerase is called with confirm=True (noprompt)."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.lockDebugAccess(disable_device_erase=True, confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"],
+      ["mock", "security", "disabledeviceerase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noprompt", "--json"],
+    ])
+
+  def test_target_lockDebugAccess_disable_device_erase_no_confirm(self):
+    """Lock succeeds, disabledeviceerase called without noprompt (confirm=False)."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.lockDebugAccess(disable_device_erase=True, confirm=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"],
+      ["mock", "security", "disabledeviceerase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"],
+    ])
+
+  def test_target_lockDebugAccess_disable_device_erase_lock_fails(self):
+    """Lock fails -- disabledeviceerase should not be called."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Lock failed"}'))
+
+    self.assertFalse(device.lockDebugAccess(disable_device_erase=True, confirm=True))
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    self.assertIn("lock", commander._runner.logged_commands[0])
+
+  def test_target_lockDebugAccess_disable_device_erase_failed(self):
+    """Lock succeeds but disabledeviceerase fails."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Disable erase failed"}'))
+
+    self.assertFalse(device.lockDebugAccess(disable_device_erase=True, confirm=True))
+    self.assertEqual(len(commander._runner.logged_commands), 2)
+
+  def test_target_lockDebugAccess_disable_device_erase_noreset(self):
+    """Lock with noreset and disable_device_erase -- both commands get noreset."""
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.lockDebugAccess(allow_reset=False, disable_device_erase=True, confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--json"],
+      ["mock", "security", "disabledeviceerase", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--noprompt", "--json"],
+    ])
+
+  def test_target_unlockDebugAccess(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertEqual(device.unlockDebugAccess(), True)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "security", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_target_unlockDebugAccess_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to unlock the device"}'))
+
+    self.assertEqual(device.unlockDebugAccess(), False)
+    self.assertEqual(commander._runner.logged_commands, [["mock", "security", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
+
+  def test_target_unlockDebugAccess_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.unlockDebugAccess(allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "unlock", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--json"]
+    ])
+
+  def test_target_unlockDebugAccess_with_certificate(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.unlockDebugAccess(
+      certificate_file=Path("/path/to/cert.pem"),
+      certificate_private_key=Path("/path/to/cert_privkey.pem"),
+      certificate_public_key=Path("/path/to/cert_pubkey.pem"),
+      certificate_signature=Path("/path/to/cert_sig.bin"),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "unlock",
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--cert", "/path/to/cert.pem",
+       "--cert-privkey", "/path/to/cert_privkey.pem",
+       "--cert-signature", "/path/to/cert_sig.bin",
+       "--cert-pubkey", "/path/to/cert_pubkey.pem",
+       "--json"]
+    ])
+
+  def test_target_unlockDebugAccess_with_command_key(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.unlockDebugAccess(
+      command_key=Path("/path/to/command_key.pem"),
+      command_signature=Path("/path/to/command_sig.bin"),
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "unlock",
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--command-key", "/path/to/command_key.pem",
+       "--command-signature", "/path/to/command_sig.bin",
+       "--json"]
+    ])
+
+  def test_target_unlockDebugAccess_with_authorization(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.unlockDebugAccess(
+      authorization="auth_token_abc",
+      unlock_param="param_xyz",
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "unlock",
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--authorization", "auth_token_abc",
+       "--unlock-param", "param_xyz",
+       "--json"]
+    ])
+
+  def test_target_unlockDebugAccess_with_all_options(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.unlockDebugAccess(
+      allow_reset=False,
+      certificate_file=Path("/cert.pem"),
+      certificate_private_key=Path("/cert_privkey.pem"),
+      certificate_public_key=Path("/cert_pubkey.pem"),
+      certificate_signature=Path("/cert_sig.bin"),
+      command_key=Path("/cmd_key.pem"),
+      command_signature=Path("/cmd_sig.bin"),
+      authorization="auth_data",
+      unlock_param="unlock_data",
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "unlock",
+       "--serialno", "123456789",
+       "--device", "EFR32MG24B020F1536IM48",
+       "--noreset",
+       "--cert", "/cert.pem",
+       "--cert-privkey", "/cert_privkey.pem",
+       "--command-key", "/cmd_key.pem",
+       "--cert-signature", "/cert_sig.bin",
+       "--command-signature", "/cmd_sig.bin",
+       "--authorization", "auth_data",
+       "--cert-pubkey", "/cert_pubkey.pem",
+       "--unlock-param", "unlock_data",
+       "--json"]
+    ])
+
+  def test_target_enableSecureDebugUnlock(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.enableSecureDebugUnlock())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lockconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--secure-debug-unlock", "enable", "--json"]
+    ])
+
+  def test_target_enableSecureDebugUnlock_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertFalse(device.enableSecureDebugUnlock())
+
+  def test_target_enableSecureDebugUnlock_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.enableSecureDebugUnlock(allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lockconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--secure-debug-unlock", "enable", "--json"]
+    ])
+
+  def test_target_disableSecureDebugUnlock(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.disableSecureDebugUnlock())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lockconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--secure-debug-unlock", "disable", "--json"]
+    ])
+
+  def test_target_disableSecureDebugUnlock_confirm(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.disableSecureDebugUnlock(confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lockconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--secure-debug-unlock", "disable", "--noprompt", "--json"]
+    ])
+
+  def test_target_disableSecureDebugUnlock_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.disableSecureDebugUnlock(allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "lockconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--secure-debug-unlock", "disable", "--json"]
+    ])
+
+  def test_target_disableSecureDebugUnlock_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertFalse(device.disableSecureDebugUnlock())
