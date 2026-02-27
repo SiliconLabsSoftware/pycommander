@@ -81,6 +81,7 @@ class AdapterBase:
 
   def reset(self) -> bool:
     """Reset the adapter.
+
     Returns:
       True if the adapter was reset successfully, False otherwise.
     """
@@ -89,6 +90,7 @@ class AdapterBase:
 
   def getVoltage(self) -> dict[int, AdapterVoltageInfo] | None:
     """Get the voltage for the target device.
+
     Returns:
       A dictionary of rail indices and AdapterVoltageInfo objects containing the voltage 
       information for each rail, or None if the voltage information could not be retrieved. 
@@ -114,9 +116,11 @@ class AdapterBase:
 
   def setVoltage(self, voltage: float, calibrate: bool = True) -> bool:
     """Set the voltage for the target device.
+
     Args:
       voltage (float): Voltage to set.
       calibrate (bool): If True, automatically calibrate if voltage has changed.
+
     Returns:
       True if the voltage was set successfully, False otherwise.
     """
@@ -125,10 +129,12 @@ class AdapterBase:
 
   def setVcomConfig(self, baudrate: int, handshake: VcomHandshake, store: bool = False) -> bool:
     """Set the VCOM configuration for the adapter.
+
     Args:
       baudrate (int): VCOM baudrate.
       handshake (VcomHandshake): VCOM handshake.
       store (bool): Store the VCOM configuration.
+
     Returns:
       True if the VCOM configuration was set successfully, False otherwise.
     """
