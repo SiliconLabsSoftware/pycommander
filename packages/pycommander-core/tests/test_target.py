@@ -3027,10 +3027,10 @@ class TestTarget(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    none_existent_file = Path("/nonexistent/config.json")
+    non_existent_file = Path("/nonexistent/config.json")
 
-    with self.assertRaisesRegex(FileNotFoundError, f"Configuration file {re.escape(str(none_existent_file))} does not exist"):
-      device.writeSecurityConfig(config_file=none_existent_file)
+    with self.assertRaisesRegex(FileNotFoundError, f"Configuration file {str(non_existent_file)} does not exist"):
+      device.writeSecurityConfig(config_file=non_existent_file)
 
     self.assertEqual(commander._runner.logged_commands, [])
 
@@ -3065,8 +3065,10 @@ class TestTarget(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with self.assertRaisesRegex(FileNotFoundError, re.escape("Secure Engine firmware file /nonexistent/se.bin does not exist")):
-      device.provisionSeFirmware(sefw_file=Path("/nonexistent/se.bin"))
+    non_existent_file = Path("/nonexistent/se.bin")
+
+    with self.assertRaisesRegex(FileNotFoundError, f"Secure Engine firmware file {str(non_existent_file)} does not exist"):
+      device.provisionSeFirmware(sefw_file=non_existent_file)
     self.assertEqual(commander._runner.logged_commands, [])
 
   def test_target_provisionSeFirmware_noreset(self):
@@ -3163,8 +3165,10 @@ class TestTarget(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
-    with self.assertRaisesRegex(FileNotFoundError, re.escape("Secure Engine firmware file /nonexistent/se.bin does not exist")):
-      device.upgradeSeFirmware(sefw_file=Path("/nonexistent/se.bin"))
+    non_existent_file = Path("/nonexistent/se.bin")
+
+    with self.assertRaisesRegex(FileNotFoundError, f"Secure Engine firmware file {str(non_existent_file)} does not exist"):
+      device.upgradeSeFirmware(sefw_file=non_existent_file)
     self.assertEqual(commander._runner.logged_commands, [])
 
   def test_target_upgradeSeFirmware_all_options(self):
