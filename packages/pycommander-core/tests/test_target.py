@@ -3029,7 +3029,7 @@ class TestTarget(unittest.TestCase):
 
     none_existent_file = Path("/nonexistent/config.json")
 
-    with self.assertRaisesRegex(FileNotFoundError, re.escape(f"Configuration file {str(none_existent_file)} does not exist")):
+    with self.assertRaisesRegex(FileNotFoundError, f"Configuration file {re.escape(str(none_existent_file))} does not exist"):
       device.writeSecurityConfig(config_file=none_existent_file)
 
     self.assertEqual(commander._runner.logged_commands, [])
