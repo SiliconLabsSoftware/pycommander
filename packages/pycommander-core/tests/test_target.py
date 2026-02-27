@@ -3029,7 +3029,7 @@ class TestTarget(unittest.TestCase):
 
     non_existent_file = Path("/nonexistent/config.json")
 
-    with self.assertRaisesRegex(FileNotFoundError, f"Configuration file {str(non_existent_file)} does not exist"):
+    with self.assertRaisesRegex(FileNotFoundError, f"Configuration file {re.escape(str(non_existent_file))} does not exist"):
       device.writeSecurityConfig(config_file=non_existent_file)
 
     self.assertEqual(commander._runner.logged_commands, [])
@@ -3067,7 +3067,7 @@ class TestTarget(unittest.TestCase):
 
     non_existent_file = Path("/nonexistent/se.bin")
 
-    with self.assertRaisesRegex(FileNotFoundError, f"Secure Engine firmware file {str(non_existent_file)} does not exist"):
+    with self.assertRaisesRegex(FileNotFoundError, f"Secure Engine firmware file {re.escape(str(non_existent_file))} does not exist"):
       device.provisionSeFirmware(sefw_file=non_existent_file)
     self.assertEqual(commander._runner.logged_commands, [])
 
@@ -3167,7 +3167,7 @@ class TestTarget(unittest.TestCase):
 
     non_existent_file = Path("/nonexistent/se.bin")
 
-    with self.assertRaisesRegex(FileNotFoundError, f"Secure Engine firmware file {str(non_existent_file)} does not exist"):
+    with self.assertRaisesRegex(FileNotFoundError, f"Secure Engine firmware file {re.escape(str(non_existent_file))} does not exist"):
       device.upgradeSeFirmware(sefw_file=non_existent_file)
     self.assertEqual(commander._runner.logged_commands, [])
 
