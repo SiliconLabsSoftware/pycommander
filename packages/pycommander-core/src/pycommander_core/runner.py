@@ -60,13 +60,18 @@ class Runner:
 
     except subprocess.CalledProcessError as e:
       self._write_log_file(f"Command failed with return code {e.returncode}: {e.output}")
-      if json_format:
-        command_output = json.loads(e.output)
-        error_string = "\n".join(command_output.get("error", ""))
+      output = e.output or ""
 
+      if json_format:
+        try:
+          command_output = json.loads(output)
+          error_string = "\n".join(command_output.get("error", []))
+        except (json.JSONDecodeError, TypeError, ValueError):
+          error_string = output.strip()
       else:
-        command_output = e.output
-        error_string = "\n".join([line for line in command_output.split("\n") if line.startswith("ERROR:")])
+        error_string = "\n".join(
+          line for line in output.split("\n") if line.startswith("ERROR:")
+        )
 
       error_message = f"Command failed with return code {e.returncode}: {error_string}"
       if e.returncode == -1 or e.returncode == 255:
