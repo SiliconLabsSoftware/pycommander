@@ -48,7 +48,6 @@ class Runner:
         timeout = self._timeout_s,
         check = True,
         text = True,
-        universal_newlines = True,
       )
 
       returncode = result.returncode
