@@ -894,3 +894,62 @@ class Target:
     )
 
     return result["success"]
+
+  def provisionSeFirmware(self, sefw_file: Path, allow_reset: bool = True) -> bool:
+    """Provision the Secure Engine firmware to the target device.
+    Args:
+      sefw_file (Path): The path to the Secure Engine firmware file.
+      allow_reset (bool): Allow the target device to be reset during the operation.
+      confirm (bool): Confirm the provision operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+    Returns:
+      True if the Secure Engine firmware was provisioned successfully, False otherwise.
+    """
+    if not sefw_file.exists():
+      raise FileNotFoundError(f"Secure Engine firmware file {str(sefw_file)} does not exist")
+
+    result = self._commander.security.provision(
+      sefw=str(sefw_file),
+      reset=allow_reset,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def upgradeSeFirmware(self, sefw_file: Path | None = None, address: int | None = None, allow_reset: bool = True, confirm: bool = False) -> bool:
+    """Upgrade the Secure Engine firmware to the target device, using the bundled Secure Engine firmware. This command is only available on Series 3 devices.
+    Args:
+      sefw_file (Path | None): The path to the Secure Engine firmware file. If not provided, the bundled Secure Engine firmware will be used.
+      address (int | None): The address to place the Secure Engine firmware at.
+      allow_reset (bool): Allow the target device to be reset during the operation.
+      confirm (bool): Confirm the upgrade operation (only required if the provided address is in RAM).
+    Returns:
+      True if the Secure Engine firmware was upgraded successfully, False otherwise.
+    """
+    if sefw_file is not None:
+      if not sefw_file.exists():
+        raise FileNotFoundError(f"Secure Engine firmware file {str(sefw_file)} does not exist")
+
+    result = self._commander.security.fwupgrade(
+      filename=str(sefw_file) if sefw_file is not None else None,
+      address=address,
+      reset=allow_reset,
+      prompt=not confirm,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def checkSeFirmwareUpgrade(self, allow_reset: bool = True) -> tuple[bool, str | None, str | None] | None:
+    """Check if a new Secure Engine firmware is available. This command is only available on Series 3 devices.
+    Args:
+      allow_reset (bool): Allow the target device to be reset during the operation.
+    Returns:
+      A tuple containing a boolean indicating if a new Secure Engine firmware is available, the current Secure Engine firmware version, and the latest Secure Engine firmware version.
+    """
+    result = self._commander.security.fwupgradecheck(reset=allow_reset, device=self.part_number)
+    if not result["success"]:
+      return None
+
+    upgrade_available = result["result"].get("upgrade_available", None)
+    current_version   = result["result"].get("current_fw_version", None)
+    new_version       = result["result"].get("new_fw_version", None)
+
+    return upgrade_available, current_version, new_version

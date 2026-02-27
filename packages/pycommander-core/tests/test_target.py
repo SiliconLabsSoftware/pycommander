@@ -3033,3 +3033,254 @@ class TestTarget(unittest.TestCase):
       device.writeSecurityConfig(config_file=none_existent_file)
 
     self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_provisionSeFirmware(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertTrue(device.provisionSeFirmware(sefw_file=Path(sefw_file.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "provision", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--sefw", str(Path(sefw_file.name)), "--json"]
+    ])
+
+  def test_target_provisionSeFirmware_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Provision failed"}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertFalse(device.provisionSeFirmware(sefw_file=Path(sefw_file.name)))
+
+  def test_target_provisionSeFirmware_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaisesRegex(FileNotFoundError, re.escape("Secure Engine firmware file /nonexistent/se.bin does not exist")):
+      device.provisionSeFirmware(sefw_file=Path("/nonexistent/se.bin"))
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_provisionSeFirmware_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertTrue(device.provisionSeFirmware(sefw_file=Path(sefw_file.name), allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "provision", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--sefw", str(Path(sefw_file.name)), "--json"]
+    ])
+
+  def test_target_upgradeSeFirmware_with_file(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertTrue(device.upgradeSeFirmware(sefw_file=Path(sefw_file.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgrade", str(Path(sefw_file.name)), "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_upgradeSeFirmware_no_file(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.upgradeSeFirmware())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgrade", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_upgradeSeFirmware_with_address(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertTrue(device.upgradeSeFirmware(sefw_file=Path(sefw_file.name), address=0x08000000))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgrade", str(Path(sefw_file.name)), "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--address", "0x08000000", "--json"]
+    ])
+
+  def test_target_upgradeSeFirmware_confirm(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertTrue(device.upgradeSeFirmware(sefw_file=Path(sefw_file.name), confirm=True))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgrade", str(Path(sefw_file.name)), "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noprompt", "--json"]
+    ])
+
+  def test_target_upgradeSeFirmware_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.upgradeSeFirmware(allow_reset=False))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgrade", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--json"]
+    ])
+
+  def test_target_upgradeSeFirmware_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Upgrade failed"}'))
+
+    self.assertFalse(device.upgradeSeFirmware())
+
+  def test_target_upgradeSeFirmware_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    with self.assertRaisesRegex(FileNotFoundError, re.escape("Secure Engine firmware file /nonexistent/se.bin does not exist")):
+      device.upgradeSeFirmware(sefw_file=Path("/nonexistent/se.bin"))
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_target_upgradeSeFirmware_all_options(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    sefw_file = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", mode="w", delete=False)
+    self.addCleanup(os.remove, sefw_file.name)
+    sefw_file.close()
+
+    self.assertTrue(device.upgradeSeFirmware(
+      sefw_file=Path(sefw_file.name),
+      address=0x20000000,
+      allow_reset=False,
+      confirm=True,
+    ))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgrade", str(Path(sefw_file.name)), "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--address", "0x20000000", "--noprompt", "--json"]
+    ])
+
+  def test_target_checkSeFirmwareUpgrade(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0,
+"""
+{
+    "result": {
+        "upgrade_available": true,
+        "current_fw_version": "2.2.6",
+        "new_fw_version": "2.3.0"
+    },
+    "success": true
+}
+"""
+    ))
+
+    result = device.checkSeFirmwareUpgrade()
+    self.assertIsNotNone(result)
+    upgrade_available, current_version, new_version = result
+    self.assertTrue(upgrade_available)
+    self.assertEqual(current_version, "2.2.6")
+    self.assertEqual(new_version, "2.3.0")
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgradecheck", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_checkSeFirmwareUpgrade_no_upgrade(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0,
+"""
+{
+    "result": {
+        "upgrade_available": false,
+        "current_fw_version": "2.3.0",
+        "new_fw_version": "2.3.0"
+    },
+    "success": true
+}
+"""
+    ))
+
+    result = device.checkSeFirmwareUpgrade()
+    self.assertIsNotNone(result)
+    upgrade_available, current_version, new_version = result
+    self.assertFalse(upgrade_available)
+    self.assertEqual(current_version, "2.3.0")
+    self.assertEqual(new_version, "2.3.0")
+
+  def test_target_checkSeFirmwareUpgrade_noreset(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0,
+"""
+{
+    "result": {
+        "upgrade_available": false,
+        "current_fw_version": "2.3.0",
+        "new_fw_version": "2.3.0"
+    },
+    "success": true
+}
+"""
+    ))
+
+    result = device.checkSeFirmwareUpgrade(allow_reset=False)
+    self.assertIsNotNone(result)
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgradecheck", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--noreset", "--json"]
+    ])
+
+  def test_target_checkSeFirmwareUpgrade_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Check failed"}'))
+
+    self.assertIsNone(device.checkSeFirmwareUpgrade())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "fwupgradecheck", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_checkSeFirmwareUpgrade_missing_fields(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"result": {}, "success": true}'))
+
+    result = device.checkSeFirmwareUpgrade()
+    self.assertIsNotNone(result)
+    upgrade_available, current_version, new_version = result
+    self.assertIsNone(upgrade_available)
+    self.assertIsNone(current_version)
+    self.assertIsNone(new_version)
