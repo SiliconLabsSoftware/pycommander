@@ -27,13 +27,13 @@ class Runner:
       SEM_NOGPFAULTERRORBOX = 0x0002 # From MSDN
       ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX)
 
-  def run(self, *args: str, json_format: bool = True) -> RunnerResult:
     if not Path(self._executable).exists():
       raise FileNotFoundError(f"Commander executable not found: {self._executable}")
 
     if not Path(self._executable).is_file():
       raise ValueError(f"Commander executable is not a file: {self._executable}")
 
+  def run(self, *args: str, json_format: bool = True) -> RunnerResult:
     if json_format:
       args += ("--json",)
 
