@@ -18,11 +18,19 @@ class BaseCommand:
     # Strip away any empty or None elements
     args = [arg for arg in args if arg is not None and arg != ""]
 
+    command_result : CommandResult = None
     result : RunnerResult = self._runner.run(*args, json_format=True)
-    json_output = json.loads(result.output)
+    try:
+      json_output = json.loads(result.output) 
+      command_result = CommandResult(result.returncode, json_output)
+    except json.JSONDecodeError:
+      # If the output wasn't pure JSON, we shoehorn it regardless.
+      if result.returncode == 0:
+        command_result = CommandResult(result.returncode, {"success": True, "output": result.output})
+      else:
+        command_result = CommandResult(result.returncode, {"success": False, "error": result.output})
 
-    return CommandResult(result.returncode, json_output)
-
+    return command_result
 
   # Adapter connection arguments
   def _get_adapter_connection_args(self) -> list[str]:
