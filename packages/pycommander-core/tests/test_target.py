@@ -1,6 +1,8 @@
 import os
 import tempfile
 import unittest
+import re
+
 from pathlib import Path
 
 from pycommander_core.target import Target
@@ -2871,3 +2873,163 @@ class TestTarget(unittest.TestCase):
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
 
     self.assertFalse(device.disableSecureDebugUnlock())
+
+  def test_target_generateSecurityConfig_to_file(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    outfile = Path("/tmp/security_config.json")
+    self.assertTrue(device.generateSecurityConfig(outfile=outfile))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "genconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--outfile", str(outfile), "--nostore", "--json"]
+    ])
+
+  def test_target_generateSecurityConfig_to_file_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    outfile = Path("/tmp/security_config.json")
+    self.assertFalse(device.generateSecurityConfig(outfile=outfile))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "genconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--outfile", str(outfile), "--nostore", "--json"]
+    ])
+
+  def test_target_generateSecurityConfig_to_store(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.generateSecurityConfig())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "genconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_generateSecurityConfig_to_store_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertFalse(device.generateSecurityConfig())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "genconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_readSecurityConfig(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, 
+"""
+{
+    "result": {
+        "mcu_config": {
+            "anti_rollback": false,
+            "page_lock_full": false,
+            "page_lock_narrow": false,
+            "secure_boot": false,
+            "verify_certificate": false
+        }
+    },
+    "success": true
+}
+"""
+    ))
+
+    result = device.readSecurityConfig()
+    self.assertIsNotNone(result)
+    self.assertIsInstance(result, dict)
+    self.assertEqual(result, {"mcu_config": {"anti_rollback": False, "page_lock_full": False, "page_lock_narrow": False, "secure_boot": False, "verify_certificate": False}})
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_readSecurityConfig_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertIsNone(device.readSecurityConfig())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_readSecurityConfig_missing_result(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertIsNone(device.readSecurityConfig())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "readconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_writeSecurityConfig_from_file(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    config_file = tempfile.NamedTemporaryFile(dir=".", suffix=".json", mode="w", delete=False)
+    self.addCleanup(os.remove, config_file.name)
+    config_file.close()
+
+    self.assertTrue(device.writeSecurityConfig(config_file=Path(config_file.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writeconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--configfile", str(Path(config_file.name)), "--json"]
+    ])
+
+  def test_target_writeSecurityConfig_from_file_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    config_file = tempfile.NamedTemporaryFile(dir=".", suffix=".json", mode="w", delete=False)
+    self.addCleanup(os.remove, config_file.name)
+    config_file.close()
+
+    self.assertFalse(device.writeSecurityConfig(config_file=Path(config_file.name)))
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writeconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--configfile", str(Path(config_file.name)), "--json"]
+    ])
+
+  def test_target_writeSecurityConfig_from_store(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+
+    self.assertTrue(device.writeSecurityConfig())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writeconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_writeSecurityConfig_from_store_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed"}'))
+
+    self.assertFalse(device.writeSecurityConfig())
+    self.assertEqual(commander._runner.logged_commands, [
+      ["mock", "security", "writeconfig", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
+    ])
+
+  def test_target_writeSecurityConfig_from_file_not_found(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    none_existent_file = Path("/nonexistent/config.json")
+
+    with self.assertRaisesRegex(FileNotFoundError, re.escape(f"Configuration file {str(none_existent_file)} does not exist")):
+      device.writeSecurityConfig(config_file=none_existent_file)
+
+    self.assertEqual(commander._runner.logged_commands, [])
