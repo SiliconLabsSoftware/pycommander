@@ -59,9 +59,11 @@ class Target:
 
   def pageerase(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
     """Erase selected flash pages from the target device.
+
     Args:
       ranges (list[tuple[int | str, int | str]]): Memory ranges to erase (start, end); extended to page boundaries.
       regions (list[str]): Named memory regions (@region).
+
     Returns:
       True if the page erase was successful, False otherwise.
     """
@@ -75,6 +77,7 @@ class Target:
                   tokendefs: Path | None = None,
                   securerange: tuple[int | str, int | str] | None = None) -> bool:
     """Write manufacturing tokens to the device. This command is only applicable to Series 1 and 2 devices.
+
     Args:
       tokenfiles (list[Path]): The paths to the token files to write.
       tokens (list[tuple[str, str]]): The tokens to write (TOKEN_NAME, value).
@@ -106,6 +109,7 @@ class Target:
                         tokendefs: Path | None = None,
                         securerange: tuple[int | str, int | str] | None = None) -> bool:
     """Write static tokens to the device. This command is only applicable to Series 3 devices.
+
     Args:
       tokenfiles (list[Path]): The paths to the token files to write.
       tokens (list[tuple[str, str]]): The tokens to write (TOKEN_NAME, value).
@@ -178,6 +182,7 @@ class Target:
                    force: bool = False,
                    halt: bool = False) -> bool:
     """Flash RAM code to the device.
+
     Args:
       filenames (list[Path]): The paths to the binary files to flash.
       address (int): The address to flash the binary file to. If the file is a .hex or .s37 file, the address will be ignored.
@@ -186,6 +191,7 @@ class Target:
       vtor (int): The vector table address to flash the binary file to. If the file is a .hex or .s37 file, the vtor will be ignored.
       force (bool): Whether to force the flash.
       halt (bool): Halt the device after flashing.
+
     Returns:
       True if the RAM code was flashed successfully, False otherwise.
     """
@@ -212,11 +218,13 @@ class Target:
                    reset: bool = True,
                    halt: bool = False) -> bool:
     """Flash patches to the device.
+
     Args:
       patches (list[tuple[int | str, int | str, int | str | None]]): The patches to flash.
       force (bool): Whether to force the flash.
       reset (bool): Whether to reset the device after flashing.
       halt (bool): Halt the device after flashing.
+
     Returns:
       True if the patches were flashed successfully, False otherwise.
     """
@@ -235,7 +243,6 @@ class Target:
     Returns:
       A CtuneValue object containing the CTUNE values from the DI, board and token, or None if the CTUNE values could not be retrieved.
     """
-
     result : dict = self._commander.ctune.get(device=self.part_number)
     if not result["success"]:
       return None
@@ -272,7 +279,6 @@ class Target:
     Returns:
       True if the CTUNE value was set successfully, False otherwise.
     """
-
     existing_ctune : CtuneValue | None = self.getCTUNE()
     if not force and existing_ctune is None:
       return False
@@ -350,8 +356,10 @@ class Target:
 
   def readRegionConfig(self, allow_reset: bool = True) -> RegionConfig | None:
     """Read the region configuration from the target device. Series 3 only.
+
     Args:
       allow_reset (bool): Allow the device to be reset during the operation.
+
     Returns:
       A RegionConfig object containing the region configuration, or None if the region configuration could not be retrieved.
     """
@@ -399,9 +407,11 @@ class Target:
 
   def readRegionConfigToFile(self, outfile: Path, allow_reset: bool = True) -> bool:
     """Read the region configuration from the target device and write it to a file. Series 3 only.
+
     Args:
       outfile (Path): The path to the output file.
       allow_reset (bool): Allow the target device to be reset during the operation.
+
     Returns:
       True if the region configuration was read successfully and written to the file, False otherwise.
     """
@@ -411,10 +421,12 @@ class Target:
 
   def writeRegionConfig(self, config: RegionConfig, allow_reset: bool = True, force: bool = False) -> bool:
     """Write the region configuration to the target device. Series 3 only.
+
     Args:
       config (RegionConfig): The region configuration to write.
       allow_reset (bool): Allow the target device to be reset during the operation.
       force (bool): Force the region configuration to be written, even if the desired configuration is already set.
+
     Returns:
       True if the region configuration was written successfully, False otherwise.
     """
@@ -468,10 +480,12 @@ class Target:
 
   def writeRegionConfigFromFile(self, config_file: Path, allow_reset: bool = True, force: bool = False) -> bool:
     """Write the region configuration to the target device. Series 3 only.
+
     Args:
       config_file (Path): The path to the configuration file.
       allow_reset (bool): Allow the target device to be reset during the operation.
       force (bool): Force the region configuration to be written, even if the desired configuration is already set.
+
     Returns:
       True if the region configuration was written successfully, False otherwise.
     """
@@ -517,11 +531,13 @@ class Target:
 
   def closeCodeRegion(self, index: int, code_version: int | None = None, allow_reset: bool = True, force: bool = False) -> bool:
     """Close a code region by index. Series 3 only.
+
     Args:
       index (int): The index of the code region to close.
       code_version (int | None): The code version to set (32 bits unsigned integer).
       allow_reset (bool): Allow the target device to be reset during the operation.
       force (bool): Force the code region to be closed, even if it is already closed.
+
     Returns:
       True if the code region was closed successfully, False otherwise.
     """
@@ -548,6 +564,7 @@ class Target:
 
   def getSecurityStatus(self, show_trustzone_status: bool = False, allow_reset: bool = True) -> SecurityStatus | None:
     """Get the security status of the target device.
+
     Returns:
       A SecurityStatus object containing the security status of the target device, or None if the security status could not be retrieved.
     """
@@ -598,8 +615,10 @@ class Target:
 
   def generateGblDecryptionKey(self, outfile: Path) -> bool:
     """Generate a GBL decryption key and write it to a file.
+
     Args:
       outfile (Path): The path to the output file.
+
     Returns:
       True if the GBL decryption key was generated successfully and written to the file, False otherwise.
     """
@@ -608,9 +627,11 @@ class Target:
 
   def writeGblDecryptionKey(self, key_file: Path, confirm: bool = False) -> bool:
     """Write a GBL decryption key to OTP memory in the target device.
+
     Args:
       key_file (Path): The path to the key file.
       confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+
     Returns:
       True if the GBL decryption key was written successfully, False otherwise.
     """
@@ -626,10 +647,12 @@ class Target:
 
   def generateSigningKeys(self, pubkey_file: Path, privkey_file: Path, tokenfile: Path | None = None) -> bool:
     """Generate a signing key pair and write them to the provided files.
+
     Args:
       pubkey_file (Path): The path to the public key file.
       privkey_file (Path): The path to the private key file.
       tokenfile (Path | None): The path to the token file to write the public key to.
+
     Returns:
       True if the signing key pair was generated successfully and written to the files, False otherwise.
     """
@@ -644,6 +667,7 @@ class Target:
 
   def readPublicSigningKey(self) -> bytes | None:
     """Read the public signing key from the target device.
+
     Returns:
       The public signing key as a bytes object, or None if the public signing key could not be retrieved.
     """
@@ -658,9 +682,11 @@ class Target:
 
   def writePublicSigningKey(self, key_file: Path, confirm: bool = False) -> bool:
     """Write a public signing key to OTP memory in the target device. If a public signing key already exists in OTP memory, an exception will be raised.
+
     Args:
       key_file (Path): The path to the key file.
       confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+
     Returns:
       True if the public signing key was written successfully, False otherwise.
     """
@@ -680,10 +706,12 @@ class Target:
 
   def generateCommandKeys(self, pubkey_file: Path, privkey_file: Path, tokenfile: Path | None = None) -> bool:
     """Generate a command key pair and write them to the provided files.
+
     Args:
       pubkey_file (Path): The path to the public key file.
       privkey_file (Path): The path to the private key file.
       tokenfile (Path | None): The path to the token file to write the public key to.
+
     Returns:
       True if the command key pair was generated successfully and written to the files, False otherwise.
     """
@@ -698,6 +726,7 @@ class Target:
   
   def readPublicCommandKey(self) -> bytes | None:
     """Read the public command key from the target device.
+
     Returns:
       The public command key as a bytes object, or None if the public command key could not be retrieved.
     """
@@ -712,9 +741,11 @@ class Target:
 
   def writePublicCommandKey(self, key_file: Path, confirm: bool = False) -> bool:
     """Write a public command key to OTP memory in the target device. If a public command key already exists in OTP memory, an exception will be raised.
+
     Args:
       key_file (Path): The path to the key file.
       confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+
     Returns:
       True if the public command key was written successfully, False otherwise.
     """
@@ -734,8 +765,10 @@ class Target:
 
   def enableSecureDebugUnlock(self, allow_reset: bool = True) -> bool:
     """Enable secure debug unlock.
+
     Args:
       allow_reset (bool): Allow the target device to be reset during the operation.
+
     Returns:
       True if the secure debug unlock was enabled successfully, False otherwise.
     """
@@ -748,9 +781,11 @@ class Target:
 
   def disableSecureDebugUnlock(self, confirm: bool = False, allow_reset: bool = True) -> bool:
     """Disable secure debug unlock.
+
     Args:
       confirm (bool): Confirm the disable operation. If device erase is disabled and the device is locked, debug access will be PERMANENTLY disabled.
       allow_reset (bool): Allow the target device to be reset during the operation.
+
     Returns:
       True if the secure debug unlock was disabled successfully, False otherwise.
     """
@@ -793,7 +828,6 @@ class Target:
       return False
 
     if disable_device_erase:
-      # Disable device erase
       result = self._commander.security.disabledeviceerase(
         reset=allow_reset,
         prompt=not confirm,
@@ -822,6 +856,7 @@ class Target:
       certificate_signature (Path | None): The path to the certificate signature.
       command_key (Path | None): The path to the command key.
       command_signature (Path | None): The path to the command signature.
+
     Returns:
       True if the debug unlock was successful, False otherwise.
     """
@@ -842,9 +877,11 @@ class Target:
 
   def generateSecurityConfig(self, outfile: Path | None = None, device_serial_number: str | None = None) -> bool:
     """Generate a security configuration and write it to a file.
+
     Args:
       outfile (Path | None): The path to the output file. If not provided, the configuration will be written to this computer's security store.
       device_serial_number (str | None): The serial number of the device to generate the configuration for.
+
     Returns:
       True if the security configuration was generated successfully, False otherwise.
     """
@@ -861,6 +898,7 @@ class Target:
 
   def readSecurityConfig(self) -> dict | None:
     """Read the security configuration from the target device.
+
     Returns:
       A SecurityConfig object containing the security configuration, or None if the security configuration could not be retrieved.
     """
@@ -871,13 +909,14 @@ class Target:
 
     return result.get("result", None)
 
-
   def writeSecurityConfig(self, config_file: Path | None = None, allow_reset: bool = True, confirm: bool = False) -> bool:
     """Write a security configuration to the target device.
+
     Args:
       config_file (Path | None): The path to the configuration file. If not provided, the configuration will be taken from this computer's security store for the given device.
       allow_reset (bool): Allow the target device to be reset during the operation.
       confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+
     Returns:
       True if the security configuration was written successfully, False otherwise.
     """
@@ -897,10 +936,12 @@ class Target:
 
   def provisionSeFirmware(self, sefw_file: Path, allow_reset: bool = True) -> bool:
     """Provision the Secure Engine firmware to the target device.
+
     Args:
       sefw_file (Path): The path to the Secure Engine firmware file.
       allow_reset (bool): Allow the target device to be reset during the operation.
       confirm (bool): Confirm the provision operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+
     Returns:
       True if the Secure Engine firmware was provisioned successfully, False otherwise.
     """
@@ -916,11 +957,13 @@ class Target:
 
   def upgradeSeFirmware(self, sefw_file: Path | None = None, address: int | None = None, allow_reset: bool = True, confirm: bool = False) -> bool:
     """Upgrade the Secure Engine firmware to the target device, using the bundled Secure Engine firmware. This command is only available on Series 3 devices.
+
     Args:
       sefw_file (Path | None): The path to the Secure Engine firmware file. If not provided, the bundled Secure Engine firmware will be used.
       address (int | None): The address to place the Secure Engine firmware at.
       allow_reset (bool): Allow the target device to be reset during the operation.
       confirm (bool): Confirm the upgrade operation (only required if the provided address is in RAM).
+
     Returns:
       True if the Secure Engine firmware was upgraded successfully, False otherwise.
     """
@@ -939,8 +982,10 @@ class Target:
 
   def checkSeFirmwareUpgrade(self, allow_reset: bool = True) -> tuple[bool, str | None, str | None] | None:
     """Check if a new Secure Engine firmware is available. This command is only available on Series 3 devices.
+
     Args:
       allow_reset (bool): Allow the target device to be reset during the operation.
+
     Returns:
       A tuple containing a boolean indicating if a new Secure Engine firmware is available, the current Secure Engine firmware version, and the latest Secure Engine firmware version.
     """
