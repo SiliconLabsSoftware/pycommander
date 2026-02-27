@@ -839,3 +839,58 @@ class Target:
       device=self.part_number,
     )
     return result["success"]
+
+  def generateSecurityConfig(self, outfile: Path | None = None, device_serial_number: str | None = None) -> bool:
+    """Generate a security configuration and write it to a file.
+    Args:
+      outfile (Path | None): The path to the output file. If not provided, the configuration will be written to this computer's security store.
+      device_serial_number (str | None): The serial number of the device to generate the configuration for.
+    Returns:
+      True if the security configuration was generated successfully, False otherwise.
+    """
+
+    store: bool = outfile is None
+
+    result = self._commander.security.genconfig(
+      outfile=str(outfile) if outfile is not None else None,
+      store=store,
+      deviceserialno=device_serial_number,
+      device=self.part_number,
+    )
+    return result["success"]
+
+  def readSecurityConfig(self) -> dict | None:
+    """Read the security configuration from the target device.
+    Returns:
+      A SecurityConfig object containing the security configuration, or None if the security configuration could not be retrieved.
+    """
+    result = self._commander.security.readconfig(device=self.part_number)
+    
+    if not result["success"]:
+      return None
+
+    return result.get("result", None)
+
+
+  def writeSecurityConfig(self, config_file: Path | None = None, allow_reset: bool = True, confirm: bool = False) -> bool:
+    """Write a security configuration to the target device.
+    Args:
+      config_file (Path | None): The path to the configuration file. If not provided, the configuration will be taken from this computer's security store for the given device.
+      allow_reset (bool): Allow the target device to be reset during the operation.
+      confirm (bool): Confirm the write operation. THIS IS PERMANENT AND CANNOT BE REVERTED!
+    Returns:
+      True if the security configuration was written successfully, False otherwise.
+    """
+    if config_file is not None:
+      if not config_file.exists():
+        raise FileNotFoundError(f"Configuration file {str(config_file)} does not exist")
+
+    result = self._commander.security.writeconfig(
+      configfile=str(config_file) if config_file is not None else None,
+      reset=allow_reset,
+      store=True,
+      prompt=not confirm,
+      device=self.part_number,
+    )
+
+    return result["success"]
