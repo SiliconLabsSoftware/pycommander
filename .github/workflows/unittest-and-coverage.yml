@@ -137,10 +137,12 @@ jobs:
       - name: Add coverage to summary
         shell: bash
         run: |
-          TOTAL=$(coverage report | grep TOTAL | awk '{print $4}')
+          REPORT_SUMMARY=$(coverage report)
+          TOTAL=$(echo "$REPORT_SUMMARY" | grep TOTAL | awk '{print $4}')
           echo "## 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Total Coverage: $TOTAL**" >> $GITHUB_STEP_SUMMARY
+          echo "$REPORT_SUMMARY" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload combined coverage report
         uses: actions/upload-artifact@v4
