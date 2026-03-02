@@ -15,11 +15,13 @@ from .commander import Commander
 from .adapter import Adapter
 from .target import Target
 
+from pycommander_core.commander_base import CommanderResult
 from pycommander_core._version import __version__
 
 __all__ = [
   "Commander",
   "Adapter",
   "Target",
+  "CommanderResult",
   "__version__",
 ]
