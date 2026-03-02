@@ -10,3 +10,4 @@ class TestUtils(unittest.TestCase):
     self.assertEqual(sanitize_args(["command", None, "arg3"]), ["command", "arg3"])
     self.assertEqual(sanitize_args(["command", "arg1", None, "arg3"]), ["command", "arg1", "arg3"])
     self.assertEqual(sanitize_args(["command", "arg1", "arg2", "arg3"]), ["command", "arg1", "arg2", "arg3"])
+    self.assertEqual(sanitize_args(["command", 1, 2, 3.0, 4.5]), ["command", "1", "2", "3.0", "4.5"])
