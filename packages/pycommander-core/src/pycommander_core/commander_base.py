@@ -58,7 +58,7 @@ class CommanderBase:
     if (serial_number and ip_address) or (serial_number and serial_port) or (ip_address and serial_port):
       raise ValueError("Only one of serial_number, ip_address, or serial_port can be provided")
 
-    if executable_path is None:
+    if not executable_path:
       raise ValueError("executable_path must be provided")
 
     if executable_path == EXECUTABLE_PATH_CLI or executable_path == EXECUTABLE_PATH_GUI:
