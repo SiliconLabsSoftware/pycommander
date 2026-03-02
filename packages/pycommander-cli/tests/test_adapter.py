@@ -1,4 +1,5 @@
 import unittest
+import shutil
 
 from pathlib import Path
 
@@ -36,13 +37,21 @@ class TestAdapter(unittest.TestCase):
     self.assertEqual(adapter._commander._debug_drpre, 1)
 
   def test_adapter_yes_commander_missing_target_device(self):
-    commander = Commander(serial_number="123456789", executable_path=Path("mock"))
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+
+    commander = Commander(serial_number="123456789", executable_path=command)
 
     with self.assertRaisesRegex(ValueError, "target_device must be provided"):
       Adapter(commander=commander)
 
   def test_adapter_yes_commander_and_target_device(self):
-    commander = Commander(serial_number="123456789", executable_path="mock")
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+
+    commander = Commander(serial_number="123456789", executable_path=command)
     adapter = Adapter(commander=commander, target_device="EFR32MG24")
 
     self.assertTrue(isinstance(adapter._commander, Commander))
