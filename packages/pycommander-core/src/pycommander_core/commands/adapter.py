@@ -84,11 +84,11 @@ class AdapterCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if dhcp:
       args += ["--dhcp"]
-    if addr is not None:
+    if addr:
       args += ["--addr", addr]
-    if dns is not None:
+    if dns:
       args += ["--dns", dns]
-    if gw is not None:
+    if gw:
       args += ["--gw", gw]
     return self._run("adapter", "ip", *args).output
 
@@ -110,7 +110,7 @@ class AdapterCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if net:
       args += ["--net"]
-    if filter_regex is not None:
+    if filter_regex:
       args += ["--filter", filter_regex]
     if not connect:
       args += ["--noconnect"]    

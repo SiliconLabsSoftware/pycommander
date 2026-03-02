@@ -88,7 +88,7 @@ class BaseCommand:
   # Keyword arguments
   def _get_kwargs(self, **kwargs: Any) -> list[str]:
     args = []
-    if kwargs.get("device", None) is not None:
+    if kwargs.get("device"):
       args += ["--device", kwargs["device"]]
     if kwargs.get("force", False):
       args += ["--force"]

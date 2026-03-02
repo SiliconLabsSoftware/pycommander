@@ -33,7 +33,7 @@ class ExtflashCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if ranges:
       args += self._get_ranges(ranges)
-    if board_id is not None:
+    if board_id:
       args += ["--board-id", board_id]
     if not verify:
       args += ["--noverify"]
@@ -55,11 +55,11 @@ class ExtflashCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if ranges:
       args += self._get_ranges(ranges)
-    if board_id is not None:
+    if board_id:
       args += ["--board-id", board_id]
     return self._run("extflash", "read", *args).output
 
@@ -83,7 +83,7 @@ class ExtflashCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if address is not None:
       args += ["--address", self._get_address_string(address)]
-    if board_id is not None:
+    if board_id:
       args += ["--board-id", board_id]
     if not verify:
       args += ["--noverify"]

@@ -24,7 +24,7 @@ class LittlefsCommand(BaseCommand):
       args += ["--address", self._get_address_string(address)]
     if range is not None:
       args += self._get_ranges([range])
-    if infile is not None:
+    if infile:
       args += ["--infile", infile]
     return args
 
@@ -121,9 +121,9 @@ class LittlefsCommand(BaseCommand):
       args += self._get_file_paths(file_paths)
     if dir_paths:
       args += self._get_dir_paths(dir_paths)
-    if dest_dir is not None:
+    if dest_dir:
       args += ["--dest", dest_dir]
-    if zip_dir is not None:
+    if zip_dir:
       args += ["--zip", zip_dir]
     return self._run("littlefs", "extract", *args).output
 

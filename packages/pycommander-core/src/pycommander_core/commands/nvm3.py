@@ -149,7 +149,7 @@ class Nvm3Command(BaseCommand):
     if object_keys:
       for k in object_keys:
         args += ["--key", k]
-    if nvm3file is not None:
+    if nvm3file:
       args += ["--nvm3file", nvm3file]
     if address is not None:
       args += ["--address", self._get_address_string(address)]
@@ -176,7 +176,7 @@ class Nvm3Command(BaseCommand):
     if object_keys:
       for k in object_keys:
         args += ["--key", k]
-    if nvm3file is not None:
+    if nvm3file:
       args += ["--nvm3file", nvm3file]
     if range is not None:
       args += self._get_ranges([range])
@@ -217,7 +217,7 @@ class Nvm3Command(BaseCommand):
     if counters:
       for k, v in counters:
         args += ["--counter", f"0x{k:05X}:{v}"]
-    if nvm3file is not None:
+    if nvm3file:
       args += ["--nvm3file", nvm3file]
     return self._run("nvm3", "set", filename, *args).output
 
@@ -247,6 +247,6 @@ class Nvm3Command(BaseCommand):
     if counters:
       for k, v in counters:
         args += ["--counter", f"0x{k:05X}:{v}"]
-    if nvm3file is not None:
+    if nvm3file:
       args += ["--nvm3file", nvm3file]
     return self._run("nvm3", "writedevice", *args).output

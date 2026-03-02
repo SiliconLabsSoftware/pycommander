@@ -24,7 +24,7 @@ class Mfg917Command(BaseCommand):
                               skipinit: bool = False,
                               pinset: int | None = None) -> list[str]:
     args = []
-    if serialport is not None:
+    if serialport:
       args += ["--serialport", serialport]
     if baudrate is not None:
       args += ["--baudrate", str(baudrate)]
@@ -32,7 +32,7 @@ class Mfg917Command(BaseCommand):
       args += ["--serialinterface"]
     if closeinterface:
       args += ["--closeinterface"]
-    if host is not None:
+    if host:
       args += ["--host", host]
     if skipinit:
       args += ["--skipinit"]
@@ -360,9 +360,9 @@ class Mfg917Command(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
-    if mbr is not None:
+    if mbr:
       args += ["--mbr", mbr]
-    if data is not None:
+    if data:
       args += ["--data", data]
     return self._run("mfg917", "init", *args).output
 
@@ -403,13 +403,13 @@ class Mfg917Command(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
-    if symmetrickey is not None:
+    if symmetrickey:
       args += ["--symmetrickey", symmetrickey]
-    if privatekey is not None:
+    if privatekey:
       args += ["--privatekey", privatekey]
     if protectlength is not None:
       args += ["--protectlength", str(protectlength)]
-    if sha is not None:
+    if sha:
       args += ["--sha", sha]
     if not prompt:
       args += ["--noprompt"]
@@ -450,13 +450,13 @@ class Mfg917Command(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
-    if mbr is not None:
+    if mbr:
       args += ["--mbr", mbr]
-    if keys is not None:
+    if keys:
       args += ["--keys", keys]
-    if data is not None:
+    if data:
       args += ["--data", data]
-    if profile is not None:
+    if profile:
       args += ["--profile", profile]
     if listprofiles:
       args += ["--listprofiles"]
@@ -493,9 +493,9 @@ class Mfg917Command(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += self._get_mfg917_serial_args(serialport, baudrate, serialinterface, closeinterface, host, skipinit, pinset)
-    if symmetrickey is not None:
+    if symmetrickey:
       args += ["--symmetrickey", symmetrickey]
-    if publickey is not None:
+    if publickey:
       args += ["--publickey", publickey]
     if not prompt:
       args += ["--noprompt"]
@@ -546,7 +546,7 @@ class Mfg917Command(BaseCommand):
       args += ["--channel", str(channel)]
     if power is not None:
       args += ["--power", str(power)]
-    if phy is not None:
+    if phy:
       args += ["--phy", phy]
     if not burst:
       args += ["--noburst"]
@@ -603,9 +603,9 @@ class Mfg917Command(BaseCommand):
       args += self._get_ranges([range])
     if position is not None:
       args += ["--position", str(position)]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
-    if property_field is not None:
+    if property_field:
       args += ["--property", property_field]
     return self._run("mfg917", "read", region, *args).output
 
@@ -681,7 +681,7 @@ class Mfg917Command(BaseCommand):
       args += ["--address", self._get_address_string(address)]
     if position is not None:
       args += ["--position", str(position)]
-    if data is not None:
+    if data:
       args += ["--data", data]
     if not crc:
       args += ["--nocrc"]
@@ -732,7 +732,7 @@ class Mfg917Command(BaseCommand):
       args += ["--storeinefuse"]
     if offset_khz is not None:
       args += ["--offset", str(offset_khz)]
-    if ctuneoverride is not None:
+    if ctuneoverride:
       args += ["--ctuneoverride", ctuneoverride]
     if not prompt:
       args += ["--noprompt"]

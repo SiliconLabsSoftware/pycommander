@@ -61,7 +61,7 @@ class ConvertCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = list(infiles) + self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if address is not None:
       args += ["--address", self._get_address_string(address)]
@@ -73,19 +73,19 @@ class ConvertCommand(BaseCommand):
       args += self._get_tokens(tokens)
     if tokenfiles:
       args += self._get_tokenfiles(tokenfiles)
-    if tokengroup is not None:
+    if tokengroup:
       args += ["--tokengroup", tokengroup]
-    if tokendefs is not None:
+    if tokendefs:
       args += ["--tokendefs", tokendefs]
     if secureboot:
       args += ["--secureboot"]
-    if keyfile is not None:
+    if keyfile:
       args += ["--keyfile", keyfile]
     if crc:
       args += ["--crc"]
-    if certificate is not None:
+    if certificate:
       args += ["--certificate", certificate]
-    if aeskey is not None:
+    if aeskey:
       args += ["--aeskey", aeskey]
     if include_sections:
       args += self._get_include_sections(include_sections)
@@ -93,8 +93,8 @@ class ConvertCommand(BaseCommand):
       args += self._get_exclude_sections(exclude_sections)
     if extsign:
       args += ["--extsign"]
-    if signature is not None:
+    if signature:
       args += ["--signature", signature]
-    if verify_key is not None:
+    if verify_key:
       args += ["--verify", verify_key]
     return self._run("convert", *args).output

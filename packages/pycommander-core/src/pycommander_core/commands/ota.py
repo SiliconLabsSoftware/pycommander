@@ -76,7 +76,7 @@ class OtaCommand(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += ["--outfile", outfile]
-    if type is not None:
+    if type:
       args += ["--type", type]
     if input_files:
       for file in input_files:
@@ -87,15 +87,15 @@ class OtaCommand(BaseCommand):
       args += ["--productid", str(productid)]
     if swversion is not None:
       args += ["--swversion", str(swversion)]
-    if swstring is not None:
+    if swstring:
       args += ["--swstring", swstring]
     if min_sw is not None:
       args += ["--min-sw", str(min_sw)]
     if max_sw is not None:
       args += ["--max-sw", str(max_sw)]
-    if releasenote is not None:
+    if releasenote:
       args += ["--releasenote", releasenote]
-    if digest is not None:
+    if digest:
       args += ["--digest", digest]
     if upgrade_images:
       for image in upgrade_images:
@@ -106,24 +106,24 @@ class OtaCommand(BaseCommand):
       args += ["--manufacturer-id", str(manufacturer_id)]
     if image_type is not None:
       args += ["--image-type", str(image_type)]
-    if string is not None:
+    if string:
       args += ["--string", string]
     if stack_version is not None:
       args += ["--stack-version", str(stack_version)]
     if credentials is not None:
       args += ["--credentials", str(credentials)]
-    if destination is not None:
+    if destination:
       args += ["--destination", destination]
     if min_hw is not None:
       args += ["--min-hw", str(min_hw)]
     if max_hw is not None:
       args += ["--max-hw", str(max_hw)]
-    if null_tag is not None:
+    if null_tag:
       args += ["--null", null_tag]
     if manufacturer_tags is not None:
       for tag in manufacturer_tags:
         args += ["--manufacturer-tag", tag]
-    if certificate is not None:
+    if certificate:
       args += ["--certificate", certificate]
     if sign:
       args += ["--sign"]
@@ -147,9 +147,9 @@ class OtaCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if type is not None:
+    if type:
       args += ["--type", type]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("ota", "parse", filename, *args).output
 
