@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
   from .commands import *
 
+from .types import CommanderVersionInfo
 from .paths import EXECUTABLE_PATH_CLI, EXECUTABLE_PATH_GUI
 from .runner import Runner, RunnerResult
 from ._ensure_commander import ensure_commander
@@ -84,18 +85,30 @@ class CommanderBase:
       setattr(self, attribute_name, command_class(self))
 
 
-  def getVersion(self) -> str:
-    """Get the version of the Commander executable.
+  def getVersion(self) -> CommanderVersionInfo | None:
+    """Get the version information for the Commander executable.
 
     Returns:
-      The version of the Commander executable, e.g. "1v22p0b1234"
+      A CommanderVersionInfo object containing the version of the Commander executable.
     """
     result : RunnerResult = self._runner.run("--version", json_format=True)
 
-    json_output = json.loads(result.output)
-    version_string = json_output["result"]["version"]["simplicity_commander_version"]
+    if result.returncode != 0:
+      return None
 
-    return version_string
+    json_output = json.loads(result.output)
+    if "result" not in json_output or "version" not in json_output["result"]:
+      return None
+
+    version_info = CommanderVersionInfo(
+      simplicity_commander_version=json_output["result"]["version"]["simplicity_commander_version"],
+      jlink_dll_version=json_output["result"]["version"]["jlink_dll_version"],
+      emdll_version=json_output["result"]["version"]["emdll_version"],
+      mbed_tls_version=json_output["result"]["version"]["mbed_tls_version"],
+      qt_version=json_output["result"]["version"]["qt_version"],
+    )
+
+    return version_info
 
   def runCommand(self, *args : str, json_formatted_output: bool = True) -> CommanderResult | dict:
     """Run a command and return the result.
