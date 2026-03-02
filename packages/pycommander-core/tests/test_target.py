@@ -158,10 +158,8 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_getCTUNE_failed(self):
-    """
-    Test the device getCTUNE method when getting the CTUNE value from the board fails.
-    The method should return None.
-    """
+    # Test the device getCTUNE method when getting the CTUNE value from the board fails.
+    # The method should return None.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -172,10 +170,8 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_setCTUNE_autoset_same_value(self):
-    """
-    Test the device setCTUNE method with autoset, no force, and the desired value is the same as the current value in the board EEPROM.
-    The method should return True and *not* call the autoset command.
-    """
+    # Test the device setCTUNE method with autoset, no force, and the desired value is the same as the current value in the board EEPROM.
+    # The method should return True and *not* call the autoset command.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -218,10 +214,8 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_setCTUNE_autoset_same_value_force(self):
-    """
-    Test the device setCTUNE method with autoset, force, and the desired value is the same as the current value in the board EEPROM.
-    The method should return True and call the autoset command.
-    """
+    # Test the device setCTUNE method with autoset, force, and the desired value is the same as the current value in the board EEPROM.
+    # The method should return True and call the autoset command.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -271,10 +265,8 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_setCTUNE_autoset_different_value(self):
-    """
-    Test the device setCTUNE method with autoset, no force, and the desired value is different from the current value in the board EEPROM.
-    The method should return True and call the autoset command.
-    """
+    # Test the device setCTUNE method with autoset, no force, and the desired value is different from the current value in the board EEPROM.
+    # The method should return True and call the autoset command.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -324,10 +316,8 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_setCTUNE_set_same_value(self):
-    """
-    Test the device setCTUNE method with set, no force, and the desired value is the same as the current value in the board EEPROM.
-    The method should return True and *not* call the set command.
-    """
+    # Test the device setCTUNE method with set, no force, and the desired value is the same as the current value in the board EEPROM.
+    # The method should return True and *not* call the set command.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -370,10 +360,8 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [["mock", "ctune", "get", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_setCTUNE_set_same_value_force(self):
-    """
-    Test the device setCTUNE method with set, force, and the desired value is the same as the current value in the board EEPROM.
-    The method should return True and call the set command.
-    """
+    # Test the device setCTUNE method with set, force, and the desired value is the same as the current value in the board EEPROM.
+    # The method should return True and call the set command.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -423,10 +411,8 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_setCTUNE_set_different_value(self):
-    """
-    Test the device setCTUNE method with set, no force, and the desired value is different from the current value in the board EEPROM.
-    The method should return True and call the set command.
-    """
+    # Test the device setCTUNE method with set, no force, and the desired value is different from the current value in the board EEPROM.
+    # The method should return True and call the set command.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -475,10 +461,8 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_setCTUNE_get_failed(self):
-    """
-    Test the device setCTUNE method when getting the CTUNE value from the board fails.
-    The method should return False.
-    """
+    # Test the device setCTUNE method when getting the CTUNE value from the board fails.
+    # The method should return False.
 
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
@@ -593,7 +577,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "protect", "--read", "--disable", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_info_no_device_info_key(self):
-    """Result is successful but the 'device_info' key is missing from the response."""
+    # Result is successful but the 'device_info' key is missing from the response.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -730,7 +714,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_flashApplication_multiple_files_one_missing(self):
-    """One file exists and one doesn't -- should raise before running the command."""
+    # One file exists and one doesn't -- should raise before running the command.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -818,7 +802,7 @@ class TestTarget(unittest.TestCase):
     self.assertFalse(device.flashPatches(patches=[(0x08000000, 0xABCD, 2)]))
 
   def test_target_getCTUNE_alternate_validity(self):
-    """Board invalid, DI valid, token invalid -- covers the branches missed by the main test."""
+    # Board invalid, DI valid, token invalid -- covers the branches missed by the main test.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -955,7 +939,7 @@ class TestTarget(unittest.TestCase):
       device.flashRamCode(filenames=[Path("/nonexistent/firmware.bin")])
 
   def test_target_flashRamCode_multiple_files_one_missing(self):
-    """One file exists and one doesn't -- should raise before running the command."""
+    # One file exists and one doesn't -- should raise before running the command.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -1014,7 +998,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [["mock", "security", "readregionconfig", "--serialno", "123456789", "--device", "SiMG301", "--noreset", "--json"]])
 
   def test_target_readRegionConfig_allow_reset(self):
-    """Default allow_reset=True should not add --noreset."""
+    # Default allow_reset=True should not add --noreset.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1050,7 +1034,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_readRegionConfig_all_protection_modes(self):
-    """Cover the Encrypted and None protection mode branches."""
+    # Cover the Encrypted and None protection mode branches.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1167,7 +1151,7 @@ class TestTarget(unittest.TestCase):
     self.assertFalse(device.readRegionConfigToFile(outfile=file_path))
 
   def test_target_writeRegionConfig_force(self):
-    """force=True skips comparison, writes directly."""
+    # force=True skips comparison, writes directly.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1200,7 +1184,7 @@ class TestTarget(unittest.TestCase):
     self.assertFalse(device.writeRegionConfig(config, force=True))
 
   def test_target_writeRegionConfig_no_force_configs_equal(self):
-    """Existing config matches desired -- should return True without writing."""
+    # Existing config matches desired -- should return True without writing.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1231,7 +1215,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
   def test_target_writeRegionConfig_no_force_configs_differ(self):
-    """Existing config differs -- should write the new config."""
+    # Existing config differs -- should write the new config.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1265,7 +1249,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
 
   def test_target_writeRegionConfig_no_force_data_region_differs(self):
-    """Existing data_region location differs -- should write."""
+    # Existing data_region location differs -- should write.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1297,7 +1281,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 2)
 
   def test_target_writeRegionConfig_no_force_closed_differs(self):
-    """Existing closed state differs -- should write."""
+    # Existing closed state differs -- should write.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1329,7 +1313,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 2)
 
   def test_target_writeRegionConfig_no_force_read_fails(self):
-    """readRegionConfig fails -- should return False without writing."""
+    # readRegionConfig fails -- should return False without writing.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1347,7 +1331,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
   def test_target_writeRegionConfig_no_force_index_differs(self):
-    """Existing index differs -- should write."""
+    # Existing index differs -- should write.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1498,7 +1482,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("Invalid protection mode", str(ctx.exception))
 
   def test_target_writeRegionConfigFromFile_no_force_configs_equal(self):
-    """Existing config matches file config -- returns True without writing."""
+    # Existing config matches file config -- returns True without writing.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1527,7 +1511,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("readregionconfig", commander._runner.logged_commands[0])
 
   def test_target_writeRegionConfigFromFile_no_force_configs_differ(self):
-    """Existing config differs from file config -- should write."""
+    # Existing config differs from file config -- should write.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1559,7 +1543,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("writeregionconfig", commander._runner.logged_commands[1])
 
   def test_target_writeRegionConfigFromFile_no_force_read_fails(self):
-    """readRegionConfig fails -- returns False without writing."""
+    # readRegionConfig fails -- returns False without writing.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="SiMG301", commander=commander)
 
@@ -1817,7 +1801,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_all_disabled(self):
-    """All lock/erase/unlock fields report Disabled -- corresponding bools should be False."""
+    # All lock/erase/unlock fields report Disabled -- corresponding bools should be False.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -1867,7 +1851,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_missing_fields(self):
-    """Security dict is present but individual keys are missing -- .get() defaults apply."""
+    # Security dict is present but individual keys are missing -- .get() defaults apply.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -1905,7 +1889,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_missing_security_key(self):
-    """Result is successful but the 'security' key is missing from the response."""
+    # Result is successful but the 'security' key is missing from the response.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -1919,7 +1903,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_noreset(self):
-    """allow_reset=False should add --noreset to the command."""
+    # allow_reset=False should add --noreset to the command.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -1933,7 +1917,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_with_trustzone(self):
-    """show_trustzone_status=True with full trustzone data."""
+    # show_trustzone_status=True with full trustzone data.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2010,7 +1994,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_with_trustzone_all_false(self):
-    """show_trustzone_status=True with all trustzone fields false."""
+    # show_trustzone_status=True with all trustzone fields false.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2067,7 +2051,7 @@ class TestTarget(unittest.TestCase):
     self.assertFalse(result.trustzone_state.spnidlock_locked)
 
   def test_target_getSecurityStatus_with_trustzone_missing_fields(self):
-    """Trustzone dicts present but individual keys missing -- .get() defaults to False."""
+    # Trustzone dicts present but individual keys missing -- .get() defaults to False.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2091,7 +2075,7 @@ class TestTarget(unittest.TestCase):
     self.assertFalse(result.trustzone_state.spnidlock_locked)
 
   def test_target_getSecurityStatus_with_trustzone_missing_trustzone_key(self):
-    """show_trustzone_status=True but 'trustzone' key missing from result -- returns None."""
+    # show_trustzone_status=True but 'trustzone' key missing from result -- returns None.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2127,7 +2111,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_getSecurityStatus_without_trustzone_omits_flag(self):
-    """show_trustzone_status=False (default) should not pass --trustzone and should leave trustzone fields as None."""
+    # show_trustzone_status=False (default) should not pass --trustzone and should leave trustzone fields as None.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2178,7 +2162,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_writeGblDecryptionKey_confirm(self):
-    """confirm=True should add --noprompt to the command."""
+    # confirm=True should add --noprompt to the command.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2246,7 +2230,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_writePublicSigningKey(self):
-    """No existing key in OTP -- should read first, then write."""
+    # No existing key in OTP -- should read first, then write.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2264,7 +2248,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_writePublicSigningKey_confirm(self):
-    """confirm=True should add --noprompt to the writekey command."""
+    # confirm=True should add --noprompt to the writekey command.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2282,7 +2266,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_writePublicSigningKey_already_exists(self):
-    """Existing signing key in OTP -- should raise RuntimeError without writing."""
+    # Existing signing key in OTP -- should raise RuntimeError without writing.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2310,7 +2294,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [])
 
   def test_target_writePublicSigningKey_failed(self):
-    """No existing key, but writekey command fails."""
+    # No existing key, but writekey command fails.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2371,7 +2355,7 @@ class TestTarget(unittest.TestCase):
     ))
 
   def test_target_readPublicSigningKey_missing_sign_key(self):
-    """Result is successful but the 'sign_key' key is missing from the response."""
+    # Result is successful but the 'sign_key' key is missing from the response.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2462,7 +2446,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_readPublicCommandKey_missing_command_key(self):
-    """Result is successful but the 'command_key' key is missing from the response."""
+    # Result is successful but the 'command_key' key is missing from the response.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2473,7 +2457,7 @@ class TestTarget(unittest.TestCase):
     self.assertIsNone(device.readPublicCommandKey())
 
   def test_target_writePublicCommandKey(self):
-    """No existing key in OTP -- should read first, then write."""
+    # No existing key in OTP -- should read first, then write.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2491,7 +2475,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_writePublicCommandKey_confirm(self):
-    """confirm=True should add --noprompt to the writekey command."""
+    # confirm=True should add --noprompt to the writekey command.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2509,7 +2493,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_writePublicCommandKey_already_exists(self):
-    """Existing command key in OTP -- should raise RuntimeError without writing."""
+    # Existing command key in OTP -- should raise RuntimeError without writing.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2537,7 +2521,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(commander._runner.logged_commands, [])
 
   def test_target_writePublicCommandKey_failed(self):
-    """No existing key, but writekey command fails."""
+    # No existing key, but writekey command fails.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2602,7 +2586,7 @@ class TestTarget(unittest.TestCase):
       device.lockDebugAccess(trustzone="nope") # Invalid character
 
   def test_target_lockDebugAccess_disable_device_erase(self):
-    """Lock succeeds, then disabledeviceerase is called with confirm=True (noprompt)."""
+    # Lock succeeds, then disabledeviceerase is called with confirm=True (noprompt).
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2616,7 +2600,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_lockDebugAccess_disable_device_erase_no_confirm(self):
-    """Lock succeeds, disabledeviceerase called without noprompt (confirm=False)."""
+    # Lock succeeds, disabledeviceerase called without noprompt (confirm=False).
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2630,7 +2614,7 @@ class TestTarget(unittest.TestCase):
     ])
 
   def test_target_lockDebugAccess_disable_device_erase_lock_fails(self):
-    """Lock fails -- disabledeviceerase should not be called."""
+    # Lock fails -- disabledeviceerase should not be called.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2641,7 +2625,7 @@ class TestTarget(unittest.TestCase):
     self.assertIn("lock", commander._runner.logged_commands[0])
 
   def test_target_lockDebugAccess_disable_device_erase_failed(self):
-    """Lock succeeds but disabledeviceerase fails."""
+    # Lock succeeds but disabledeviceerase fails.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
@@ -2652,7 +2636,7 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 2)
 
   def test_target_lockDebugAccess_disable_device_erase_noreset(self):
-    """Lock with noreset and disable_device_erase -- both commands get noreset."""
+    # Lock with noreset and disable_device_erase -- both commands get noreset.
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
 
