@@ -77,7 +77,7 @@ class UtilCommand(BaseCommand):
     args += ["--cert-version", str(cert_version)]
     args += ["--cert-type", cert_type]
     args += ["--cert-pubkey", cert_pubkey]
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
     if extsign:
       args += ["--extsign"]
@@ -105,13 +105,13 @@ class UtilCommand(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += ["--type", type]
-    if pubkey is not None:
+    if pubkey:
       args += ["--pubkey", pubkey]
-    if privkey is not None:
+    if privkey:
       args += ["--privkey", privkey]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
-    if tokenfile is not None:
+    if tokenfile:
       args += self._get_tokenfiles([tokenfile])
     return self._run("util", "genkey", *args).output
 
@@ -144,9 +144,9 @@ class UtilCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = [keyfile] + self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
-    if key_type is not None:
+    if key_type:
       args += ["--type", key_type]
     return self._run("util", "keytotoken", *args).output
 
@@ -184,7 +184,7 @@ class UtilCommand(BaseCommand):
     args += ["--signature", signature]
     args += ["--cert-type", cert_type]
     args += ["--outfile", outfile]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
     return self._run("util", "signcert", filename, *args).output
 
@@ -206,7 +206,7 @@ class UtilCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if map_filename is not None:
+    if map_filename:
       args += ["--map", map_filename]
     if include_sections:
       args += self._get_include_sections(include_sections)

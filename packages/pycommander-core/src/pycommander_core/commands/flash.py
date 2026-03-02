@@ -75,9 +75,9 @@ class FlashCommand(BaseCommand):
       args += self._get_tokens(tokens)
     if tokenfiles:
       args += self._get_tokenfiles(tokenfiles)
-    if tokengroup is not None:
+    if tokengroup:
       args += ["--tokengroup", tokengroup]
-    if tokendefs is not None:
+    if tokendefs:
       args += ["--tokendefs", tokendefs]
     if binary:
       args += ["--binary"]

@@ -47,28 +47,28 @@ class Gbl4Command(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if config is not None:
+    if config:
       args += ["--config", config]
     if data:
       for d in data:
         args += ["--data", d]
-    if seupgrade is not None:
+    if seupgrade:
       args += ["--seupgrade", seupgrade]
-    if encrypt_keyfile is not None:
+    if encrypt_keyfile:
       args += ["--encrypt", encrypt_keyfile]
-    if compress is not None:
+    if compress:
       args += ["--compress", compress]
-    if certificate is not None:
+    if certificate:
       args += ["--certificate", certificate]
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
     if extsign:
       args += ["--extsign"]
-    if productid is not None:
+    if productid:
       args += ["--productid", productid]
-    if bundleversion is not None:
+    if bundleversion:
       args += ["--bundleversion", bundleversion]
-    if minversion is not None:
+    if minversion:
       args += ["--minversion", minversion]
     return self._run("gbl4", "create", outfile, *args).output
 
@@ -112,9 +112,9 @@ class Gbl4Command(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if seupgrade is not None:
+    if seupgrade:
       args += ["--seupgrade", seupgrade]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("gbl4", "parse", infile, *args).output
 
@@ -138,6 +138,6 @@ class Gbl4Command(BaseCommand):
     args = self._get_general_args(**kwargs)
     args += ["--signature", signature]
     args += ["--outfile", outfile]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
     return self._run("gbl4", "sign", infile, *args).output

@@ -31,9 +31,9 @@ class TokensCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if tokengroup is not None:
+    if tokengroup:
       args += ["--tokengroup", tokengroup]
-    if tokendefs is not None:
+    if tokendefs:
       args += ["--tokendefs", tokendefs]
     return self._run("tokens", "createheader", filename, *args).output
 
@@ -59,13 +59,13 @@ class TokensCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if securerange is not None:
       args += self._get_secureranges([securerange])
-    if type is not None:
+    if type:
       args += ["--type", type]
     if tokens:
       args += self._get_token_names(tokens)
-    if tokengroup is not None:
+    if tokengroup:
       args += ["--tokengroup", tokengroup]
-    if tokendefs is not None:
+    if tokendefs:
       args += ["--tokendefs", tokendefs]
     return self._run("tokens", "erase", *args).output
 
@@ -103,13 +103,13 @@ class TokensCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if filenames:
       args = list(filenames) + args
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if tokens:
       args += self._get_token_names(tokens)
-    if tokengroup is not None:
+    if tokengroup:
       args += ["--tokengroup", tokengroup]
-    if tokendefs is not None:
+    if tokendefs:
       args += ["--tokendefs", tokendefs]
     if range is not None:
       args += self._get_ranges([range])
@@ -117,7 +117,7 @@ class TokensCommand(BaseCommand):
       args += ["--showoverrides"]
     if securerange is not None:
       args += self._get_secureranges([securerange])
-    if type is not None:
+    if type:
       args += ["--type", type]
     if includeall:
       args += ["--includeall"]
@@ -149,9 +149,9 @@ class TokensCommand(BaseCommand):
       args += self._get_tokenfiles(tokenfiles)
     if tokens:
       args += self._get_tokens(tokens)
-    if tokengroup is not None:
+    if tokengroup:
       args += ["--tokengroup", tokengroup]
-    if tokendefs is not None:
+    if tokendefs:
       args += ["--tokendefs", tokendefs]
     if securerange is not None:
       args += self._get_secureranges([securerange])

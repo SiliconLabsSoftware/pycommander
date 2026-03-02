@@ -59,21 +59,21 @@ class RpsCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if encrypt_key is not None:
+    if encrypt_key:
       args += ["--encrypt", encrypt_key]
-    if mic_key is not None:
+    if mic_key:
       args += ["--mic", mic_key]
-    if iv_file is not None:
+    if iv_file:
       args += ["--iv", iv_file]
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
-    if sha is not None:
+    if sha:
       args += ["--sha", sha]
     if extsign:
       args += ["--extsign"]
     if address is not None:
       args += ["--address", self._get_address_string(address)]
-    if app is not None:
+    if app:
       args += ["--app", app]
     if app_version is not None:
       args += ["--app-version", str(app_version)]
@@ -83,15 +83,15 @@ class RpsCommand(BaseCommand):
       args += self._get_include_sections(include_sections)
     if exclude_sections:
       args += self._get_exclude_sections(exclude_sections)
-    if map_file is not None:
+    if map_file:
       args += ["--map", map_file]
     if combinedimage:
       args += ["--combinedimage"]
-    if key_type is not None:
+    if key_type:
       args += ["--key-type", key_type]
-    if new_key is not None:
+    if new_key:
       args += ["--new-key", new_key]
-    if prev_key is not None:
+    if prev_key:
       args += ["--prev-key", prev_key]
     return self._run("rps", "create", outfile, *args).output
 
@@ -129,21 +129,21 @@ class RpsCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if encrypt_key is not None:
+    if encrypt_key:
       args += ["--encrypt", encrypt_key]
-    if mic_key is not None:
+    if mic_key:
       args += ["--mic", mic_key]
-    if iv_file is not None:
+    if iv_file:
       args += ["--iv", iv_file]
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
-    if sha is not None:
+    if sha:
       args += ["--sha", sha]
     if extsign:
       args += ["--extsign"]
-    if app is not None:
+    if app:
       args += ["--app", app]
-    if nwpapp is not None:
+    if nwpapp:
       args += ["--nwpapp", nwpapp]
     if app_version is not None:
       args += ["--app-version", str(app_version)]
@@ -184,6 +184,6 @@ class RpsCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = [filename, "--signature", signature] + self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("rps", "sign", *args).output

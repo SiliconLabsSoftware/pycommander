@@ -105,21 +105,21 @@ class SecurityCommand(BaseCommand):
       args += ["--noreset"]
     if not store:
       args += ["--nostore"]
-    if cert is not None:
+    if cert:
       args += ["--cert", cert]
-    if cert_privkey is not None:
+    if cert_privkey:
       args += ["--cert-privkey", cert_privkey]
-    if command_key is not None:
+    if command_key:
       args += ["--command-key", command_key]
-    if cert_signature is not None:
+    if cert_signature:
       args += ["--cert-signature", cert_signature]
-    if command_signature is not None:
+    if command_signature:
       args += ["--command-signature", command_signature]
-    if authorization is not None:
+    if authorization:
       args += ["--authorization", authorization]
-    if cert_pubkey is not None:
+    if cert_pubkey:
       args += ["--cert-pubkey", cert_pubkey]
-    if disable_param is not None:
+    if disable_param:
       args += ["--disable-param", disable_param]
     return self._run("security", "disabletamper", *args).output
 
@@ -198,11 +198,11 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not store:
       args += ["--nostore"]
-    if deviceserialno is not None:
+    if deviceserialno:
       args += ["--deviceserialno", deviceserialno]
     if not reset:
       args += ["--noreset"]
@@ -234,19 +234,19 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not store:
       args += ["--nostore"]
-    if deviceserialno is not None:
+    if deviceserialno:
       args += ["--deviceserialno", deviceserialno]
     if not reset:
       args += ["--noreset"]
-    if cert_pubkey is not None:
+    if cert_pubkey:
       args += ["--cert-pubkey", cert_pubkey]
-    if authorization is not None:
+    if authorization:
       args += ["--authorization", authorization]
-    if command_key is not None:
+    if command_key:
       args += ["--command-key", command_key]
     if extsign:
       args += ["--extsign"]
@@ -274,17 +274,17 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not store:
       args += ["--nostore"]
     if not reset:
       args += ["--noreset"]
-    if action is not None:
+    if action:
       args += ["--action", action]
     if disable_param is not None:
       args += ["--disable-param", str(disable_param)]
-    if unlock_param is not None:
+    if unlock_param:
       args += ["--unlock-param", unlock_param]
     return self._run("security", "gencommand", *args).output
 
@@ -306,11 +306,11 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not store:
       args += ["--nostore"]
-    if deviceserialno is not None:
+    if deviceserialno:
       args += ["--deviceserialno", deviceserialno]
     if not reset:
       args += ["--noreset"]
@@ -335,11 +335,11 @@ class SecurityCommand(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += ["--type", type]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
-    if privkey is not None:
+    if privkey:
       args += ["--privkey", privkey]
-    if pubkey is not None:
+    if pubkey:
       args += ["--pubkey", pubkey]
     return self._run("security", "genkey", *args).output
 
@@ -359,7 +359,7 @@ class SecurityCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
-    if deviceserialno is not None:
+    if deviceserialno:
       args += ["--deviceserialno", deviceserialno]
     return self._run("security", "getpath", *args).output
 
@@ -383,7 +383,7 @@ class SecurityCommand(BaseCommand):
       args += ["--noreset"]
     if dryrun:
       args += ["--dryrun"]
-    if trustzone is not None:
+    if trustzone:
       args += ["--trustzone", trustzone]
     return self._run("security", "lock", *args).output
 
@@ -407,7 +407,7 @@ class SecurityCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
-    if secure_debug_unlock is not None:
+    if secure_debug_unlock:
       args += ["--secure-debug-unlock", secure_debug_unlock]
     if dryrun:
       args += ["--dryrun"]
@@ -442,7 +442,7 @@ class SecurityCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if not reset:
       args += ["--noreset"]
-    if sefw is not None:
+    if sefw:
       args += ["--sefw", sefw]
     return self._run("security", "provision", *args).output
 
@@ -462,7 +462,7 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not reset:
       args += ["--noreset"]
@@ -506,7 +506,7 @@ class SecurityCommand(BaseCommand):
       args += ["--sign"]
     if command:
       args += ["--command"]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not reset:
       args += ["--noreset"]
@@ -528,7 +528,7 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if not reset:
       args += ["--noreset"]
@@ -624,21 +624,21 @@ class SecurityCommand(BaseCommand):
       args += ["--noreset"]
     if not store:
       args += ["--nostore"]
-    if cert is not None:
+    if cert:
       args += ["--cert", cert]
-    if cert_privkey is not None:
+    if cert_privkey:
       args += ["--cert-privkey", cert_privkey]
-    if command_key is not None:
+    if command_key:
       args += ["--command-key", command_key]
-    if cert_signature is not None:
+    if cert_signature:
       args += ["--cert-signature", cert_signature]
-    if command_signature is not None:
+    if command_signature:
       args += ["--command-signature", command_signature]
-    if authorization is not None:
+    if authorization:
       args += ["--authorization", authorization]
-    if cert_pubkey is not None:
+    if cert_pubkey:
       args += ["--cert-pubkey", cert_pubkey]
-    if unlock_param is not None:
+    if unlock_param:
       args += ["--unlock-param", unlock_param]
     return self._run("security", "unlock", *args).output
 
@@ -670,7 +670,7 @@ class SecurityCommand(BaseCommand):
       args += ["--dryrun"]
     if not prompt:
       args += ["--noprompt"]
-    if configfile is not None:
+    if configfile:
       args += ["--configfile", configfile]
     return self._run("security", "writeconfig", *args).output
 
@@ -698,11 +698,11 @@ class SecurityCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
-    if command_keyfile is not None:
+    if command_keyfile:
       args += ["--command", command_keyfile]
-    if decrypt_keyfile is not None:
+    if decrypt_keyfile:
       args += ["--decrypt", decrypt_keyfile]
     if not reset:
       args += ["--noreset"]

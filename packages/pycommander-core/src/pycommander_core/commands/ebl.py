@@ -45,17 +45,17 @@ class EblCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if app is not None:
+    if app:
       args += ["--app", app]
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
-    if encrypt_keyfile is not None:
+    if encrypt_keyfile:
       args += ["--encrypt", encrypt_keyfile]
     if extsign:
       args += ["--extsign"]
-    if signature is not None:
+    if signature:
       args += ["--signature", signature]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
     return self._run("ebl", "create", outfile, *args).output
 
@@ -75,9 +75,9 @@ class EblCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if type is not None:
+    if type:
       args += ["--type", type]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("ebl", "keyconvert", infile, *args).output
 
@@ -96,7 +96,7 @@ class EblCommand(BaseCommand):
     """
     args = self._get_general_args(**kwargs)
     args += ["--type", type]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("ebl", "keygen", *args).output
 
@@ -118,11 +118,11 @@ class EblCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if app is not None:
+    if app:
       args += ["--app", app]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
-    if decrypt_keyfile is not None:
+    if decrypt_keyfile:
       args += ["--decrypt", decrypt_keyfile]
     return self._run("ebl", "parse", infile, *args).output
 

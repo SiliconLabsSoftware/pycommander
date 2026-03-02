@@ -31,7 +31,7 @@ class ReadmemCommand(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     if ranges:
       args += self._get_ranges(ranges)

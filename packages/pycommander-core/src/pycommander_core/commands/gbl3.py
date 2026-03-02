@@ -69,17 +69,17 @@ class Gbl3Command(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if app is not None:
+    if app:
       args += ["--app", app]
-    if bootloader is not None:
+    if bootloader:
       args += ["--bootloader", bootloader]
-    if seupgrade is not None:
+    if seupgrade:
       args += ["--seupgrade", seupgrade]
-    if metadata is not None:
+    if metadata:
       args += ["--metadata", metadata]
-    if compress is not None:
+    if compress:
       args += ["--compress", compress]
-    if certificate is not None:
+    if certificate:
       args += ["--certificate", certificate]
     if include_sections:
       args += self._get_include_sections(include_sections)
@@ -87,23 +87,23 @@ class Gbl3Command(BaseCommand):
       args += self._get_exclude_sections(exclude_sections)
     if seunencrypted:
       args += ["--seunencrypted"]
-    if dep_app is not None:
+    if dep_app:
       args += ["--dep-app", dep_app]
-    if dep_boot is not None:
+    if dep_boot:
       args += ["--dep-boot", dep_boot]
-    if dep_se is not None:
+    if dep_se:
       args += ["--dep-se", dep_se]
-    if delta_app is not None:
+    if delta_app:
       args += ["--delta-app", delta_app]
-    if sign_keyfile is not None:
+    if sign_keyfile:
       args += ["--sign", sign_keyfile]
-    if encrypt_keyfile is not None:
+    if encrypt_keyfile:
       args += ["--encrypt", encrypt_keyfile]
     if extsign:
       args += ["--extsign"]
-    if signature is not None:
+    if signature:
       args += ["--signature", signature]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
     return self._run("gbl3", "create", outfile, *args).output
 
@@ -123,9 +123,9 @@ class Gbl3Command(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if type is not None:
+    if type:
       args += ["--type", type]
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("gbl3", "keyconvert", infile, *args).output
 
@@ -143,7 +143,7 @@ class Gbl3Command(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = ["--type", type] + self._get_general_args(**kwargs)
-    if outfile is not None:
+    if outfile:
       args += ["--outfile", outfile]
     return self._run("gbl3", "keygen", *args).output
 
@@ -171,17 +171,17 @@ class Gbl3Command(BaseCommand):
       Command output as parsed JSON (dict).
     """
     args = self._get_general_args(**kwargs)
-    if app is not None:
+    if app:
       args += ["--app", app]
-    if bootloader is not None:
+    if bootloader:
       args += ["--bootloader", bootloader]
-    if seupgrade is not None:
+    if seupgrade:
       args += ["--seupgrade", seupgrade]
-    if metadata is not None:
+    if metadata:
       args += ["--metadata", metadata]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
-    if decrypt_keyfile is not None:
+    if decrypt_keyfile:
       args += ["--decrypt", decrypt_keyfile]
     return self._run("gbl3", "parse", infile, *args).output
 
@@ -205,6 +205,6 @@ class Gbl3Command(BaseCommand):
     args = self._get_general_args(**kwargs)
     args += ["--outfile", outfile]
     args += ["--signature", signature]
-    if verify_keyfile is not None:
+    if verify_keyfile:
       args += ["--verify", verify_keyfile]
     return self._run("gbl3", "sign", infile, *args).output

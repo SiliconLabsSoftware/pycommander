@@ -32,7 +32,7 @@ class VcomCommand(BaseCommand):
     args = self._get_general_args(**kwargs)
     if baudrate is not None:
       args += ["--baudrate", str(baudrate)]
-    if handshake is not None:
+    if handshake:
       args += ["--handshake", handshake]
     if store:
       args += ["--store"]
