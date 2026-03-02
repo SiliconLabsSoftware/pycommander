@@ -1,6 +1,8 @@
 import unittest
 
 from pycommander_core.commands._base import BaseCommand, CommandResult
+from pycommander_core.runner import RunnerResult
+
 from ..mock_commander import MockCommander
 
 class TestBase(unittest.TestCase):
@@ -10,15 +12,32 @@ class TestBase(unittest.TestCase):
     base_command = BaseCommand(commander)
     self.assertEqual(base_command._run("command", "arg1", "arg2"), CommandResult(0, {"result": {}}))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
-    commander._runner.logged_commands.clear()
 
+  def test_base_run_empty_args(self):
+    commander = MockCommander()
+    base_command = BaseCommand(commander)
     self.assertEqual(base_command._run("command", "", "arg2"), CommandResult(0, {"result": {}}))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg2", "--json"]])
-    commander._runner.logged_commands.clear()
 
+  def test_base_run_none_args(self):
+    commander = MockCommander()
+    base_command = BaseCommand(commander)
     self.assertEqual(base_command._run("command", "arg1", None, "arg3"), CommandResult(0, {"result": {}}))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg3", "--json"]])
-    commander._runner.logged_commands.clear()
+
+  def test_base_run_bad_json_returncode_zero(self):
+    commander = MockCommander()
+    commander._runner.queue_result(RunnerResult(0, "This is not JSON"))
+    base_command = BaseCommand(commander)
+    self.assertEqual(base_command._run("command", "arg1", "arg2"), CommandResult(0, {"success": True, "output": "This is not JSON"}))
+    self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
+
+  def test_base_run_bad_json_returncode_non_zero(self):
+    commander = MockCommander()
+    commander._runner.queue_result(RunnerResult(1, "This is not JSON"))
+    base_command = BaseCommand(commander)
+    self.assertEqual(base_command._run("command", "arg1", "arg2"), CommandResult(1, {"success": False, "error": "This is not JSON"}))
+    self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
 
   def test_base_get_adapter_connection_args(self):
     commander = MockCommander(serial_number="123456789")
