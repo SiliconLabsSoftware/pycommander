@@ -5,6 +5,7 @@ from typing import Any
 
 from pycommander_core.commander_base import CommanderBase
 from pycommander_core.runner import Runner, RunnerResult
+from pycommander_core._utils import sanitize_args
 
 CommandResult = namedtuple("CommandResult", ["returncode", "output"])
 
@@ -15,11 +16,8 @@ class BaseCommand:
 
 
   def _run(self, *args: str) -> CommandResult:
-    # Strip away any empty or None elements
-    args = [arg for arg in args if arg is not None and arg != ""]
-
-    command_result : CommandResult = None
-    result : RunnerResult = self._runner.run(*args, json_format=True)
+    result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=True)
+    command_result : CommandResult | None = None
     try:
       json_output = json.loads(result.output) 
       command_result = CommandResult(result.returncode, json_output)

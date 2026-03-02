@@ -11,6 +11,7 @@ from .types import CommanderVersionInfo
 from .paths import EXECUTABLE_PATH_CLI, EXECUTABLE_PATH_GUI
 from .runner import Runner, RunnerResult
 from ._ensure_commander import ensure_commander
+from ._utils import sanitize_args
 
 CommanderResult = namedtuple("CommanderResult", ["returncode", "output"])
 
@@ -121,10 +122,7 @@ class CommanderBase:
       The result of the command.
     """
 
-    # Strip away any empty or None elements
-    args = [arg for arg in args if arg is not None and arg != ""]
-
-    result : RunnerResult = self._runner.run(*args, json_format=json_formatted_output)
+    result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=json_formatted_output)
     if json_formatted_output:
       return json.loads(result.output)
     else:

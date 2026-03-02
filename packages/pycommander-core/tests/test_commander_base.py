@@ -65,20 +65,29 @@ class TestCommanderBase(unittest.TestCase):
     commander = MockCommander()
     self.assertEqual(commander.runCommand("command", "arg1", "arg2"), {"result": {}})
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
-    commander._runner.logged_commands.clear()
 
+  def test_commander_base_runCommand_empty_args(self):
+    commander = MockCommander()
     self.assertEqual(commander.runCommand("command", "", "arg2"), {"result": {}})
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg2", "--json"]])
-    commander._runner.logged_commands.clear()
 
+  def test_commander_base_runCommand_none_args(self):
+    commander = MockCommander()
     self.assertEqual(commander.runCommand("command", "arg1", None, "arg3"), {"result": {}})
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg3", "--json"]])
-    commander._runner.logged_commands.clear()
 
+  def test_commander_base_runCommand_whitespace_args(self):
+    commander = MockCommander()
+    self.assertEqual(commander.runCommand("command", "arg 1", "arg 2"), {"result": {}})
+    self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg 1", "arg 2", "--json"]])
+
+  def test_commander_base_runCommand_json_formatted_output_false(self):
+    commander = MockCommander()
     self.assertEqual(commander.runCommand("command", "arg1", "arg2", json_formatted_output=False), CommanderResult(0, ""))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2"]])
-    commander._runner.logged_commands.clear()
 
+  def test_commander_base_runCommand_json_formatted_output_true(self):
+    commander = MockCommander()
     self.assertEqual(commander.runCommand("command", "arg1", "arg2", json_formatted_output=True), {"result": {}})
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
     commander._runner.logged_commands.clear()
