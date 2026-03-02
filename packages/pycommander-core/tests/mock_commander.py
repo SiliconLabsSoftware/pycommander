@@ -26,27 +26,25 @@ class MockCommander(CommanderBase):
     executable_path: Path | None = None,
   ):
     executable_path = executable_path or Path("mock")
-    super().__init__(
-      serial_number=serial_number,
-      ip_address=ip_address,
-      serial_port=serial_port,
-      debug_speed=debug_speed,
-      debug_tif=debug_tif,
-      debug_irpre=debug_irpre,
-      debug_drpre=debug_drpre,
-      log_file_path=log_file_path,
-      executable_path=executable_path,
-    )
 
-    # Replace the runner with a mock runner
     self._runner = MockRunner(
       executable_path,
       log_file_path=log_file_path,
       timeout_s=CommanderBase.default_timeout_s,
     )
 
-    # Update all commands to use the mock runner
-    for command in self.__dict__.values():
-      if isinstance(command, BaseCommand):
-        command._commander = self
-        command._runner    = self._runner
+    self._serial_number = serial_number
+    self._ip_address    = ip_address
+    self._serial_port   = serial_port
+    self._debug_speed   = debug_speed
+    self._debug_tif     = debug_tif
+    self._debug_irpre   = debug_irpre
+    self._debug_drpre   = debug_drpre
+
+    from pycommander_core import commands
+    for name in commands.__all__:
+      command_class = getattr(commands, name)
+      attribute_name = name.removesuffix("Command").lower()
+      command = command_class(self)
+      command._runner = self._runner
+      setattr(self, attribute_name, command)

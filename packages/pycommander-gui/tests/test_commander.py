@@ -1,4 +1,5 @@
 import unittest
+import shutil
 
 from pathlib import Path
 
@@ -12,6 +13,10 @@ class TestCommander(unittest.TestCase):
     self.assertTrue(Path(commander._runner._executable).exists())
 
   def test_commander_gui_all_options_passed(self):
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+
     commander = Commander(
       serial_number="123456789",
       debug_speed=115200,
@@ -19,7 +24,7 @@ class TestCommander(unittest.TestCase):
       debug_irpre=1,
       debug_drpre=1,
       log_file_path=Path("test.log"),
-      executable_path="derp",
+      executable_path=command,
     )
 
     self.assertEqual(commander._serial_number, "123456789")
@@ -28,7 +33,7 @@ class TestCommander(unittest.TestCase):
     self.assertEqual(commander._debug_irpre, 1)
     self.assertEqual(commander._debug_drpre, 1)
     self.assertEqual(commander._runner._log_file_path, Path("test.log"))
-    self.assertEqual(commander._runner._executable, "derp")
+    self.assertEqual(commander._runner._executable, command)
 
 
   def test_commander_gui_serial_number_and_ip_address_provided(self):

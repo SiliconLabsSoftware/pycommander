@@ -14,8 +14,12 @@ from pycommander_core.errors import PyCommanderInputError, PyCommanderRuntimeErr
 
 class TestRunner(unittest.TestCase):
   def test_runner_init(self):
-    runner = Runner(executable="mock")
-    self.assertEqual(runner._executable, "mock")
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+
+    runner = Runner(executable=command)
+    self.assertEqual(runner._executable, command)
     self.assertEqual(runner._log_file_path, None)
     self.assertEqual(runner._timeout_s, 300)
 
@@ -24,17 +28,15 @@ class TestRunner(unittest.TestCase):
     else:
       self.assertEqual(runner._subprocess_flags, 0)
 
-  def test_runner_run_missing_executable(self):
-    runner = Runner(executable=Path("mock"))
+  def test_runner_init_missing_executable(self):
     with self.assertRaisesRegex(FileNotFoundError, f"Commander executable not found: {Path('mock')}"):
-      runner.run("command")
+      Runner(executable=Path("mock"))
 
-  def test_runner_run_not_a_file(self):
+  def test_runner_init_not_a_file(self):
     temp_dir = Path(tempfile.mkdtemp(dir="."))
 
-    runner = Runner(executable=temp_dir)
     with self.assertRaisesRegex(ValueError, f"Commander executable is not a file: {re.escape(str(temp_dir))}"):
-      runner.run("command")
+      Runner(executable=temp_dir)
 
     temp_dir.rmdir()
 
