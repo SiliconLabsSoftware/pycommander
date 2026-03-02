@@ -3,6 +3,15 @@ import enum
 from dataclasses import dataclass
 
 @dataclass
+class CommanderVersionInfo:
+  simplicity_commander_version: str
+  jlink_dll_version: str
+  emdll_version: str
+  mbed_tls_version: str
+  qt_version: str
+
+
+@dataclass
 class AdapterBoardInfo:
   name:          str | None = None
   part_number:   str | None = None

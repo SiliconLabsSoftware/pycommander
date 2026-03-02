@@ -30,13 +30,7 @@ class MockRunner(Runner):
 
     self.logged_commands.append([str(self._executable), *args])
 
-    if "--version" in args:
-      output = json.dumps({
-        "result": {
-            "version": {"simplicity_commander_version": "0.0.0"},
-        },
-      })
-    elif self.queued_results:
+    if self.queued_results:
       result = self.queued_results.pop(0)
       return result
     elif json_format:
