@@ -19,6 +19,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/pycommander"]
 
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "build_hook.py"
+
 [project.optional-dependencies]
 gui = ["silabs-pycommander-gui==0.1.5"]
 
