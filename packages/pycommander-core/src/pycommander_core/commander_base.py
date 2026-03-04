@@ -8,7 +8,6 @@ if TYPE_CHECKING:
   from .commands import *
 
 from .types import CommanderVersionInfo
-from .paths import EXECUTABLE_PATH_CLI, EXECUTABLE_PATH_GUI
 from .runner import Runner, RunnerResult
 from ._ensure_commander import ensure_commander
 from ._utils import sanitize_args
@@ -53,19 +52,25 @@ class CommanderBase:
               debug_irpre:      int  | None = None,
               debug_drpre:      int  | None = None,
               log_file_path:    Path | None = None,
-              executable_path:  Path | None = None):
+              executable_path:  Path | None = None,
+              cli:              bool | None = None):
 
     if (serial_number and ip_address) or (serial_number and serial_port) or (ip_address and serial_port):
       raise ValueError("Only one of serial_number, ip_address, or serial_port can be provided")
 
-    if not executable_path:
-      raise ValueError("executable_path must be provided")
+    if executable_path:
+      if not isinstance(executable_path, Path):
+        executable_path = Path(executable_path)
 
-    if executable_path == EXECUTABLE_PATH_CLI or executable_path == EXECUTABLE_PATH_GUI:
-      # If we're using the default executable, ensure we are unzipped and ready to go.
-      ensure_commander(cli=executable_path == EXECUTABLE_PATH_CLI)
+      if not executable_path.exists():
+        raise FileNotFoundError(f"Executable not found: {str(executable_path)}")
+      self._executable_path = executable_path
+    else:
+      if cli is None:
+        raise ValueError("cli must be provided if executable_path is not provided")
+      self._executable_path = ensure_commander(cli=cli)
 
-    self._runner : Runner = Runner(executable_path, log_file_path=log_file_path, timeout_s=CommanderBase.default_timeout_s)
+    self._runner : Runner = Runner(self._executable_path, log_file_path=log_file_path, timeout_s=CommanderBase.default_timeout_s)
 
     # Adapter-specific parameters
     self._serial_number : str | None = serial_number

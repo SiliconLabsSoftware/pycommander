@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from pycommander_core.paths import EXECUTABLE_PATH_CLI
 from pycommander_core.commander_base import CommanderBase
 
 class Commander(CommanderBase):
@@ -13,7 +12,7 @@ class Commander(CommanderBase):
               debug_irpre:      int  | None = None,
               debug_drpre:      int  | None = None,
               log_file_path:    Path | None = None,
-              executable_path:  Path        = EXECUTABLE_PATH_CLI):
+              executable_path:  Path | None = None):
 
     super().__init__(serial_number=serial_number,
                      ip_address=ip_address,
@@ -23,4 +22,5 @@ class Commander(CommanderBase):
                      debug_irpre=debug_irpre,
                      debug_drpre=debug_drpre,
                      log_file_path=log_file_path,
-                     executable_path=executable_path)
+                     executable_path=executable_path,
+                     cli=True)

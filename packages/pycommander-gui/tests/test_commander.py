@@ -3,13 +3,11 @@ import shutil
 
 from pathlib import Path
 
-from pycommander_core.paths import EXECUTABLE_PATH_GUI
 from pycommander_gui.commander import Commander
 
 class TestCommander(unittest.TestCase):
   def test_commander_gui_executable_path(self):
     commander = Commander()
-    self.assertEqual(Path(commander._runner._executable), EXECUTABLE_PATH_GUI)
     self.assertTrue(Path(commander._runner._executable).exists())
 
   def test_commander_gui_all_options_passed(self):
@@ -24,7 +22,7 @@ class TestCommander(unittest.TestCase):
       debug_irpre=1,
       debug_drpre=1,
       log_file_path=Path("test.log"),
-      executable_path=command,
+      executable_path=Path(command),
     )
 
     self.assertEqual(commander._serial_number, "123456789")
@@ -33,7 +31,7 @@ class TestCommander(unittest.TestCase):
     self.assertEqual(commander._debug_irpre, 1)
     self.assertEqual(commander._debug_drpre, 1)
     self.assertEqual(commander._runner._log_file_path, Path("test.log"))
-    self.assertEqual(commander._runner._executable, command)
+    self.assertEqual(commander._runner._executable, str(Path(command)))
 
 
   def test_commander_gui_serial_number_and_ip_address_provided(self):
