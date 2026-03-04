@@ -1,4 +1,7 @@
 import unittest
+import shutil
+
+from pathlib import Path
 
 from .mock_commander import MockCommander
 
@@ -8,9 +11,27 @@ from pycommander_core.runner import RunnerResult
 
 class TestCommanderBase(unittest.TestCase):
 
-  def test_commander_base_missing_executable_path(self):
-    with self.assertRaises(ValueError):
-      CommanderBase(executable_path=None)
+  def test_commander_base_executable_path_and_cli_true(self):
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+    commander = CommanderBase(executable_path=Path(command), cli=True)
+    self.assertEqual(commander._executable_path, Path(command))
+
+  def test_commander_base_executable_path_and_cli_false(self):
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+    commander = CommanderBase(executable_path=Path(command), cli=False)
+    self.assertEqual(commander._executable_path, Path(command))
+
+  def test_commander_base_nonexistent_executable_path(self):
+    with self.assertRaisesRegex(FileNotFoundError, f"Executable not found: {str(Path('mock'))}"):
+      CommanderBase(executable_path=Path("mock"))
+
+  def test_commander_base_no_executable_path_and_missing_cli(self):
+    with self.assertRaisesRegex(ValueError, "cli must be provided if executable_path is not provided"):
+      CommanderBase(cli=None)
 
   def test_commander_base_getVersion(self):
     commander = MockCommander()

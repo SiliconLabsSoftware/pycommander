@@ -41,7 +41,7 @@ class TestAdapter(unittest.TestCase):
     if command is None:
       self.fail("echo command not found")
 
-    commander = Commander(serial_number="123456789", executable_path=command)
+    commander = Commander(serial_number="123456789", executable_path=Path(command))
 
     with self.assertRaisesRegex(ValueError, "target_device must be provided"):
       Adapter(commander=commander)
@@ -51,7 +51,7 @@ class TestAdapter(unittest.TestCase):
     if command is None:
       self.fail("echo command not found")
 
-    commander = Commander(serial_number="123456789", executable_path=command)
+    commander = Commander(serial_number="123456789", executable_path=Path(command))
     adapter = Adapter(commander=commander, target_device="EFR32MG24")
 
     self.assertTrue(isinstance(adapter._commander, Commander))
