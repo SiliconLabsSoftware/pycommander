@@ -25,6 +25,13 @@ class TestCommanderBase(unittest.TestCase):
     commander = CommanderBase(executable_path=Path(command), cli=False)
     self.assertEqual(commander._executable_path, Path(command))
 
+  def test_commander_base_nonstring_executable_path(self):
+    command = shutil.which("echo")
+    if command is None:
+      self.fail("echo command not found")
+    commander = CommanderBase(executable_path=str(Path(command)))
+    self.assertEqual(commander._executable_path, Path(command))
+
   def test_commander_base_nonexistent_executable_path(self):
     with self.assertRaisesRegex(FileNotFoundError, f"Executable not found: {str(Path('mock'))}"):
       CommanderBase(executable_path=Path("mock"))
