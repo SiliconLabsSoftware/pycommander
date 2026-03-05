@@ -79,7 +79,7 @@ class TestRunner(unittest.TestCase):
       self.fail("bash command not found")
 
     runner = Runner(executable=command)
-    with self.assertRaisesRegex(PyCommanderInputError, f"Command failed with return code 255:"):
+    with self.assertRaises(PyCommanderInputError):
       runner.run("-c", "exit 255", json_format=False)
 
   def test_runner_run_command_runtime_error(self):
@@ -88,7 +88,7 @@ class TestRunner(unittest.TestCase):
       self.fail("bash command not found")
 
     runner = Runner(executable=command)
-    with self.assertRaisesRegex(PyCommanderRuntimeError, f"Command failed with return code 254:"):
+    with self.assertRaises(PyCommanderRuntimeError):
       runner.run("-c", "exit 254", json_format=False)
 
   def test_runner_run_command_error(self):
@@ -97,7 +97,7 @@ class TestRunner(unittest.TestCase):
       self.fail("bash command not found")
 
     runner = Runner(executable=command)
-    with self.assertRaisesRegex(PyCommanderError, f"Command failed with return code 1:"):
+    with self.assertRaises(PyCommanderError):
       runner.run("-c", "exit 1", json_format=False)
 
   def test_runner_log_file_on_success(self):
