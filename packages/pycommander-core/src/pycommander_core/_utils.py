@@ -5,7 +5,7 @@ def sanitize_args(args: list[str | int | float | None]) -> list[str]:
   sanitized_args : list[str] = []
   for arg in args:
     # Remove any empty or None elements
-    if not arg:
+    if arg is None:
       continue
 
     # Stringify any non-string elements
