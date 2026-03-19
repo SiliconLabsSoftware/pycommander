@@ -85,7 +85,7 @@ jobs:
       - name: Run unit tests for total coverage
         shell: bash
         run: |
-          coverage run --parallel-mode run_tests.py
+          coverage run --parallel-mode scripts/run_tests.py
           ls -la
 
       - name: Upload raw coverage data
@@ -98,7 +98,7 @@ jobs:
       - name: Generate local coverage report
         shell: bash
         run: |
-          coverage run run_tests.py
+          coverage run scripts/run_tests.py
           coverage report
           coverage html
 
