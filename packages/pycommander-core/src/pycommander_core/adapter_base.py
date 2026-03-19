@@ -1,7 +1,7 @@
 from .commander_base import CommanderBase
 from .target import Target
 
-from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo, AdapterVoltageInfo, VcomHandshake
+from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo, AdapterVoltageInfo, AdapterRailInfo, VcomHandshake
 
 class AdapterBase:
   def __init__(self,
@@ -85,7 +85,7 @@ class AdapterBase:
     result : dict = self._commander.adapter.reset()
     return result["success"]
 
-  def getVoltage(self) -> dict[int, AdapterVoltageInfo] | None:
+  def getVoltage(self) -> AdapterVoltageInfo | None:
     """Get the voltage for the target device.
 
     Returns:
@@ -98,18 +98,16 @@ class AdapterBase:
     if not result["success"]:
       return None
 
-    voltage_info_dict : dict[int, AdapterVoltageInfo] = {}
-    for voltage_info in result["result"]["voltages"]:
-      rail_index = voltage_info.get("rail_index", None)
-      if rail_index is None:
-        continue
-      voltage_info_dict[rail_index] = AdapterVoltageInfo(
-        configured_voltage_v=voltage_info.get("configured_voltage_v", None),
-        measured_voltage_v=voltage_info.get("measured_voltage_v", None),
-        rail_powered=voltage_info.get("rail_powered", None),
-      )
+    voltage_info : AdapterVoltageInfo = AdapterVoltageInfo(rails=[])
+    for rail_info in result["result"]["voltages"]:
+      voltage_info.rails.append(AdapterRailInfo(
+        rail_index=rail_info.get("rail_index", None),
+        configured_voltage_v=rail_info.get("configured_voltage_v", None),
+        measured_voltage_v=rail_info.get("measured_voltage_v", None),
+        rail_powered=rail_info.get("rail_powered", None),
+      ))
 
-    return voltage_info_dict
+    return voltage_info
 
   def setVoltage(self, voltage: float, calibrate: bool = True) -> bool:
     """Set the voltage for the target device.

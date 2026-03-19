@@ -41,10 +41,15 @@ class AdapterInfo:
   debug_part:          str                    | None = None
 
 @dataclass
-class AdapterVoltageInfo:
+class AdapterRailInfo:
+  rail_index: int | None = None
   configured_voltage_v: float | None = None
   measured_voltage_v: float | None = None
   rail_powered: bool | None = None
+
+@dataclass
+class AdapterVoltageInfo:
+  rails: list[AdapterRailInfo]
 
 @dataclass
 class CtuneValue:
