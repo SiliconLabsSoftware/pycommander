@@ -19,11 +19,8 @@ class AdapterBase:
     if commander is None:
       raise ValueError("commander must be provided")
 
-    if target is None:
-      raise ValueError("target must be provided")
-
     self._commander : CommanderBase = commander
-    self.target : Target = target
+    self.target : Target | None = target
 
   def info(self) -> AdapterInfo | None:
     """Get information about the adapter.

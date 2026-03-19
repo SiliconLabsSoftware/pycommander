@@ -43,8 +43,8 @@ class TestAdapter(unittest.TestCase):
 
     commander = Commander(serial_number="123456789", executable_path=Path(command))
 
-    with self.assertRaisesRegex(ValueError, "target_device must be provided"):
-      Adapter(commander=commander)
+    adapter = Adapter(commander=commander)
+    self.assertIsNone(adapter.target)
 
   def test_adapter_yes_commander_and_target_device(self):
     command = shutil.which("echo")
