@@ -290,11 +290,16 @@ class TestAdapterBase(unittest.TestCase):
 """
       )
     )
-    self.assertEqual(adapter.getVoltage(), {0: AdapterVoltageInfo(
-      configured_voltage_v=3.299999952316284,
-      measured_voltage_v=3.308469772338867,
-      rail_powered=True,
-    )})
+    self.assertEqual(adapter.getVoltage(), AdapterVoltageInfo(
+      rails=[
+        AdapterRailInfo(
+          rail_index=0,
+          configured_voltage_v=3.299999952316284,
+          measured_voltage_v=3.308469772338867,
+          rail_powered=True,
+        ),
+      ],
+    ))
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "voltage", "--serialno", "123456789", "--json"]])
 
   def test_adapter_base_getVoltage_multiple_rails(self):
@@ -327,20 +332,24 @@ class TestAdapterBase(unittest.TestCase):
       )
     )
 
-    expected_voltage_info_dict : dict[int, AdapterVoltageInfo] = {
-      0: AdapterVoltageInfo(
-        configured_voltage_v=3.299999952316284,
-        measured_voltage_v=3.308469772338867,
-        rail_powered=True,
-      ),
-      1: AdapterVoltageInfo(
-        configured_voltage_v=1.8,
-        measured_voltage_v=1.8,
-        rail_powered=False,
-      ),
-    }
+    expected_voltage_info : AdapterVoltageInfo = AdapterVoltageInfo(
+      rails=[
+        AdapterRailInfo(
+          rail_index=0,
+          configured_voltage_v=3.299999952316284,
+          measured_voltage_v=3.308469772338867,
+          rail_powered=True,
+        ),
+        AdapterRailInfo(
+          rail_index=1,
+          configured_voltage_v=1.8,
+          measured_voltage_v=1.8,
+          rail_powered=False,
+        ),
+      ],
+    )
 
-    self.assertEqual(adapter.getVoltage(), expected_voltage_info_dict)
+    self.assertEqual(adapter.getVoltage(), expected_voltage_info)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "voltage", "--serialno", "123456789", "--json"]])
 
   def test_adapter_base_getVoltage_missing_one_rail_index(self):
@@ -372,15 +381,24 @@ class TestAdapterBase(unittest.TestCase):
       )
     )
 
-    expected_voltage_info_dict : dict[int, AdapterVoltageInfo] = {
-      0: AdapterVoltageInfo(
-        configured_voltage_v=3.299999952316284,
-        measured_voltage_v=3.308469772338867,
-        rail_powered=True,
-      ),
-    }
+    expected_voltage_info : AdapterVoltageInfo = AdapterVoltageInfo(
+      rails=[
+        AdapterRailInfo(
+          rail_index=0,
+          configured_voltage_v=3.299999952316284,
+          measured_voltage_v=3.308469772338867,
+          rail_powered=True,
+        ),
+        AdapterRailInfo(
+          rail_index=None,
+          configured_voltage_v=1.8,
+          measured_voltage_v=1.8,
+          rail_powered=False,
+        ),
+      ],
+    )
 
-    self.assertEqual(adapter.getVoltage(), expected_voltage_info_dict)
+    self.assertEqual(adapter.getVoltage(), expected_voltage_info)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "voltage", "--serialno", "123456789", "--json"]])
 
   def test_adapter_base_getVoltage_failed(self):
