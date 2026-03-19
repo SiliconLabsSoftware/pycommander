@@ -1,5 +1,26 @@
 #!/usr/bin/env python3
 
+"""
+This is a convenience script to update the Commander archives that are embedded in the pycommander packages.
+For the specified version of Commander, it pulls all available archives from the Artifactory repository and
+places them in the ../archives directory. The release process will then later use these archives to create
+the wheels that are uploaded to PyPI.
+
+Usage:
+  ./update_commander_archives.py [-v, --version <version>]
+
+Options:
+  -v, --version <version>   The version of Commander to update to (e.g. 1.2.3). If not specified, the script 
+                            will traverse the Artifactory API and find the latest version (in terms of 
+                            the version number, not the time of upload).
+
+Example:
+  ./update_commander_archives.py
+  ./update_commander_archives.py --version 1.0.0
+
+"""
+
+
 import argparse
 import re
 import requests
