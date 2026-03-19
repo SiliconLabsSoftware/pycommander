@@ -81,6 +81,10 @@ def get_artifact_urls_from_artifactory(version_string: str) -> list[str]:
   return artifact_urls
 
 
+def get_longest_string_length(strings: list[str]) -> int:
+  return max(len(s) for s in strings)
+
+
 def main(version: str) -> int:
   version_string : str = ""
 
@@ -103,9 +107,10 @@ def main(version: str) -> int:
     file.unlink()
 
   print("Downloading fresh ones. This may take a little while...")
+  longest_filename_length = get_longest_string_length([url.split("/")[-1] for url in artifact_urls]) + 3
   for artifact_url in artifact_urls:
     filename = artifact_url.split("/")[-1]
-    print(f"  {filename:<50}...", end="")
+    print(f"  {filename:.<{longest_filename_length}}", end="")
     with requests.get(artifact_url, stream=True) as response:
       if response.status_code != 200:
         raise Exception(f"Failed to download {filename}: {response.status_code}")
@@ -118,8 +123,8 @@ def main(version: str) -> int:
           f.write(chunk)
           downloaded += len(chunk)
           progress = int(downloaded / total_size * 100)
-          print(f"\r  {filename:<50}... {progress:>3}%", end="", flush=True)
-    print(f"\r  {filename:<50}... 100%")
+          print(f"\r  {filename:.<{longest_filename_length}} {progress:>3}%", end="", flush=True)
+    print(f"\r  {filename:.<{longest_filename_length}} 100%")
 
   print(f"Archives updated to version {version_string}")
 
