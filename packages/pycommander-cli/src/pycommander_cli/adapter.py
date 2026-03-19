@@ -41,9 +41,9 @@ class Adapter(AdapterBase):
         debug_drpre=debug_drpre,
       )
 
-    if not target_device:
-      raise ValueError("target_device must be provided")
-
-    target = Target(part_number=target_device, commander=commander)
+    if target_device:
+      target = Target(part_number=target_device, commander=commander)
+    else:
+      target = None
 
     super().__init__(commander=commander, target=target)
