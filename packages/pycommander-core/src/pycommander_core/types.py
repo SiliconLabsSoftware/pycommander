@@ -123,3 +123,9 @@ class SecurityStatus:
   tamper_ok: bool
   trustzone_config: TrustzoneConfig | None = None
   trustzone_state: TrustzoneState | None = None
+
+@dataclass
+class SeFirmwareInfo:
+  current_version:   str  | None = None
+  latest_version:    str  | None = None
+  upgrade_available: bool | None = None

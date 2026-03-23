@@ -3194,10 +3194,9 @@ class TestTarget(unittest.TestCase):
 
     result = device.checkSeFirmwareUpgrade()
     self.assertIsNotNone(result)
-    upgrade_available, current_version, new_version = result
-    self.assertTrue(upgrade_available)
-    self.assertEqual(current_version, "2.2.6")
-    self.assertEqual(new_version, "2.3.0")
+    self.assertTrue(result.upgrade_available)
+    self.assertEqual(result.current_version, "2.2.6")
+    self.assertEqual(result.latest_version, "2.3.0")
     self.assertEqual(commander._runner.logged_commands, [
       ["mock", "security", "fwupgradecheck", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]
     ])
@@ -3221,10 +3220,9 @@ class TestTarget(unittest.TestCase):
 
     result = device.checkSeFirmwareUpgrade()
     self.assertIsNotNone(result)
-    upgrade_available, current_version, new_version = result
-    self.assertFalse(upgrade_available)
-    self.assertEqual(current_version, "2.3.0")
-    self.assertEqual(new_version, "2.3.0")
+    self.assertFalse(result.upgrade_available)
+    self.assertEqual(result.current_version, "2.3.0")
+    self.assertEqual(result.latest_version, "2.3.0")
 
   def test_target_checkSeFirmwareUpgrade_noreset(self):
     commander = MockCommander(serial_number="123456789")
@@ -3268,7 +3266,6 @@ class TestTarget(unittest.TestCase):
 
     result = device.checkSeFirmwareUpgrade()
     self.assertIsNotNone(result)
-    upgrade_available, current_version, new_version = result
-    self.assertIsNone(upgrade_available)
-    self.assertIsNone(current_version)
-    self.assertIsNone(new_version)
+    self.assertIsNone(result.upgrade_available)
+    self.assertIsNone(result.current_version)
+    self.assertIsNone(result.latest_version)
