@@ -980,7 +980,7 @@ class Target:
     )
     return result["success"]
 
-  def checkSeFirmwareUpgrade(self, allow_reset: bool = True) -> tuple[bool, str | None, str | None] | None:
+  def checkSeFirmwareUpgrade(self, allow_reset: bool = True) -> SeFirmwareInfo | None:
     """Check if a new Secure Engine firmware is available. This command is only available on Series 3 devices.
 
     Args:
@@ -997,4 +997,10 @@ class Target:
     current_version   = result["result"].get("current_fw_version", None)
     new_version       = result["result"].get("new_fw_version", None)
 
-    return upgrade_available, current_version, new_version
+    se_firmware_info = SeFirmwareInfo(
+      upgrade_available=upgrade_available,
+      current_version=current_version,
+      latest_version=new_version
+    )
+
+    return se_firmware_info
