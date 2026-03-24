@@ -11,6 +11,13 @@ class TestEbl(unittest.TestCase):
     expected = ["mock", "ebl", "aat-usageinfo", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_ebl_aat_usageinfo_command_with_device(self):
+    commander = MockCommander()
+    commander.ebl.aat_usageinfo(device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "ebl", "aat-usageinfo", "--device", "EFR32MG24", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_ebl_create_command(self):
     commander = MockCommander()
     commander.ebl.create("out.ebl", app="app.s37", sign_keyfile="key.pem")

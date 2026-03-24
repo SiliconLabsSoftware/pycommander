@@ -16,6 +16,18 @@ class TestExtflash(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_extflash_erase_command_with_device(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.extflash.erase(ranges=[(0x0, 0x10000)], device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "extflash", "erase",
+      "--serialno", "123456789", "--device", "EFR32MG24",
+      "--range", "0x00000000:0x00010000",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_extflash_read_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.extflash.read(outfile="out.bin", ranges=[(0x0, 0x8000)], board_id="brd1")

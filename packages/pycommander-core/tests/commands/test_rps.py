@@ -72,6 +72,13 @@ class TestRps(unittest.TestCase):
     expected = ["mock", "rps", "load", "file.rps", "--serialno", "123456789", "--eraseapp", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_rps_load_command_with_device(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.rps.load("file.rps", device="SiWx917")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "rps", "load", "file.rps", "--device", "SiWx917", "--serialno", "123456789", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_rps_sign_command(self):
     commander = MockCommander()
     commander.rps.sign("in.rps", "sig.der", outfile="signed.rps")

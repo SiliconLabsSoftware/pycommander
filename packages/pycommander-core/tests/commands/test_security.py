@@ -15,6 +15,17 @@ class TestSecurity(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_security_attestation_command_with_device(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.security.attestation(device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "security", "attestation",
+      "--serialno", "123456789", "--device", "EFR32MG24",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_security_closeregion_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.security.closeregion(1, reset=False, codeversion=2)

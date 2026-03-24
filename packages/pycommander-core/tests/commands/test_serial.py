@@ -29,6 +29,17 @@ class TestSerial(unittest.TestCase):
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_serial_load_command_with_device(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.serial.load("image.s37", device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "serial", "load", "image.s37",
+      "--serialno", "123456789", "--device", "EFR32MG24",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_serial_lock_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.serial.lock(token_file="t.dat", key_file="k.dat", userdata="ud", serialport="COM1")

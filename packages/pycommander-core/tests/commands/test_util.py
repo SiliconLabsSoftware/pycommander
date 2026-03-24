@@ -11,6 +11,13 @@ class TestUtil(unittest.TestCase):
     expected = ["mock", "util", "appinfo", "app.s37", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_util_appinfo_command_with_device(self):
+    commander = MockCommander()
+    commander.util.appinfo("app.s37", device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "util", "appinfo", "app.s37", "--device", "EFR32MG24", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_util_elfinfo_command(self):
     commander = MockCommander()
     commander.util.elfinfo("app.elf")

@@ -18,10 +18,12 @@ class TestConvert(unittest.TestCase):
       crc=True,
       include_sections=[".text"],
       exclude_sections=[".debug"],
+      device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "convert", "a.bin", "b.hex",
+      "--device", "EFR32MG24",
       "--outfile", "out.s37",
       "--address", "0x08000000",
       "--range", "0x00000000:0x00001000",
