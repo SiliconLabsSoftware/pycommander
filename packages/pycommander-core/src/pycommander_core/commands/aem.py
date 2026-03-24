@@ -90,3 +90,39 @@ class AemCommand(BaseCommand):
     if calibrate:
       args += ["--calibrate"]
     return self._run("aem", "measure", *args).output
+
+  def analyze(self,
+              file: str | None = None,
+              windowlength_ms: int | None = None,
+              get_distribution: bool = False,
+              cluster: bool = False,
+              cluster_filename: str | None = None,
+              find_period: bool = False,
+              **kwargs: Any) -> dict:
+    """Analyze AEM data, either direct measurement or from a file.
+    
+    Args:
+      file (str): File to analyze. If not provided, a measurement is performed and analyzed.
+      windowlength_ms (int): Duration in ms to measure (default 10000).
+      get_distribution (bool): Get the distribution of measurements.
+      cluster (bool): Enable block clustering using Bayesian blocks.
+      cluster_filename (str): File to save cluster analysis results to.
+      find_period (bool): Find the period (if any) of the measurements. Requires at least 5 periods to be measured.
+
+    Returns:
+      Command output as parsed JSON (dict).
+    """
+    args = self._get_general_args(**kwargs)
+    if file:
+      args += ["--file", file]
+    if windowlength_ms is not None:
+      args += ["--windowlength", str(windowlength_ms)]
+    if get_distribution:
+      args += ["--showdistribution"]
+    if cluster:
+      args += ["--cluster"]
+    if cluster_filename:
+      args += ["--clusterfile", cluster_filename]
+    if find_period:
+      args += ["--findperiod"]
+    return self._run("aem", "analyze", *args).output
