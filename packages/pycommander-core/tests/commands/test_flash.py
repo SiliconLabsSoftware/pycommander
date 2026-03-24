@@ -30,11 +30,12 @@ class TestFlash(unittest.TestCase):
       include_sections=[".text"],
       exclude_sections=[".debug"],
       vtor=0x08000000,
+      device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "flash", "app.s37", "bootloader.s37",
-      "--serialno", "123456789",
+      "--serialno", "123456789", "--device", "EFR32MG24",
       "--address", "0x08000000", "--halt", "--masserase", "--noreset", "--noclose", "--noverify",
       "--patch", "0x00000100:0x000000AB:1",
       "--token", "TOKEN_X:1", "--tokenfile", "tokens.json", "--tokengroup", "zigbee",

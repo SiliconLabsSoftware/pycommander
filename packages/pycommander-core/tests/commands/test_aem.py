@@ -11,6 +11,13 @@ class TestAem(unittest.TestCase):
     expected = ["mock", "aem", "calibrate", "--serialno", "123456789", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_aem_calibrate_command_with_options(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.aem.calibrate(device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "aem", "calibrate", "--serialno", "123456789", "--device", "EFR32MG24", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_aem_dump_command(self):
     commander = MockCommander(serial_number="123456789")
     commander.aem.dump("out.csv", 10.0)
@@ -29,11 +36,13 @@ class TestAem(unittest.TestCase):
       pretrigger_ms=100,
       header=False,
       calibrate=True,
+      device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "aem", "dump",
       "--serialno", "123456789",
+      "--device", "EFR32MG24",
       "--outfile", "out.csv", "--duration", "5.0",
       "--datarate", "100", "--triggerabove", "50.0", "--triggerbelow", "10.0",
       "--triggertimeout", "2.0", "--pretrigger", "100",
@@ -51,9 +60,9 @@ class TestAem(unittest.TestCase):
 
   def test_aem_measure_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    commander.aem.measure(windowlength_ms=200, calibrate=True)
+    commander.aem.measure(windowlength_ms=200, calibrate=True, device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
-    expected = ["mock", "aem", "measure", "--serialno", "123456789", "--windowlength", "200", "--calibrate", "--json"]
+    expected = ["mock", "aem", "measure", "--serialno", "123456789", "--device", "EFR32MG24", "--windowlength", "200", "--calibrate", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
   def test_aem_analyze_command(self):

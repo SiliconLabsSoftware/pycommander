@@ -92,3 +92,18 @@ class TestTokens(unittest.TestCase):
       "--json",
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_tokens_write_command_with_device(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.tokens.write(
+      tokenfiles=["tokens.json"],
+      device="EFR32MG24",
+    )
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = [
+      "mock", "tokens", "write",
+      "--serialno", "123456789", "--device", "EFR32MG24",
+      "--tokenfile", "tokens.json",
+      "--json",
+    ]
+    self.assertEqual(commander._runner.logged_commands[0], expected)

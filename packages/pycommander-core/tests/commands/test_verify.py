@@ -17,11 +17,12 @@ class TestVerify(unittest.TestCase):
       reset=False,
       regions=["@main"],
       binary=True,
+      device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "verify", "app.s37", "boot.s37",
-      "--serialno", "123456789",
+      "--serialno", "123456789", "--device", "EFR32MG24",
       "--address", "0x08000000",
       "--patch", "0x00000100:0x000000AB:1",
       "--token", "TOKEN_A:1", "--tokenfile", "tokens.json", "--tokengroup", "zigbee",

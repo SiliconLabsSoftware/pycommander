@@ -38,6 +38,13 @@ class TestGbl4(unittest.TestCase):
     expected = ["mock", "gbl4", "createconfig", "--outfile", "config.yaml", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_gbl4_createconfig_command_with_device(self):
+    commander = MockCommander()
+    commander.gbl4.createconfig("config.yaml", device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "gbl4", "createconfig", "--device", "EFR32MG24", "--outfile", "config.yaml", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_gbl4_info_command(self):
     commander = MockCommander()
     commander.gbl4.info("file.gbl4")

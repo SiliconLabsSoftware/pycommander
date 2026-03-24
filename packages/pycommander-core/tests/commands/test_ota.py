@@ -76,3 +76,10 @@ class TestOta(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "ota", "verify", "file.ota", "--certificate", "cert.pem", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_ota_verify_command_with_device(self):
+    commander = MockCommander()
+    commander.ota.verify("file.ota", "cert.pem", device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "ota", "verify", "file.ota", "--device", "EFR32MG24", "--certificate", "cert.pem", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)

@@ -11,6 +11,13 @@ class TestCtune(unittest.TestCase):
     expected = ["mock", "ctune", "autoset", "--serialno", "123456789", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
 
+  def test_ctune_autoset_command_with_device(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.ctune.autoset(device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "ctune", "autoset", "--serialno", "123456789", "--device", "EFR32MG24", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
   def test_ctune_get_command(self):
     commander = MockCommander(serial_number="123456789", debug_speed=2000000)
     commander.ctune.get()
