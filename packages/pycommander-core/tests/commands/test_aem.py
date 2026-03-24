@@ -55,3 +55,17 @@ class TestAem(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "measure", "--serialno", "123456789", "--windowlength", "200", "--calibrate", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_aem_analyze_command(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.aem.analyze()
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "aem", "analyze", "--serialno", "123456789", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
+
+  def test_aem_analyze_command_with_options(self):
+    commander = MockCommander(serial_number="123456789")
+    commander.aem.analyze(file="data.csv", windowlength_ms=200, get_distribution=True, cluster=True, cluster_filename="clusters.csv", find_period=True, device="EFR32MG24")
+    self.assertEqual(len(commander._runner.logged_commands), 1)
+    expected = ["mock", "aem", "analyze", "--serialno", "123456789", "--device", "EFR32MG24", "--file", "data.csv", "--windowlength", "200", "--showdistribution", "--cluster", "--clusterfile", "clusters.csv", "--findperiod", "--json"]
+    self.assertEqual(commander._runner.logged_commands[0], expected)
