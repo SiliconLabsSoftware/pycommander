@@ -10,6 +10,12 @@ class CommanderVersionInfo:
   mbed_tls_version: str
   qt_version: str
 
+@dataclass
+class AemMeasurement:
+  timestamp_us: int
+  current_ma: float
+  voltage_v: float
+  power_mw: float
 
 @dataclass
 class AdapterBoardInfo:

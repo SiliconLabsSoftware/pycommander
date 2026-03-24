@@ -14,6 +14,7 @@ sections of the MSLA applicable to Source Code.
 from .commander import Commander
 from .adapter import Adapter
 from .target import Target
+from .aemstream import AemStream
 
 from pycommander_core.commander_base import CommanderResult
 from pycommander_core._version import __version__
@@ -22,6 +23,7 @@ __all__ = [
   "Commander",
   "Adapter",
   "Target",
+  "AemStream",
   "CommanderResult",
   "__version__",
 ]
