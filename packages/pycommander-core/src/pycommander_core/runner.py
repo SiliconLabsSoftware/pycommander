@@ -1,6 +1,7 @@
 import sys
 import subprocess
 import datetime
+import signal
 
 from collections import namedtuple
 from pathlib import Path
@@ -15,12 +16,12 @@ class Runner:
     self._subprocess_kwargs = {
       "stdout": subprocess.PIPE,
       "stderr": subprocess.STDOUT,
-      "timeout": timeout_s,
       "text": True,
     }
 
     self._executable       : str = str(executable)
     self._log_file_path    : Path | None = log_file_path
+    self._timeout_s        : int = timeout_s
 
     if sys.platform == "win32":
       self._subprocess_kwargs["creationflags"] = self._subprocess_kwargs.get("creationflags", 0) | subprocess.CREATE_NO_WINDOW
@@ -40,6 +41,7 @@ class Runner:
     # Run the command (synchronous)
     run_kwargs = {
       "check": True,
+      "timeout": self._timeout_s,
       **self._subprocess_kwargs,
     }
 
@@ -68,6 +70,75 @@ class Runner:
         raise PyCommanderRuntimeError(e.output)
       else:
         raise PyCommanderError(e.output)
+
+  def open(self, *args: str) -> bool:
+    # Open the command (asynchronous)
+    popen_kwargs = {
+      **self._subprocess_kwargs,
+    }
+
+    if sys.platform == "win32":
+      popen_kwargs["creationflags"] = popen_kwargs.get("creationflags", 0) | subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+      popen_kwargs["start_new_session"] = True
+
+    self._write_log_file(f"{self._executable} {' '.join(args)}")
+
+    return subprocess.Popen([str(self._executable), *args], **popen_kwargs)
+
+  def isAlive(self, process: subprocess.Popen) -> bool:
+    return process is not None and process.poll() is None
+
+  def sendCtrlC(self, process: subprocess.Popen) -> None:
+    if not self.isAlive(process):
+      return
+
+    if sys.platform == "win32":
+      process.send_signal(signal.CTRL_BREAK_EVENT)
+    else:
+      process.send_signal(signal.SIGINT)
+
+  def terminate(self, process: subprocess.Popen) -> None:
+    if not self.isAlive(process):
+      return
+
+    process.terminate()
+
+  def kill(self, process: subprocess.Popen) -> None:
+    if not self.isAlive(process):
+      return
+
+    process.kill()
+
+  def wait(self, process: subprocess.Popen, timeout_s: int | None = None) -> int:
+    if not self.isAlive(process):
+      return process.returncode
+
+    return process.wait(timeout=timeout_s)
+
+  def close(self, process: subprocess.Popen) -> None:
+    if not self.isAlive(process):
+      return
+
+    # Try exiting gracefully first
+    self.sendCtrlC(process)
+    try:
+      returncode = self.wait(process, timeout_s=1)
+      return
+    except subprocess.TimeoutExpired:
+      pass
+
+    # No joy, terminate
+    self.terminate(process)
+    try:
+      returncode = self.wait(process, timeout_s=1)
+      return
+    except subprocess.TimeoutExpired:
+      pass
+
+    # No mercy, kill
+    self.kill(process)
+    self.wait(process)
 
   def _write_log_file(self, entry: str) -> None:
     if self._log_file_path is None:

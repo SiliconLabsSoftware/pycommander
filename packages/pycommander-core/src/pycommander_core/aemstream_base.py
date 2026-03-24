@@ -1,0 +1,94 @@
+import subprocess
+
+from .commander_base import CommanderBase
+from .runner import Runner
+from .types import AemMeasurement
+
+class AemStreamBase:
+  def __init__(self,
+               commander: CommanderBase,
+               datarate_hz: int | None = None,
+               duration_s: float | None = None,
+               triggerabove_ma: float | None = None,
+               triggerbelow_ma: float | None = None,
+               triggertimeout_s: float | None = None,
+               pretrigger_ms: int | None = None,
+               calibrate: bool = False):
+    
+    self._commander : CommanderBase = commander
+    self._runner : Runner = self._commander._runner
+    self._process : subprocess.Popen | None = None
+
+    self._args : list[str] = [
+      "aem", "dump"
+    ]
+
+    if self._commander._serial_number:
+      self._args += ["--serialno", self._commander._serial_number]
+    if self._commander._ip_address:
+      self._args += ["--ip", self._commander._ip_address]
+    if self._commander._serial_port:
+      self._args += ["--identifybyserialport", self._commander._serial_port]
+
+    if datarate_hz:
+      self._args += ["--datarate", str(datarate_hz)]
+    if duration_s:
+      self._args += ["--duration", str(duration_s)]
+    if triggerabove_ma is not None:
+      self._args += ["--triggerabove", str(triggerabove_ma)]
+    if triggerbelow_ma is not None:
+      self._args += ["--triggerbelow", str(triggerbelow_ma)]
+    if triggertimeout_s:
+      self._args += ["--triggertimeout", str(triggertimeout_s)]
+    if pretrigger_ms:
+      self._args += ["--pretrigger", str(pretrigger_ms)]
+    if calibrate:
+      self._args += ["--calibrate"]
+
+  def open(self) -> None:
+    if not self._process:
+      self._process : subprocess.Popen = self._runner.open(*self._args)
+    else:
+      raise RuntimeError("AemStream already open")
+
+  def close(self) -> None:
+    if self._process:
+      self._runner.close(self._process)
+      self._process = None
+
+  def _parse_line(self, line: str) -> AemMeasurement:
+    parts = line.split(",")
+    timestamp_us = int(parts[0])
+    current_ma = float(parts[1])
+    voltage_v = float(parts[2])
+    power_mw = current_ma * voltage_v
+    return AemMeasurement(timestamp_us=timestamp_us, current_ma=current_ma, voltage_v=voltage_v, power_mw=power_mw)
+
+  def __iter__(self):
+    return self
+
+  def __next__(self) -> AemMeasurement:
+    if not self._process:
+      raise RuntimeError("AemStream not open")
+
+    while True:
+      line = self._process.stdout.readline()
+      if not line:
+        if self._runner.isAlive(self._process):
+          # Wait for more data
+          continue
+        else:
+          # We're done
+          raise StopIteration
+      try:
+        return self._parse_line(line)
+      except:
+        # No bother
+        continue
+
+  def __enter__(self):
+    self.open()
+    return self
+
+  def __exit__(self, exc_type, exc_value, traceback):
+    self.close()
