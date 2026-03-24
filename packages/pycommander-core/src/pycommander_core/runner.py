@@ -12,14 +12,18 @@ RunnerResult = namedtuple("RunnerResult", ["returncode", "output"])
 class Runner:
   def __init__(self, executable: Path, log_file_path: Path | None = None, timeout_s: int = 300):
 
+    self._subprocess_kwargs = {
+      "stdout": subprocess.PIPE,
+      "stderr": subprocess.STDOUT,
+      "timeout": timeout_s,
+      "text": True,
+    }
+
     self._executable       : str = str(executable)
     self._log_file_path    : Path | None = log_file_path
-    self._timeout_s        : int  = timeout_s
-
-    self._subprocess_flags : int = 0
 
     if sys.platform == "win32":
-      self._subprocess_flags |= subprocess.CREATE_NO_WINDOW
+      self._subprocess_kwargs["creationflags"] = self._subprocess_kwargs.get("creationflags", 0) | subprocess.CREATE_NO_WINDOW
 
       # Don't display the Windows GPF dialog if commander crashes
       import ctypes
@@ -33,21 +37,19 @@ class Runner:
       raise ValueError(f"Commander executable is not a file: {self._executable}")
 
   def run(self, *args: str, json_format: bool = True) -> RunnerResult:
+    # Run the command (synchronous)
+    run_kwargs = {
+      "check": True,
+      **self._subprocess_kwargs,
+    }
+
     if json_format:
       args += ("--json",)
 
     try:
       self._write_log_file(f"{self._executable} {' '.join(args)}")
 
-      result = subprocess.run(
-        [str(self._executable), *args],
-        stdout = subprocess.PIPE,
-        stderr = subprocess.STDOUT,
-        creationflags = self._subprocess_flags,
-        timeout = self._timeout_s,
-        check = True,
-        text = True,
-      )
+      result = subprocess.run([str(self._executable), *args], **run_kwargs)
 
       returncode = result.returncode
       output     = result.stdout
