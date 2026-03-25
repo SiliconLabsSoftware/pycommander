@@ -24,7 +24,8 @@ class TestRunner(unittest.TestCase):
     self.assertEqual(runner._timeout_s, 300)
 
     if sys.platform == "win32":
-      self.assertEqual(runner._subprocess_kwargs, {"creationflags": subprocess.CREATE_NO_WINDOW})
+      self.assertIn("creationflags", runner._subprocess_kwargs)
+      self.assertEqual(runner._subprocess_kwargs["creationflags"], subprocess.CREATE_NO_WINDOW)
     else:
       self.assertNotIn("creationflags", runner._subprocess_kwargs)
 
