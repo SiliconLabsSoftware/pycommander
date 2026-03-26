@@ -14,7 +14,7 @@ class AemStreamBase:
                triggertimeout_s: float | None = None,
                pretrigger_ms: int | None = None,
                calibrate: bool = False):
-    
+
     self._commander : CommanderBase = commander
     self._runner : Runner = self._commander._runner
     self._process : subprocess.Popen | None = None
@@ -59,7 +59,7 @@ class AemStreamBase:
       self._runner.close(self._process)
       self._process = None
 
-  def _parse_line(self, line: str) -> AemMeasurement:
+  def __parse_line(self, line: str) -> AemMeasurement:
     parts = line.split(",")
     timestamp_us = int(parts[0])
     current_ma = float(parts[1])
@@ -84,7 +84,7 @@ class AemStreamBase:
           # We're done
           raise StopIteration
       try:
-        return self._parse_line(line)
+        return self.__parse_line(line)
       except:
         # No bother
         continue

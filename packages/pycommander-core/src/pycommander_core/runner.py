@@ -13,7 +13,7 @@ RunnerResult = namedtuple("RunnerResult", ["returncode", "output"])
 class Runner:
   def __init__(self, executable: Path, log_file_path: Path | None = None, timeout_s: int = 300):
 
-    self._subprocess_kwargs = {
+    self._common_subprocess_kwargs = {
       "stdout": subprocess.PIPE,
       "stderr": subprocess.STDOUT,
       "text": True,
@@ -24,7 +24,7 @@ class Runner:
     self._timeout_s        : int = timeout_s
 
     if sys.platform == "win32":
-      self._subprocess_kwargs["creationflags"] = self._subprocess_kwargs.get("creationflags", 0) | subprocess.CREATE_NO_WINDOW
+      self._common_subprocess_kwargs["creationflags"] = self._common_subprocess_kwargs.get("creationflags", 0) | subprocess.CREATE_NO_WINDOW
 
       # Don't display the Windows GPF dialog if commander crashes
       import ctypes
@@ -51,7 +51,7 @@ class Runner:
     run_kwargs = {
       "check": True,
       "timeout": self._timeout_s,
-      **self._subprocess_kwargs,
+      **self._common_subprocess_kwargs,
     }
 
     if json_format:
@@ -91,7 +91,7 @@ class Runner:
       subprocess.Popen: The subprocess object
     """
     popen_kwargs = {
-      **self._subprocess_kwargs,
+      **self._common_subprocess_kwargs,
     }
 
     if sys.platform == "win32":
