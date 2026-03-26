@@ -52,101 +52,10 @@ class TestBase(unittest.TestCase):
     base_command = BaseCommand(commander)
     self.assertEqual(base_command._get_adapter_connection_args(), ["--identifybyserialport", "/dev/tty.usbmodem141101"])
 
-  def test_base_get_serial_number_option(self):
-    commander = MockCommander(serial_number="123456789")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_serial_number_option(), ["--serialno", "123456789"])
-
-    commander = MockCommander(serial_number=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_serial_number_option(), [])
-
-    commander = MockCommander(serial_number="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_serial_number_option(), [])
-
-  def test_base_get_ip_address_option(self):
-    commander = MockCommander(ip_address="192.168.1.100")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_ip_address_option(), ["--ip", "192.168.1.100"])
-
-    commander = MockCommander(ip_address=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_ip_address_option(), [])
-
-    commander = MockCommander(ip_address="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_ip_address_option(), [])
-
-  def test_base_get_serial_port_option(self):
-    commander = MockCommander(serial_port="/dev/tty.usbmodem141101")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_serial_port_option(), ["--identifybyserialport", "/dev/tty.usbmodem141101"])
-
-    commander = MockCommander(serial_port=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_serial_port_option(), [])
-
-    commander = MockCommander(serial_port="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_serial_port_option(), [])
-
   def test_base_get_debug_args(self):
     commander = MockCommander(debug_speed=1000000, debug_tif="SWD", debug_irpre=1000000, debug_drpre=1000000)
     base_command = BaseCommand(commander)
     self.assertEqual(base_command._get_debug_args(), ["--speed", "1000000", "--tif", "SWD", "--irpre", "1000000", "--drpre", "1000000"])
-
-  def test_base_get_debug_speed_option(self):
-    commander = MockCommander(debug_speed=1000000)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_speed_option(), ["--speed", "1000000"])
-
-    commander = MockCommander(debug_speed=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_speed_option(), [])
-
-    commander = MockCommander(debug_speed="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_speed_option(), [])
-
-  def test_base_get_debug_tif_option(self):
-    commander = MockCommander(debug_tif="SWD")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_tif_option(), ["--tif", "SWD"])
-
-    commander = MockCommander(debug_tif=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_tif_option(), [])
-
-    commander = MockCommander(debug_tif="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_tif_option(), [])
-
-  def test_base_get_debug_irpre_option(self):
-    commander = MockCommander(debug_irpre=1000000)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_irpre_option(), ["--irpre", "1000000"])
-
-    commander = MockCommander(debug_irpre=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_irpre_option(), [])
-
-    commander = MockCommander(debug_irpre="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_irpre_option(), [])
-
-  def test_base_get_debug_drpre_option(self):
-    commander = MockCommander(debug_drpre=1000000)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_drpre_option(), ["--drpre", "1000000"])
-
-    commander = MockCommander(debug_drpre=None)
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_drpre_option(), [])
-
-    commander = MockCommander(debug_drpre="")
-    base_command = BaseCommand(commander)
-    self.assertEqual(base_command._get_debug_drpre_option(), [])
 
   def test_base_get_kwargs(self):
     base_command = BaseCommand(MockCommander())

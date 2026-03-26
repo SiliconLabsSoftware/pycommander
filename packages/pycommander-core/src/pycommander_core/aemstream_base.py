@@ -23,12 +23,9 @@ class AemStreamBase:
       "aem", "dump"
     ]
 
-    if self._commander._serial_number:
-      self._args += ["--serialno", self._commander._serial_number]
-    if self._commander._ip_address:
-      self._args += ["--ip", self._commander._ip_address]
-    if self._commander._serial_port:
-      self._args += ["--identifybyserialport", self._commander._serial_port]
+    self._args += self._commander._get_serial_number_option()
+    self._args += self._commander._get_ip_address_option()
+    self._args += self._commander._get_serial_port_option()
 
     if datarate_hz:
       self._args += ["--datarate", str(datarate_hz)]
