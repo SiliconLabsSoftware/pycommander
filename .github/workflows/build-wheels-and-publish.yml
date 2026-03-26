@@ -107,7 +107,7 @@ jobs:
             cd "../.."
           done
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: dist-${{ matrix.platform }}
           path: packages/*/dist/*.whl
@@ -133,7 +133,7 @@ jobs:
           python -m pip install twine wheel
 
       - name: Download wheels
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: packages
           merge-multiple: true

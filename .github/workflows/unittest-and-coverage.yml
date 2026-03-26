@@ -89,7 +89,7 @@ jobs:
           ls -la
 
       - name: Upload raw coverage data
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-data-${{ matrix.platform }}
           path: .coverage*
@@ -103,7 +103,7 @@ jobs:
           coverage html
 
       - name: Upload local coverage report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: local-coverage-report-${{ matrix.platform }}
           path: htmlcov/
@@ -115,7 +115,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Download coverage data
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: coverage-data-*
           path: coverage-data/
@@ -147,7 +147,7 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload combined coverage report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-report-combined
           path: htmlcov/
