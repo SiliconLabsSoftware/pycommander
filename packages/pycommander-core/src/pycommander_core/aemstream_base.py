@@ -43,12 +43,18 @@ class AemStreamBase:
       self._args += ["--calibrate"]
 
   def open(self) -> None:
+    """
+    Open the AemStream. This will start the underlying AEM data capture process.
+    """
     if not self._process:
       self._process : subprocess.Popen = self._runner.open(*self._args)
     else:
-      raise RuntimeError("AemStream already open")
+      raise RuntimeError("AemStream was already opened. Call close() first, or, ideally, use the context manager syntax.")
 
   def close(self) -> None:
+    """
+    Close the AemStream. This will gracefully stop the underlying AEM data capture process.
+    """
     if self._process:
       self._runner.close(self._process)
       self._process = None
@@ -66,7 +72,7 @@ class AemStreamBase:
 
   def __next__(self) -> AemMeasurement:
     if not self._process:
-      raise RuntimeError("AemStream not open")
+      raise RuntimeError("AemStream not open. Call open() first, or, ideally, use the context manager syntax.")
 
     while True:
       line = self._process.stdout.readline()
