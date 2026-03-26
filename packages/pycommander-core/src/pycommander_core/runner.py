@@ -38,7 +38,16 @@ class Runner:
       raise ValueError(f"Commander executable is not a file: {self._executable}")
 
   def run(self, *args: str, json_format: bool = True) -> RunnerResult:
-    # Run the command (synchronous)
+    """
+    Run the command synchronously.
+
+    Args:
+      args: Arguments to pass to the command
+      json_format: Whether to return the output as JSON
+
+    Returns:
+      RunnerResult: The result of the command
+    """
     run_kwargs = {
       "check": True,
       "timeout": self._timeout_s,
@@ -71,8 +80,16 @@ class Runner:
       else:
         raise PyCommanderError(e.output)
 
-  def open(self, *args: str) -> bool:
-    # Open the command (asynchronous)
+  def open(self, *args: str) -> subprocess.Popen:
+    """
+    Open the command asynchronously.
+
+    Args:
+      args: Arguments to pass to the command
+
+    Returns:
+      subprocess.Popen: The subprocess object
+    """
     popen_kwargs = {
       **self._subprocess_kwargs,
     }
