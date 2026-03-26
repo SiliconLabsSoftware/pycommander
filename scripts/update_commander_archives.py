@@ -22,8 +22,11 @@ Example:
 
 
 import argparse
+import platform
 import re
 import requests
+import sys
+import shutil
 
 from pathlib import Path
 
@@ -35,6 +38,8 @@ ARTIFACTORY_URL = f"{ARTIFACTORY_URL_BASE}/{ARTIFACTORY_REPO_KEY}/{COMMANDER_PAT
 ARTIFACTORY_API = f"{ARTIFACTORY_API_BASE}/{ARTIFACTORY_REPO_KEY}/{COMMANDER_PATH}"
 
 ARCHIVES_DIR = Path(__file__).resolve().parent.parent / "archives"
+LOCAL_CLI_ARCHIVE_DIR = Path(__file__).resolve().parent.parent / "packages" / "pycommander-cli" / "src" / "pycommander_cli" / "_archive"
+LOCAL_GUI_ARCHIVE_DIR = Path(__file__).resolve().parent.parent / "packages" / "pycommander-gui" / "src" / "pycommander_gui" / "_archive"
 
 VERSION_STRING_REGEX = r"^(\d+)v(\d+)p(\d+)$"
 VERSION_NUMBER_REGEX = r"^(\d+)\.(\d+)\.(\d+)$"
@@ -106,7 +111,7 @@ def get_longest_string_length(strings: list[str]) -> int:
   return max(len(s) for s in strings)
 
 
-def main(version: str) -> int:
+def main(version: str, update_local_archives: bool) -> int:
   version_string : str = ""
 
   if version:
@@ -149,11 +154,51 @@ def main(version: str) -> int:
 
   print(f"Archives updated to version {version_string}")
 
+  if update_local_archives:
+    print("Nuking local archives...")
+    for file in LOCAL_CLI_ARCHIVE_DIR.glob("Commander-cli*"):
+      file.unlink()
+    for file in LOCAL_GUI_ARCHIVE_DIR.glob("Commander*"):
+      file.unlink()
+
+    print("Finding relevant local archives...")
+    cli_archive_path: Path | None = None
+    gui_archive_path: Path | None = None
+    if sys.platform == "darwin":
+      cli_archive_path = ARCHIVES_DIR.glob("Commander-cli_osx_*.zip").__next__()
+      gui_archive_path = ARCHIVES_DIR.glob("Commander_osx_*.zip").__next__()
+    elif sys.platform == "win32":
+      cli_archive_path = ARCHIVES_DIR.glob("Commander-cli_win32_*.zip").__next__()
+      gui_archive_path = ARCHIVES_DIR.glob("Commander_win32_*.zip").__next__()
+    elif sys.platform == "linux":
+      arch = platform.machine()
+      if arch == "x86_64":
+        cli_archive_path = ARCHIVES_DIR.glob("Commander-cli_linux_x86_64_*.tar.bz").__next__()
+        gui_archive_path = ARCHIVES_DIR.glob("Commander_linux_x86_64_*.tar.bz").__next__()
+      elif arch == "aarch64":
+        cli_archive_path = ARCHIVES_DIR.glob("Commander-cli_linux_aarch64_*.tar.bz").__next__()
+        gui_archive_path = ARCHIVES_DIR.glob("Commander_linux_aarch64_*.tar.bz").__next__()
+      elif arch.startswith("armv7"):
+        cli_archive_path = ARCHIVES_DIR.glob("Commander-cli_linux_aarch32_*.tar.bz").__next__()
+        gui_archive_path = ARCHIVES_DIR.glob("Commander_linux_aarch32_*.tar.bz").__next__()
+      else:
+        raise ValueError(f"Unsupported architecture: {arch}. Only x86_64, aarch64, and armv7 are supported.")
+    
+    if cli_archive_path is None:
+      raise ValueError(f"No CLI archive found for platform {sys.platform}")
+    if gui_archive_path is None:
+      raise ValueError(f"No GUI archive found for platform {sys.platform}")
+
+    print("Copying archives to local directories...")
+    shutil.copy(cli_archive_path, LOCAL_CLI_ARCHIVE_DIR)
+    shutil.copy(gui_archive_path, LOCAL_GUI_ARCHIVE_DIR)
+
   return 0
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--version", type=str, required=False, default="")
+    parser.add_argument("-l", "--update-local-archives", action="store_true", required=False, default=False)
     args = parser.parse_args()
-    raise SystemExit(main(args.version))
+    raise SystemExit(main(args.version, args.update_local_archives))
