@@ -142,3 +142,108 @@ class TestRunner(unittest.TestCase):
       runner.run("3", json_format=False)
     with open(tf.name, "r") as f:
       self.assertIn("Command timed out:", f.read())
+
+  def test_runner_open(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+    self.addCleanup(process.kill)
+    self.addCleanup(process.wait)
+
+    self.assertIsInstance(process, subprocess.Popen)
+    self.assertIsNone(process.poll())
+
+  def test_runner_isAlive(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+    self.addCleanup(process.kill)
+    self.addCleanup(process.wait)
+
+    self.assertTrue(runner.isAlive(process))
+    self.assertFalse(runner.isAlive(None))
+
+    process.kill()
+    process.wait()
+    self.assertFalse(runner.isAlive(process))
+
+  def test_runner_wait(self):
+    command = shutil.which("bash")
+    if command is None:
+      self.fail("bash command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("-c", "exit 42")
+
+    returncode = runner.wait(process)
+    self.assertEqual(returncode, 42)
+
+  def test_runner_wait_timeout(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+    self.addCleanup(process.kill)
+    self.addCleanup(process.wait)
+
+    with self.assertRaises(subprocess.TimeoutExpired):
+      runner.wait(process, timeout_s=1)
+
+  def test_runner_terminate(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+
+    self.assertTrue(runner.isAlive(process))
+    runner.terminate(process)
+    process.wait()
+    self.assertFalse(runner.isAlive(process))
+
+  def test_runner_kill(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+
+    self.assertTrue(runner.isAlive(process))
+    runner.kill(process)
+    process.wait()
+    self.assertFalse(runner.isAlive(process))
+
+  def test_runner_sendCtrlC(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+
+    self.assertTrue(runner.isAlive(process))
+    runner.sendCtrlC(process)
+    process.wait()
+    self.assertFalse(runner.isAlive(process))
+
+  def test_runner_close(self):
+    command = shutil.which("sleep")
+    if command is None:
+      self.fail("sleep command not found")
+
+    runner = Runner(executable=command)
+    process = runner.open("10")
+
+    self.assertTrue(runner.isAlive(process))
+    runner.close(process)
+    self.assertFalse(runner.isAlive(process))

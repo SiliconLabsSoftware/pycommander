@@ -40,5 +40,11 @@ class MockRunner(Runner):
 
     return RunnerResult(0, output)
 
+  def open(self, *args: str) -> None:
+    self.logged_commands.append([str(self._executable), *args])
+
+  def close(self, process: int) -> None:
+    pass
+
   def queue_result(self, result: RunnerResult):
     self.queued_results.append(result)
