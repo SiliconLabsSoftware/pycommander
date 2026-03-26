@@ -24,10 +24,10 @@ class TestRunner(unittest.TestCase):
     self.assertEqual(runner._timeout_s, 300)
 
     if sys.platform == "win32":
-      self.assertIn("creationflags", runner._subprocess_kwargs)
-      self.assertEqual(runner._subprocess_kwargs["creationflags"], subprocess.CREATE_NO_WINDOW)
+      self.assertIn("creationflags", runner._common_subprocess_kwargs)
+      self.assertEqual(runner._common_subprocess_kwargs["creationflags"], subprocess.CREATE_NO_WINDOW)
     else:
-      self.assertNotIn("creationflags", runner._subprocess_kwargs)
+      self.assertNotIn("creationflags", runner._common_subprocess_kwargs)
 
   def test_runner_init_missing_executable(self):
     with self.assertRaisesRegex(FileNotFoundError, f"Commander executable not found: {Path('mock')}"):
