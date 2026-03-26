@@ -132,3 +132,38 @@ class CommanderBase:
       return json.loads(result.output)
     else:
       return CommanderResult(result.returncode, result.output)
+
+  def _get_serial_number_option(self) -> list[str]:
+    if self._serial_number:
+      return ["--serialno", self._serial_number]
+    return []
+
+  def _get_ip_address_option(self) -> list[str]:
+    if self._ip_address:
+      return ["--ip", self._ip_address]
+    return []
+
+  def _get_serial_port_option(self) -> list[str]:
+    if self._serial_port:
+      return ["--identifybyserialport", self._serial_port]
+    return []
+
+  def _get_debug_speed_option(self) -> list[str]:
+    if self._debug_speed:
+      return ["--speed", str(self._debug_speed)]
+    return []
+
+  def _get_debug_tif_option(self) -> list[str]:
+    if self._debug_tif:
+      return ["--tif", self._debug_tif]
+    return []
+
+  def _get_debug_irpre_option(self) -> list[str]:
+    if self._debug_irpre:
+      return ["--irpre", str(self._debug_irpre)]
+    return []
+
+  def _get_debug_drpre_option(self) -> list[str]:
+    if self._debug_drpre:
+      return ["--drpre", str(self._debug_drpre)]
+    return []

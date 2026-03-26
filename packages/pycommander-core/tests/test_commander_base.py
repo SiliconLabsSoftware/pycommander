@@ -119,3 +119,87 @@ class TestCommanderBase(unittest.TestCase):
     self.assertEqual(commander.runCommand("command", "arg1", "arg2", json_formatted_output=True), {"result": {}})
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
     commander._runner.logged_commands.clear()
+
+  def test_get_serial_number_option(self):
+    commander = MockCommander(serial_number="123456789")
+    self.assertEqual(commander._get_serial_number_option(), ["--serialno", "123456789"])
+
+  def test_get_serial_number_option_none(self):
+    commander = MockCommander(serial_number=None)
+    self.assertEqual(commander._get_serial_number_option(), [])
+
+  def test_get_serial_number_option_empty(self):
+    commander = MockCommander(serial_number="")
+    self.assertEqual(commander._get_serial_number_option(), [])
+
+  def test_get_ip_address_option(self):
+    commander = MockCommander(ip_address="192.168.1.100")
+    self.assertEqual(commander._get_ip_address_option(), ["--ip", "192.168.1.100"])
+
+  def test_get_ip_address_option_none(self):
+    commander = MockCommander(ip_address=None)
+    self.assertEqual(commander._get_ip_address_option(), [])
+
+  def test_get_ip_address_option_empty(self):
+    commander = MockCommander(ip_address="")
+    self.assertEqual(commander._get_ip_address_option(), [])
+
+  def test_get_serial_port_option(self):
+    commander = MockCommander(serial_port="/dev/tty.usbmodem141101")
+    self.assertEqual(commander._get_serial_port_option(), ["--identifybyserialport", "/dev/tty.usbmodem141101"])
+
+  def test_get_serial_port_option_none(self):
+    commander = MockCommander(serial_port=None)
+    self.assertEqual(commander._get_serial_port_option(), [])
+
+  def test_get_serial_port_option_empty(self):
+    commander = MockCommander(serial_port="")
+    self.assertEqual(commander._get_serial_port_option(), [])
+
+  def test_get_debug_speed_option(self):
+    commander = MockCommander(debug_speed=1000000)
+    self.assertEqual(commander._get_debug_speed_option(), ["--speed", "1000000"])
+
+  def test_get_debug_speed_option_none(self):
+    commander = MockCommander(debug_speed=None)
+    self.assertEqual(commander._get_debug_speed_option(), [])
+
+  def test_get_debug_speed_option_empty(self):
+    commander = MockCommander(debug_speed="")
+    self.assertEqual(commander._get_debug_speed_option(), [])
+
+  def test_get_debug_tif_option(self):
+    commander = MockCommander(debug_tif="SWD")
+    self.assertEqual(commander._get_debug_tif_option(), ["--tif", "SWD"])
+
+  def test_get_debug_tif_option_none(self):
+    commander = MockCommander(debug_tif=None)
+    self.assertEqual(commander._get_debug_tif_option(), [])
+
+  def test_get_debug_tif_option_empty(self):
+    commander = MockCommander(debug_tif="")
+    self.assertEqual(commander._get_debug_tif_option(), [])
+
+  def test_get_debug_irpre_option(self):
+    commander = MockCommander(debug_irpre=1000000)
+    self.assertEqual(commander._get_debug_irpre_option(), ["--irpre", "1000000"])
+
+  def test_get_debug_irpre_option_none(self):
+    commander = MockCommander(debug_irpre=None)
+    self.assertEqual(commander._get_debug_irpre_option(), [])
+
+  def test_get_debug_irpre_option_empty(self):
+    commander = MockCommander(debug_irpre="")
+    self.assertEqual(commander._get_debug_irpre_option(), [])
+
+  def test_get_debug_drpre_option(self):
+    commander = MockCommander(debug_drpre=1000000)
+    self.assertEqual(commander._get_debug_drpre_option(), ["--drpre", "1000000"])
+
+  def test_get_debug_drpre_option_none(self):
+    commander = MockCommander(debug_drpre=None)
+    self.assertEqual(commander._get_debug_drpre_option(), [])
+
+  def test_get_debug_drpre_option_empty(self):
+    commander = MockCommander(debug_drpre="")
+    self.assertEqual(commander._get_debug_drpre_option(), [])

@@ -107,7 +107,7 @@ class DeviceCommand(BaseCommand):
     args += self._get_adapter_connection_args()
     args += self._get_kwargs(**kwargs)
 
-    args += self._get_debug_speed_option()
+    args += self._commander._get_debug_speed_option()
 
     return self._run("device", "recover", *self._get_general_args(**kwargs)).output
 
