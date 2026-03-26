@@ -61,6 +61,8 @@ class AemStreamBase:
 
   def __parse_line(self, line: str) -> AemMeasurement:
     parts = line.split(",")
+    if len(parts) != 3:
+      raise ValueError(f"Invalid line: {line}")
     timestamp_us = int(parts[0])
     current_ma = float(parts[1])
     voltage_v = float(parts[2])
