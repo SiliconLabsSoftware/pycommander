@@ -1,0 +1,36 @@
+{
+  "result": {
+      "clustering": {
+          "blocks": [
+              {
+                  "duration_ms": 10010.876,
+                  "end_ms": 10010.876,
+                  "level_mA": 1.8975981200205052,
+                  "max_mA": 3.1142637599259615,
+                  "min_mA": 0.8984369924291968,
+                  "range_mA": 2.2158267674967647,
+                  "samples": 957696,
+                  "start_ms": 0
+              }
+          ],
+          "configuration": {
+              "false_alarm_probability": 0.3,
+              "max_points": 8000,
+              "min_segment_ms": 25
+          },
+          "method": "bayesian_blocks_time_aware",
+          "total_blocks": 1,
+          "type": "clustering_analysis",
+          "unique_states": 1
+      },
+      "signal_characteristics": {
+          "average_voltage_V": 3.31,
+          "dynamic_range_ratio": 3,
+          "estimated_states": 3,
+          "max_current_mA": 3.114,
+          "min_current_mA": 0.8984,
+          "noise_level_mad_sigma_mA": 0.1093
+      }
+  },
+  "success": true
+}
