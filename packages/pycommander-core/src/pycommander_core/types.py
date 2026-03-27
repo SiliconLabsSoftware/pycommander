@@ -135,3 +135,127 @@ class SeFirmwareInfo:
   current_version:   str  | None = None
   latest_version:    str  | None = None
   upgrade_available: bool | None = None
+
+@dataclass
+class AemClusterBlock:
+  duration_ms: float | None = None
+  end_ms:      float | None = None
+  level_mA:    float | None = None
+  max_mA:      float | None = None
+  min_mA:      float | None = None
+  range_mA:    float | None = None
+  samples:     int   | None = None
+  start_ms:    float | None = None
+
+@dataclass
+class AemClusterConfiguration:
+  false_alarm_probability: float | None = None
+  max_points:              int   | None = None
+  min_segment_ms:          float | None = None
+
+@dataclass
+class AemClustering:
+  blocks:        list[AemClusterBlock]   | None = None
+  configuration: AemClusterConfiguration | None = None
+  method:        str                     | None = None
+  total_blocks:  int                     | None = None
+  type:          str                     | None = None
+  unique_states: int                     | None = None
+
+@dataclass
+class AemDistributionBin:
+  average_current:    float | None = None
+  bin_max:            float | None = None
+  bin_min:            float | None = None
+  current_unit:       str   | None = None
+  num_samples:        int   | None = None
+  percentage:         float | None = None
+  standard_deviation: float | None = None
+  time:               float | None = None
+  time_unit:          str   | None = None
+
+@dataclass
+class AemDistributionConfiguration:
+  bins:        int  | None = None
+  logarithmic: bool | None = None
+
+@dataclass
+class AemDistributionSummary:
+  max_current:       float | None = None
+  min_current:       float | None = None
+  total_duration_ms: float | None = None
+  total_samples:     int   | None = None
+  unit:              str   | None = None
+
+@dataclass
+class AemDistribution:
+  bins:          list[AemDistributionBin]     | None = None
+  configuration: AemDistributionConfiguration | None = None
+  summary:       AemDistributionSummary       | None = None
+  type:          str                          | None = None
+
+@dataclass
+class AemPeriodDetectionConfiguration:
+  max_period_ms: float | None = None
+  min_period_ms: float | None = None
+
+@dataclass
+class AemPeriodDetectionIntervalSummary:
+  average_mean_current_ma: float | None = None
+  average_peak_current_ma: float | None = None
+  max_period_ms:           float | None = None
+  min_period_ms:           float | None = None
+
+@dataclass
+class AemPeriodDetectionInterval:
+  cycle:           int   | None = None
+  end_index:       int   | None = None
+  end_ms:          float | None = None
+  mean_current_ma: float | None = None
+  peak_current_ma: float | None = None
+  period_ms:       float | None = None
+  start_index:     int   | None = None
+  start_ms:        float | None = None
+
+@dataclass
+class AemPeriodDetectionMethodResult:
+  method:         str   | None = None
+  detected:       bool  | None = None
+  confidence:     float | None = None
+  period_ms:      float | None = None
+  relative_error: float | None = None
+
+@dataclass
+class AemPeriodDetectionResult:
+  confidence:       float                                | None = None
+  frequency_hz:     float                                | None = None
+  interval_summary: AemPeriodDetectionIntervalSummary    | None = None
+  intervals:        list[AemPeriodDetectionInterval]     | None = None
+  is_periodic:      bool                                 | None = None
+  jitter_relative:  float                                | None = None
+  method:           str                                  | None = None
+  method_results:   list[AemPeriodDetectionMethodResult] | None = None
+  num_cycles:       int                                  | None = None
+  period_ms:        float                                | None = None
+
+@dataclass
+class AemPeriodDetection:
+  configuration: AemPeriodDetectionConfiguration | None = None
+  result:        AemPeriodDetectionResult        | None = None
+  type:          str                             | None = None
+
+@dataclass
+class AemSignalCharacteristics:
+  average_voltage_v:        float | None = None
+  dynamic_range_ratio:      float | None = None
+  estimated_states:         int   | None = None
+  max_current_ma:           float | None = None
+  min_current_ma:           float | None = None
+  noise_level_mad_sigma_ma: float | None = None
+
+@dataclass
+class AemAnalysisResult:
+  distribution:           AemDistribution          | None = None
+  clustering:             AemClustering            | None = None
+  period_detection:       AemPeriodDetection       | None = None
+  signal_characteristics: AemSignalCharacteristics | None = None

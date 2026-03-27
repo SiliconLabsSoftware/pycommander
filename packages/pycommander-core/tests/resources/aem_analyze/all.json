@@ -1,0 +1,209 @@
+{
+  "result": {
+      "clustering": {
+          "blocks": [
+              {
+                  "duration_ms": 10010.876,
+                  "end_ms": 10010.876,
+                  "level_mA": 1.8975981200205052,
+                  "max_mA": 3.1142637599259615,
+                  "min_mA": 0.8984369924291968,
+                  "range_mA": 2.2158267674967647,
+                  "samples": 957696,
+                  "start_ms": 0
+              }
+          ],
+          "configuration": {
+              "false_alarm_probability": 0.3,
+              "max_points": 8000,
+              "min_segment_ms": 25
+          },
+          "method": "bayesian_blocks_time_aware",
+          "total_blocks": 1,
+          "type": "clustering_analysis",
+          "unique_states": 1
+      },
+      "distribution": {
+          "bins": [
+              {
+                  "average_current": 1.20966,
+                  "bin_max": 1.268,
+                  "bin_min": 0.898,
+                  "current_unit": "mA",
+                  "num_samples": 11918,
+                  "percentage": 1.24,
+                  "standard_deviation": 0.04979,
+                  "time": 124.58,
+                  "time_unit": "ms"
+              },
+              {
+                  "average_current": 1.4887,
+                  "bin_max": 1.637,
+                  "bin_min": 1.268,
+                  "current_unit": "mA",
+                  "num_samples": 200152,
+                  "percentage": 20.9,
+                  "standard_deviation": 0.09698,
+                  "time": 2092.2,
+                  "time_unit": "ms"
+              },
+              {
+                  "average_current": 1.84472,
+                  "bin_max": 2.006,
+                  "bin_min": 1.637,
+                  "current_unit": "mA",
+                  "num_samples": 467572,
+                  "percentage": 48.82,
+                  "standard_deviation": 0.09796,
+                  "time": 4887.57,
+                  "time_unit": "ms"
+              },
+              {
+                  "average_current": 2.18105,
+                  "bin_max": 2.376,
+                  "bin_min": 2.006,
+                  "current_unit": "mA",
+                  "num_samples": 158381,
+                  "percentage": 16.54,
+                  "standard_deviation": 0.11033,
+                  "time": 1655.57,
+                  "time_unit": "ms"
+              },
+              {
+                  "average_current": 2.48148,
+                  "bin_max": 2.745,
+                  "bin_min": 2.376,
+                  "current_unit": "mA",
+                  "num_samples": 119565,
+                  "percentage": 12.48,
+                  "standard_deviation": 0.05565,
+                  "time": 1249.82,
+                  "time_unit": "ms"
+              },
+              {
+                  "average_current": 2.83663,
+                  "bin_max": 3.114,
+                  "bin_min": 2.745,
+                  "current_unit": "mA",
+                  "num_samples": 108,
+                  "percentage": 0.01,
+                  "standard_deviation": 0.07824,
+                  "time": 1.13,
+                  "time_unit": "ms"
+              }
+          ],
+          "configuration": {
+              "bins": 6,
+              "logarithmic": false
+          },
+          "summary": {
+              "max_current": 3.114,
+              "min_current": 0.898,
+              "total_duration_ms": 10010.871,
+              "total_samples": 957696,
+              "unit": "mA"
+          },
+          "type": "distribution_analysis"
+      },
+      "period_detection": {
+          "configuration": {
+              "max_period_ms": 3336.957,
+              "min_period_ms": 5
+          },
+          "result": {
+              "confidence": 0.7,
+              "frequency_hz": 0.672006881350465,
+              "interval_summary": {
+                  "average_mean_current_ma": 1.89548635216511,
+                  "average_peak_current_ma": 2.960399352014065,
+                  "max_period_ms": 1723.781,
+                  "min_period_ms": 1462.1689999999999
+              },
+              "intervals": [
+                  {
+                      "cycle": 1,
+                      "end_index": 161334,
+                      "end_ms": 1636.38,
+                      "mean_current_ma": 1.8895799483840778,
+                      "peak_current_ma": 2.96447379514575,
+                      "period_ms": 1517.2,
+                      "start_index": 11534,
+                      "start_ms": 119.18
+                  },
+                  {
+                      "cycle": 2,
+                      "end_index": 329104,
+                      "end_ms": 3360.161,
+                      "mean_current_ma": 1.9065092930951,
+                      "peak_current_ma": 2.9293037950992584,
+                      "period_ms": 1723.781,
+                      "start_index": 161334,
+                      "start_ms": 1636.38
+                  },
+                  {
+                      "cycle": 3,
+                      "end_index": 468793,
+                      "end_ms": 4822.33,
+                      "mean_current_ma": 1.8944068558556009,
+                      "peak_current_ma": 2.9628875199705362,
+                      "period_ms": 1462.1689999999999,
+                      "start_index": 329104,
+                      "start_ms": 3360.161
+                  },
+                  {
+                      "cycle": 4,
+                      "end_index": 617601,
+                      "end_ms": 6398.73,
+                      "mean_current_ma": 1.9014176508696041,
+                      "peak_current_ma": 2.9328842647373676,
+                      "period_ms": 1576.3999999999996,
+                      "start_index": 468793,
+                      "start_ms": 4822.33
+                  },
+                  {
+                      "cycle": 5,
+                      "end_index": 760665,
+                      "end_ms": 7910.011,
+                      "mean_current_ma": 1.8855180126211657,
+                      "peak_current_ma": 3.0124473851174116,
+                      "period_ms": 1511.2810000000009,
+                      "start_index": 617601,
+                      "start_ms": 6398.73
+                  }
+              ],
+              "is_periodic": true,
+              "jitter_relative": 0.25,
+              "method": "FFT Spectrum",
+              "method_results": [
+                  {
+                      "detected": false,
+                      "method": "Edge Detection"
+                  },
+                  {
+                      "detected": false,
+                      "method": "Autocorrelation"
+                  },
+                  {
+                      "confidence": 1,
+                      "detected": true,
+                      "method": "FFT Spectrum",
+                      "period_ms": 1488.08,
+                      "relative_error": 0
+                  }
+              ],
+              "num_cycles": 6,
+              "period_ms": 1488.08
+          },
+          "type": "period_detection"
+      },
+      "signal_characteristics": {
+          "average_voltage_V": 3.31,
+          "dynamic_range_ratio": 3,
+          "estimated_states": 3,
+          "max_current_mA": 3.114,
+          "min_current_mA": 0.8984,
+          "noise_level_mad_sigma_mA": 0.1093
+      }
+  },
+  "success": true
+}

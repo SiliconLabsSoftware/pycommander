@@ -1,4 +1,7 @@
+import json
 import unittest
+
+from pathlib import Path
 
 from pycommander_core.target import Target
 from pycommander_core.adapter_base import AdapterBase
@@ -490,3 +493,303 @@ class TestAdapterBase(unittest.TestCase):
     with self.assertRaises(ValueError):
       adapter.setVcomConfig(baudrate=115200, handshake="invalid", store=True)
     self.assertEqual(adapter._commander._runner.logged_commands, [])
+
+  def test_adapter_base_analyzeEnergyUsage(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    test_json = Path(__file__).parent / "resources" / "aem_analyze" / "all.json"
+
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        test_json.read_text()
+      )
+    )
+
+    expected_aem_analysis_result : AemAnalysisResult = AemAnalysisResult(
+      clustering=AemClustering(
+        blocks=[
+          AemClusterBlock(
+            duration_ms=10010.876,
+            end_ms=10010.876,
+            level_mA=1.8975981200205052,
+            max_mA=3.1142637599259615,
+            min_mA=0.8984369924291968,
+            range_mA=2.2158267674967647,
+            samples=957696,
+            start_ms=0,
+          ),
+        ],
+        configuration=AemClusterConfiguration(
+          false_alarm_probability=0.3,
+          max_points=8000,
+          min_segment_ms=25,
+        ),
+        method="bayesian_blocks_time_aware",
+        total_blocks=1,
+        type="clustering_analysis",
+        unique_states=1,
+      ),
+      distribution=AemDistribution(
+        bins=[
+          AemDistributionBin(
+            average_current=1.20966,
+            bin_max=1.268,
+            bin_min=0.898,
+            current_unit="mA",
+            num_samples=11918,
+            percentage=1.24,
+            standard_deviation=0.04979,
+            time=124.58,
+            time_unit="ms",
+          ),
+          AemDistributionBin(
+            average_current=1.4887,
+            bin_max=1.637,
+            bin_min=1.268,
+            current_unit="mA",
+            num_samples=200152,
+            percentage=20.9,
+            standard_deviation=0.09698,
+            time=2092.2,
+            time_unit="ms",
+          ),
+          AemDistributionBin(
+            average_current=1.84472,
+            bin_max=2.006,
+            bin_min=1.637,
+            current_unit="mA",
+            num_samples=467572,
+            percentage=48.82,
+            standard_deviation=0.09796,
+            time=4887.57,
+            time_unit="ms",
+          ),
+          AemDistributionBin(
+            average_current=2.18105,
+            bin_max=2.376,
+            bin_min=2.006,
+            current_unit="mA",
+            num_samples=158381,
+            percentage=16.54,
+            standard_deviation=0.11033,
+            time=1655.57,
+            time_unit="ms",
+          ),
+          AemDistributionBin(
+            average_current=2.48148,
+            bin_max=2.745,
+            bin_min=2.376,
+            current_unit="mA",
+            num_samples=119565,
+            percentage=12.48,
+            standard_deviation=0.05565,
+            time=1249.82,
+            time_unit="ms",
+          ),
+          AemDistributionBin(
+            average_current=2.83663,
+            bin_max=3.114,
+            bin_min=2.745,
+            current_unit="mA",
+            num_samples=108,
+            percentage=0.01,
+            standard_deviation=0.07824,
+            time=1.13,
+            time_unit="ms",
+          ),
+        ],
+        configuration=AemDistributionConfiguration(
+          bins=6,
+          logarithmic=False,
+        ),
+        summary=AemDistributionSummary(
+          max_current=3.114,
+          min_current=0.898,
+          total_duration_ms=10010.871,
+          total_samples=957696,
+          unit="mA",
+        ),
+        type="distribution_analysis",
+      ),
+      period_detection=AemPeriodDetection(
+        configuration=AemPeriodDetectionConfiguration(
+          max_period_ms=3336.957,
+          min_period_ms=5,
+        ),
+        result=AemPeriodDetectionResult(
+          confidence=0.7,
+          frequency_hz=0.672006881350465,
+          interval_summary=AemPeriodDetectionIntervalSummary(
+            average_mean_current_ma=1.89548635216511,
+            average_peak_current_ma=2.960399352014065,
+            max_period_ms=1723.781,
+            min_period_ms=1462.1689999999999,
+          ),
+          intervals=[
+            AemPeriodDetectionInterval(
+              cycle=1,
+              end_index=161334,
+              end_ms=1636.38,
+              mean_current_ma=1.8895799483840778,
+              peak_current_ma=2.96447379514575,
+              period_ms=1517.2,
+              start_index=11534,
+              start_ms=119.18,
+            ),
+            AemPeriodDetectionInterval(
+              cycle=2,
+              end_index=329104,
+              end_ms=3360.161,
+              mean_current_ma=1.9065092930951,
+              peak_current_ma=2.9293037950992584,
+              period_ms=1723.781,
+              start_index=161334,
+              start_ms=1636.38,
+            ),
+            AemPeriodDetectionInterval(
+              cycle=3,
+              end_index=468793,
+              end_ms=4822.33,
+              mean_current_ma=1.8944068558556009,
+              peak_current_ma=2.9628875199705362,
+              period_ms=1462.1689999999999,
+              start_index=329104,
+              start_ms=3360.161,
+            ),
+            AemPeriodDetectionInterval(
+              cycle=4,
+              end_index=617601,
+              end_ms=6398.73,
+              mean_current_ma=1.9014176508696041,
+              peak_current_ma=2.9328842647373676,
+              period_ms=1576.3999999999996,
+              start_index=468793,
+              start_ms=4822.33,
+            ),
+            AemPeriodDetectionInterval(
+              cycle=5,
+              end_index=760665,
+              end_ms=7910.011,
+              mean_current_ma=1.8855180126211657,
+              peak_current_ma=3.0124473851174116,
+              period_ms=1511.2810000000009,
+              start_index=617601,
+              start_ms=6398.73,
+            ),
+          ],
+          is_periodic=True,
+          jitter_relative=0.25,
+          method="FFT Spectrum",
+          method_results=[
+            AemPeriodDetectionMethodResult(
+              method="Edge Detection",
+              detected=False,
+            ),
+            AemPeriodDetectionMethodResult(
+              method="Autocorrelation",
+              detected=False,
+            ),
+            AemPeriodDetectionMethodResult(
+              confidence=1,
+              detected=True,
+              method="FFT Spectrum",
+              period_ms=1488.08,
+              relative_error=0,
+            ),
+          ],
+          num_cycles=6,
+          period_ms=1488.08,
+        ),
+        type="period_detection",
+      ),
+      signal_characteristics=AemSignalCharacteristics(
+        average_voltage_v=3.31,
+        dynamic_range_ratio=3,
+        estimated_states=3,
+        max_current_ma=3.114,
+        min_current_ma=0.8984,
+        noise_level_mad_sigma_ma=0.1093,
+      ),
+    )
+
+    self.assertEqual(adapter.analyzeEnergyUsage(duration_s=10, get_distribution=True, cluster_states=True, detect_period=True), expected_aem_analysis_result)
+    self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "aem", "analyze", "--serialno", "123456789", "--windowlength", "10000", "--showdistribution", "--cluster", "--findperiod", "--json"]])
+
+  def test_adapter_base_analyzeEnergyUsage_failed(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+    
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        254,
+        """
+        {
+          "success": false
+        }
+        """
+      )
+    )
+    self.assertEqual(adapter.analyzeEnergyUsage(duration_s=10, get_distribution=True, cluster_states=True, detect_period=True), None)
+    self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "aem", "analyze", "--serialno", "123456789", "--windowlength", "10000", "--showdistribution", "--cluster", "--findperiod", "--json"]])
+
+  def test_adapter_base_analyzeEnergyUsage_invalid_options(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+    
+    with self.assertRaises(ValueError):
+      adapter.analyzeEnergyUsage(duration_s=10, get_distribution=False, cluster_states=False, detect_period=False)
+    self.assertEqual(adapter._commander._runner.logged_commands, [])
+
+
+  def test_adapter_base_parse_aem_analyze_output_missing_result_key(self):
+    self.assertIsNone(AdapterBase._AdapterBase__parse_aem_analyze_output({"success": True}))
+
+  def test_adapter_base_parse_aem_analyze_output_empty_result(self):
+    result = AdapterBase._AdapterBase__parse_aem_analyze_output({"result": {}})
+    self.assertIsNotNone(result)
+    self.assertIsNone(result.clustering)
+    self.assertIsNone(result.distribution)
+    self.assertIsNone(result.period_detection)
+    self.assertIsNone(result.signal_characteristics)
+
+  def test_adapter_base_parse_aem_analyze_output_clustering_only(self):
+    data = json.loads((Path(__file__).parent / "resources" / "aem_analyze" / "clustering.json").read_text())
+    result = AdapterBase._AdapterBase__parse_aem_analyze_output(data)
+
+    self.assertIsNotNone(result)
+    self.assertIsNotNone(result.clustering)
+    self.assertIsNotNone(result.signal_characteristics)
+    self.assertIsNone(result.distribution)
+    self.assertIsNone(result.period_detection)
+
+    self.assertEqual(len(result.clustering.blocks), 1)
+    self.assertEqual(result.clustering.total_blocks, 1)
+    self.assertEqual(result.clustering.method, "bayesian_blocks_time_aware")
+
+  def test_adapter_base_parse_aem_analyze_output_distribution_only(self):
+    data = json.loads((Path(__file__).parent / "resources" / "aem_analyze" / "distribution.json").read_text())
+    result = AdapterBase._AdapterBase__parse_aem_analyze_output(data)
+
+    self.assertIsNotNone(result)
+    self.assertIsNotNone(result.distribution)
+    self.assertIsNotNone(result.signal_characteristics)
+    self.assertIsNone(result.clustering)
+    self.assertIsNone(result.period_detection)
+
+    self.assertEqual(len(result.distribution.bins), 6)
+    self.assertEqual(result.distribution.configuration.bins, 6)
+    self.assertEqual(result.distribution.summary.total_samples, 957696)
+
+  def test_adapter_base_parse_aem_analyze_output_period_detection_only(self):
+    data = json.loads( (Path(__file__).parent / "resources" / "aem_analyze" / "period-detection.json").read_text())
+    result = AdapterBase._AdapterBase__parse_aem_analyze_output(data)
+
+    self.assertIsNotNone(result)
+    self.assertIsNotNone(result.period_detection)
+    self.assertIsNotNone(result.signal_characteristics)
+    self.assertIsNone(result.clustering)
+    self.assertIsNone(result.distribution)
+
+    self.assertTrue(result.period_detection.result.is_periodic)
+    self.assertEqual(len(result.period_detection.result.intervals), 5)
+    self.assertEqual(result.period_detection.result.num_cycles, 6)
+    self.assertEqual(len(result.period_detection.result.method_results), 3)
