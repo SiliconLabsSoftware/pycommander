@@ -48,10 +48,10 @@ class AdapterInfo:
 
 @dataclass
 class AdapterRailInfo:
-  rail_index: int | None = None
+  rail_index:           int   | None = None
   configured_voltage_v: float | None = None
-  measured_voltage_v: float | None = None
-  rail_powered: bool | None = None
+  measured_voltage_v:   float | None = None
+  rail_powered:         bool  | None = None
 
 @dataclass
 class AdapterVoltageInfo:
@@ -74,8 +74,8 @@ class TargetInfo:
 
 class CodeRegionProtectionMode(enum.Enum):
   ENCRYPTED_AND_AUTHENTICATED = "encrypted_authenticated"
-  ENCRYPTED = "encrypted"
-  NONE = "none"
+  ENCRYPTED                   = "encrypted"
+  NONE                        = "none"
 
 @dataclass
 class CodeRegionConfig:
@@ -95,9 +95,9 @@ class RegionConfig:
   data_region: DataRegionConfig
 
 class VcomHandshake(enum.Enum):
-  NONE = "none"
+  NONE   = "none"
   RTSCTS = "rtscts"
-  AUX = "aux"
+  AUX    = "aux"
 
 @dataclass
 class TrustzoneConfig:
@@ -128,7 +128,7 @@ class SecurityStatus:
   sign_key_installed: bool
   tamper_ok: bool
   trustzone_config: TrustzoneConfig | None = None
-  trustzone_state: TrustzoneState | None = None
+  trustzone_state: TrustzoneState   | None = None
 
 @dataclass
 class SeFirmwareInfo:
