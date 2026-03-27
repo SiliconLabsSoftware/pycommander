@@ -1,7 +1,7 @@
+from . import types
+
 from .commander_base import CommanderBase
 from .target import Target
-
-from .types import AdapterBoardInfo, AdapterFwInfo, AdapterInfo, AdapterVoltageInfo, AdapterRailInfo, VcomHandshake
 
 class AdapterBase:
   def __init__(self,
@@ -22,7 +22,7 @@ class AdapterBase:
     self._commander : CommanderBase = commander
     self.target : Target | None = target
 
-  def info(self) -> AdapterInfo | None:
+  def info(self) -> types.AdapterInfo | None:
     """Get information about the adapter.
 
     Returns:
@@ -37,9 +37,9 @@ class AdapterBase:
     if "board_lists" not in result["result"]:
       return None
 
-    board_list : list[AdapterBoardInfo] = []
+    board_list : list[types.AdapterBoardInfo] = []
     for board in result["result"]["board_lists"]:
-      board_list.append(AdapterBoardInfo(
+      board_list.append(types.AdapterBoardInfo(
         name=board.get("name", None),
         part_number=board.get("part_number", None),
         serial_number=board.get("serial_number", None),
@@ -49,7 +49,7 @@ class AdapterBase:
     if "firmware_info" not in result["result"]:
       return None
 
-    fw_info = AdapterFwInfo(
+    fw_info = types.AdapterFwInfo(
       current_version=result["result"]["firmware_info"].get("fw_version", None),
       latest_version=result["result"]["firmware_info"].get("new_fw_version", None),
       upgrade_available=result["result"]["firmware_info"].get("upgrade_available", None),
@@ -58,7 +58,7 @@ class AdapterBase:
     if "kit_info" not in result["result"]:
       return None
 
-    adapter_info = AdapterInfo(
+    adapter_info = types.AdapterInfo(
       board_list=board_list,
       fw_info=fw_info,
       jlink_serial_number=result["result"]["kit_info"].get("j_link_serial", None),
@@ -85,7 +85,7 @@ class AdapterBase:
     result : dict = self._commander.adapter.reset()
     return result["success"]
 
-  def getVoltage(self) -> AdapterVoltageInfo | None:
+  def getVoltage(self) -> types.AdapterVoltageInfo | None:
     """Get the voltage for the target device.
 
     Returns:
@@ -98,9 +98,9 @@ class AdapterBase:
     if not result["success"]:
       return None
 
-    voltage_info : AdapterVoltageInfo = AdapterVoltageInfo(rails=[])
+    voltage_info : types.AdapterVoltageInfo = types.AdapterVoltageInfo(rails=[])
     for rail_info in result["result"]["voltages"]:
-      voltage_info.rails.append(AdapterRailInfo(
+      voltage_info.rails.append(types.AdapterRailInfo(
         rail_index=rail_info.get("rail_index", None),
         configured_voltage_v=rail_info.get("configured_voltage_v", None),
         measured_voltage_v=rail_info.get("measured_voltage_v", None),
@@ -122,7 +122,7 @@ class AdapterBase:
     result : dict = self._commander.adapter.voltage(voltage=voltage, calibrate=calibrate)
     return result["success"]
 
-  def setVcomConfig(self, baudrate: int, handshake: VcomHandshake, store: bool = False) -> bool:
+  def setVcomConfig(self, baudrate: int, handshake: types.VcomHandshake, store: bool = False) -> bool:
     """Set the VCOM configuration for the adapter.
 
     Args:
@@ -133,7 +133,7 @@ class AdapterBase:
     Returns:
       True if the VCOM configuration was set successfully, False otherwise.
     """
-    if handshake not in VcomHandshake.__members__.values():
+    if handshake not in types.VcomHandshake.__members__.values():
       raise ValueError(f"Invalid handshake: {handshake}")
 
     result : dict = self._commander.vcom.config(baudrate=baudrate, handshake=handshake.value, store=store)
