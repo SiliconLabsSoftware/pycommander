@@ -153,7 +153,7 @@ class Runner:
     # Try exiting gracefully first
     self.sendCtrlC(process)
     try:
-      returncode = self.wait(process, timeout_s=1)
+      self.wait(process, timeout_s=1)
       return
     except subprocess.TimeoutExpired:
       pass
@@ -161,7 +161,7 @@ class Runner:
     # No joy, terminate
     self.terminate(process)
     try:
-      returncode = self.wait(process, timeout_s=1)
+      self.wait(process, timeout_s=1)
       return
     except subprocess.TimeoutExpired:
       pass
