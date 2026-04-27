@@ -21,11 +21,6 @@ from pycommander_core.commands._base import BaseCommand
 class UtilCommand(BaseCommand):
   """Utility commands (appinfo, elfinfo, extractkeys, gencert, genkey, etc.)."""
 
-  def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_kwargs(**kwargs)
-    return args
-
   def appinfo(self, filename: str, **kwargs: Any) -> dict:
     """Show all available info about an application.
 

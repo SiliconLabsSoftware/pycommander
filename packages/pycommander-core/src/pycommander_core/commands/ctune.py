@@ -22,10 +22,9 @@ class CtuneCommand(BaseCommand):
   """CTUNE commands (get/set crystal tuning value)."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_adapter_connection_args()
+    args = self._get_adapter_connection_args()
     args += self._get_debug_args()
-    args += self._get_kwargs(**kwargs)
+    args += super()._get_general_args(**kwargs)
     return args
 
   def autoset(self, **kwargs: Any) -> dict:

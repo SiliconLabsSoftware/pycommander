@@ -21,15 +21,14 @@ from pycommander_core.commands._base import BaseCommand
 class Nvm3Command(BaseCommand):
   """NVM3 commands (Non-Volatile Memory storage)."""
 
-  def _get_on_device_args(self, **kwargs: Any) -> list[str]:
-    args = self._get_offline_args(**kwargs)
-    args += self._get_adapter_connection_args()
-    args += self._get_debug_args()
+  def _get_offline_args(self, **kwargs: Any) -> list[str]:
+    args = self._get_general_args(**kwargs)
     return args
 
-  def _get_offline_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_kwargs(**kwargs)
+  def _get_on_device_args(self, **kwargs: Any) -> list[str]:
+    args = self._get_adapter_connection_args()
+    args += self._get_debug_args()
+    args += self._get_general_args(**kwargs)
     return args
 
   def delete(self,

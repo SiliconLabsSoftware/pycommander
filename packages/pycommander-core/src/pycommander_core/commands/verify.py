@@ -22,10 +22,9 @@ class VerifyCommand(BaseCommand):
   """Compare the contents in the device flash with the given input files and options."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_adapter_connection_args()
+    args = self._get_adapter_connection_args()
     args += self._get_debug_args()
-    args += self._get_kwargs(**kwargs)
+    args += super()._get_general_args(**kwargs)
     return args
 
   def verify(self,

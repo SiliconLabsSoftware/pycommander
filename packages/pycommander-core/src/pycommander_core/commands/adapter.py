@@ -22,9 +22,8 @@ class AdapterCommand(BaseCommand):
   """Commands that affect a debug adapter (kit/debugger)."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_adapter_connection_args()
-    args += self._get_kwargs(**kwargs)
+    args = self._get_adapter_connection_args()
+    args += super()._get_general_args(**kwargs)
     return args
 
   def dbgmode(self, mode: str | None = None, **kwargs: Any) -> dict:

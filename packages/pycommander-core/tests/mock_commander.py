@@ -31,6 +31,7 @@ class MockCommander(CommanderBase):
     serial_number: str | None = None,
     ip_address: str | None = None,
     serial_port: str | None = None,
+    target_device: str | None = None,
     debug_speed: int | None = None,
     debug_tif: str | None = None,
     debug_irpre: int | None = None,
@@ -49,6 +50,7 @@ class MockCommander(CommanderBase):
     self._serial_number = serial_number
     self._ip_address    = ip_address
     self._serial_port   = serial_port
+    self._target_device = target_device
     self._debug_speed   = debug_speed
     self._debug_tif     = debug_tif
     self._debug_irpre   = debug_irpre

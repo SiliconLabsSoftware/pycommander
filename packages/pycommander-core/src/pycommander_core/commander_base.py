@@ -60,13 +60,15 @@ class CommanderBase:
               serial_number:    str  | None = None,
               ip_address:       str  | None = None,
               serial_port:      str  | None = None,
+              target_device:    str  | None = None,
               debug_speed:      int  | None = None,
               debug_tif:        str  | None = None,
               debug_irpre:      int  | None = None,
               debug_drpre:      int  | None = None,
               log_file_path:    Path | None = None,
               executable_path:  Path | None = None,
-              cli:              bool | None = None):
+              cli:              bool | None = None,
+              **kwargs):
 
     if (serial_number and ip_address) or (serial_number and serial_port) or (ip_address and serial_port):
       raise ValueError("Only one of serial_number, ip_address, or serial_port can be provided")
@@ -95,6 +97,9 @@ class CommanderBase:
     self._debug_tif   : str | None = debug_tif
     self._debug_irpre : int | None = debug_irpre
     self._debug_drpre : int | None = debug_drpre
+
+    # Additional parameters
+    self._target_device : str | None = target_device
 
     # Initialize all the available commands
     from . import commands
@@ -159,6 +164,11 @@ class CommanderBase:
   def _get_serial_port_option(self) -> list[str]:
     if self._serial_port:
       return ["--identifybyserialport", self._serial_port]
+    return []
+
+  def _get_device_option(self) -> list[str]:
+    if self._target_device:
+      return ["--device", self._target_device]
     return []
 
   def _get_debug_speed_option(self) -> list[str]:

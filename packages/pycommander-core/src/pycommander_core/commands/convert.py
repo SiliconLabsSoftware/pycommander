@@ -21,11 +21,6 @@ from pycommander_core.commands._base import BaseCommand
 class ConvertCommand(BaseCommand):
   """Conversion between image file formats; combine inputs, set tokens, patch data."""
 
-  def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_kwargs(**kwargs)
-    return args
-
   def convert(self,
               infiles: list[str],
               outfile: str | None = None,

@@ -22,10 +22,9 @@ class SecurityCommand(BaseCommand):
   """Secure Engine commands."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_adapter_connection_args()
+    args = self._get_adapter_connection_args()
     args += self._get_debug_args()
-    args += self._get_kwargs(**kwargs)
+    args += super()._get_general_args(**kwargs)
     return args
 
   def attestation(self, reset: bool = True, **kwargs: Any) -> dict:

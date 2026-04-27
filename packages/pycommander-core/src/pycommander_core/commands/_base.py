@@ -43,7 +43,14 @@ class BaseCommand:
 
     return command_result
 
-  # Adapter connection arguments are kept by the commander class
+  # Some options are (in general) available for all commands
+  def _get_general_args(self, **kwargs: Any) -> list[str]:
+    args = []
+    args += self._get_device_args()
+    args += self._get_kwargs(**kwargs)
+    return args
+
+  # Adapter connection arguments may be kept by the commander class
   def _get_adapter_connection_args(self) -> list[str]:
     args = []
     args += self._commander._get_serial_number_option()
@@ -51,7 +58,13 @@ class BaseCommand:
     args += self._commander._get_serial_port_option()
     return args
 
-  # Debug arguments are kept by the commander class
+  # Device argument may be kept by the commander class
+  def _get_device_args(self) -> list[str]:
+    args = []
+    args += self._commander._get_device_option()
+    return args
+
+  # Debug arguments may be kept by the commander class
   def _get_debug_args(self) -> list[str]:
     args = []
     args += self._commander._get_debug_speed_option()
@@ -60,13 +73,35 @@ class BaseCommand:
     args += self._commander._get_debug_drpre_option()
     return args
 
-  # Keyword arguments
+  # Keyword arguments are used to pass temporary options to the command
   def _get_kwargs(self, **kwargs: Any) -> list[str]:
     args = []
+
+    # Temporary connection options
+    if kwargs.get("serial_number"):
+      args += ["--serialno", kwargs["serial_number"]]
+    if kwargs.get("ip_address"):
+      args += ["--ip", kwargs["ip_address"]]
+    if kwargs.get("serial_port"):
+      args += ["--identifybyserialport", kwargs["serial_port"]]
+
+    # Temporary debug options
+    if kwargs.get("debug_speed"):
+      args += ["--speed", str(kwargs["debug_speed"])]
+    if kwargs.get("debug_tif"):
+      args += ["--tif", kwargs["debug_tif"]]
+    if kwargs.get("debug_irpre"):
+      args += ["--irpre", str(kwargs["debug_irpre"])]
+    if kwargs.get("debug_drpre"):
+      args += ["--drpre", str(kwargs["debug_drpre"])]
+
+    # Other temporary options
     if kwargs.get("device"):
       args += ["--device", kwargs["device"]]
+
     if kwargs.get("force", False):
       args += ["--force"]
+
     return args
 
   # Helper methods for common arguments
