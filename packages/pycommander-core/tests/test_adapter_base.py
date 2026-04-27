@@ -806,3 +806,4 @@ class TestAdapterBase(unittest.TestCase):
     self.assertEqual(len(result.period_detection.result.intervals), 5)
     self.assertEqual(result.period_detection.result.num_cycles, 6)
     self.assertEqual(len(result.period_detection.result.method_results), 3)
+  

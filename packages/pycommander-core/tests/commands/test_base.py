@@ -73,11 +73,38 @@ class TestBase(unittest.TestCase):
   def test_base_get_kwargs(self):
     base_command = BaseCommand(MockCommander())
     self.assertEqual(base_command._get_kwargs(), [])
+    self.assertEqual(base_command._get_kwargs(serial_number="123456789"), ["--serialno", "123456789"])
+    self.assertEqual(base_command._get_kwargs(ip_address="192.168.1.100"), ["--ip", "192.168.1.100"])
+    self.assertEqual(base_command._get_kwargs(serial_port="/dev/tty.usbmodem141101"), ["--identifybyserialport", "/dev/tty.usbmodem141101"])
+    self.assertEqual(base_command._get_kwargs(debug_speed=1000000), ["--speed", "1000000"])
+    self.assertEqual(base_command._get_kwargs(debug_tif="SWD"), ["--tif", "SWD"])
+    self.assertEqual(base_command._get_kwargs(debug_irpre=1000000), ["--irpre", "1000000"])
+    self.assertEqual(base_command._get_kwargs(debug_drpre=1000000), ["--drpre", "1000000"])
     self.assertEqual(base_command._get_kwargs(device="123456789"), ["--device", "123456789"])
     self.assertEqual(base_command._get_kwargs(force=True), ["--force"])
     self.assertEqual(base_command._get_kwargs(device=None), [])
     self.assertEqual(base_command._get_kwargs(force=False), [])
-    self.assertEqual(base_command._get_kwargs(device="123456789", force=True), ["--device", "123456789", "--force"])
+    self.assertEqual(base_command._get_kwargs(
+      device="Cortex-M4",
+      force=True,
+      debug_speed=1000000,
+      debug_tif="SWD",
+      debug_irpre=1000000,
+      debug_drpre=1000000,
+      serial_number="123456789",
+      ip_address="192.168.1.100",
+      serial_port="/dev/tty.usbmodem141101",
+    ), [
+      "--serialno", "123456789",
+      "--ip", "192.168.1.100",
+      "--identifybyserialport", "/dev/tty.usbmodem141101",
+      "--speed", "1000000",
+      "--tif", "SWD",
+      "--irpre", "1000000",
+      "--drpre", "1000000",
+      "--device", "Cortex-M4",
+      "--force",
+    ])
 
   def test_base_get_address_string(self):
     base_command = BaseCommand(MockCommander())

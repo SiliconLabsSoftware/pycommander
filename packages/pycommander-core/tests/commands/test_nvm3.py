@@ -45,7 +45,7 @@ class TestNvm3(unittest.TestCase):
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "nvm3", "deletedevice",
-      "--device", "EFR32MG24", "--serialno", "123456789", "--key", "k1",
+      "--serialno", "123456789", "--device", "EFR32MG24", "--key", "k1",
       "--json",
     ]
     self.assertEqual(commander._runner.logged_commands[0], expected)

@@ -21,11 +21,6 @@ from pycommander_core.commands._base import BaseCommand
 class OtaCommand(BaseCommand):
   """OTA commands."""
 
-  def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_kwargs(**kwargs)
-    return args
-
   def create(self,
              outfile: str,
              type: str | None = None,

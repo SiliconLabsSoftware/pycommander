@@ -21,11 +21,6 @@ from pycommander_core.commands._base import BaseCommand
 class Gbl3Command(BaseCommand):
   """Create, parse and other handling for GBL3 files."""
 
-  def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_kwargs(**kwargs)
-    return args
-
   def aat_usageinfo(self, **kwargs: Any) -> dict:
     """Display flash and RAM usage from AAT data (Zigbee/Thread; RAM for EM3xx only).
 

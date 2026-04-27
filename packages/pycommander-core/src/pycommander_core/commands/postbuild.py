@@ -21,11 +21,6 @@ from pycommander_core.commands._base import BaseCommand
 class PostbuildCommand(BaseCommand):
   """Perform post-build tasks as defined in a post-build YAML (.slpb) file."""
 
-  def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_kwargs(**kwargs)
-    return args
-
   def postbuild(self,
                 filename: str,
                 parameters: list[tuple[str, str]] = [],

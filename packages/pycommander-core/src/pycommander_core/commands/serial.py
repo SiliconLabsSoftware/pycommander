@@ -22,9 +22,8 @@ class SerialCommand(BaseCommand):
   """Serial commands."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
-    args = []
-    args += self._get_adapter_connection_args()
-    args += self._get_kwargs(**kwargs)
+    args = self._get_adapter_connection_args()
+    args += super()._get_general_args(**kwargs)
     return args
 
   def getopn(self, serialport: str = "", **kwargs: Any) -> dict:
