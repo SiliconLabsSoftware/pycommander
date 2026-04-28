@@ -44,7 +44,7 @@ class TestSerial(unittest.TestCase):
 
   def test_serial_load_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.serial.load("image.s37", device="EFR32MG24")
+    commander.serial.load("image.s37", target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "serial", "load", "image.s37",

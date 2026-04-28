@@ -43,7 +43,7 @@ class TestFlash(unittest.TestCase):
       include_sections=[".text"],
       exclude_sections=[".debug"],
       vtor=0x08000000,
-      device="EFR32MG24",
+      target_device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [

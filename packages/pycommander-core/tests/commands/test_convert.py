@@ -31,7 +31,7 @@ class TestConvert(unittest.TestCase):
       crc=True,
       include_sections=[".text"],
       exclude_sections=[".debug"],
-      device="EFR32MG24",
+      target_device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [

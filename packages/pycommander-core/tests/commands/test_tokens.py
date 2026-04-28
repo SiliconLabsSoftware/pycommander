@@ -110,7 +110,7 @@ class TestTokens(unittest.TestCase):
     commander = MockCommander(serial_number="123456789")
     commander.tokens.write(
       tokenfiles=["tokens.json"],
-      device="EFR32MG24",
+      target_device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [

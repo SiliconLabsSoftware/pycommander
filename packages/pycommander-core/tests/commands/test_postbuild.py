@@ -26,7 +26,7 @@ class TestPostbuild(unittest.TestCase):
 
   def test_postbuild_command_with_device(self):
     commander = MockCommander()
-    commander.postbuild.postbuild("tasks.slpb", device="EFR32MG24")
+    commander.postbuild.postbuild("tasks.slpb", target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "postbuild", "tasks.slpb", "--device", "EFR32MG24", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)

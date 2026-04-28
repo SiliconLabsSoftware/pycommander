@@ -80,12 +80,12 @@ class TestBase(unittest.TestCase):
     self.assertEqual(base_command._get_kwargs(debug_tif="SWD"), ["--tif", "SWD"])
     self.assertEqual(base_command._get_kwargs(debug_irpre=1000000), ["--irpre", "1000000"])
     self.assertEqual(base_command._get_kwargs(debug_drpre=1000000), ["--drpre", "1000000"])
-    self.assertEqual(base_command._get_kwargs(device="123456789"), ["--device", "123456789"])
+    self.assertEqual(base_command._get_kwargs(target_device="123456789"), ["--device", "123456789"])
     self.assertEqual(base_command._get_kwargs(force=True), ["--force"])
-    self.assertEqual(base_command._get_kwargs(device=None), [])
+    self.assertEqual(base_command._get_kwargs(target_device=None), [])
     self.assertEqual(base_command._get_kwargs(force=False), [])
     self.assertEqual(base_command._get_kwargs(
-      device="Cortex-M4",
+      target_device="Cortex-M4",
       force=True,
       debug_speed=1000000,
       debug_tif="SWD",

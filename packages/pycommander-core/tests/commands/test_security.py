@@ -30,7 +30,7 @@ class TestSecurity(unittest.TestCase):
 
   def test_security_attestation_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.security.attestation(device="EFR32MG24")
+    commander.security.attestation(target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "security", "attestation",

@@ -181,7 +181,7 @@ class TestMfg917(unittest.TestCase):
 
   def test_mfg917_info_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.mfg917.info(device="SiWx917")
+    commander.mfg917.info(target_device="SiWx917")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "mfg917", "info", "--serialno", "123456789", "--device", "SiWx917", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)

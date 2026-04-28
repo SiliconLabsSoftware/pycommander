@@ -31,7 +31,7 @@ class TestExtflash(unittest.TestCase):
 
   def test_extflash_erase_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.extflash.erase(ranges=[(0x0, 0x10000)], device="EFR32MG24")
+    commander.extflash.erase(ranges=[(0x0, 0x10000)], target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "extflash", "erase",

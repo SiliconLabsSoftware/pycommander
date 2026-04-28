@@ -30,7 +30,7 @@ class TestReadmem(unittest.TestCase):
       outfile="mem.bin",
       ranges=[(0x08000000, 0x08010000)],
       regions=["@main"],
-      device="EFR32MG24",
+      target_device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [

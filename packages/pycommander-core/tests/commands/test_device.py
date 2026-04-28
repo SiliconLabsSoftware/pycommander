@@ -26,7 +26,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_info_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.device.info(device="EFR32MG24")
+    commander.device.info(target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "device", "info", "--serialno", "123456789", "--device", "EFR32MG24", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
@@ -54,7 +54,7 @@ class TestDevice(unittest.TestCase):
 
   def test_device_masserase_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.device.masserase(device="EFR32MG24")
+    commander.device.masserase(target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "device", "masserase", "--serialno", "123456789", "--device", "EFR32MG24", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)

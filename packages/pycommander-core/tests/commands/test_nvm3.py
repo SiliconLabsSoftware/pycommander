@@ -41,7 +41,7 @@ class TestNvm3(unittest.TestCase):
 
   def test_nvm3_deletedevice_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.nvm3.deletedevice(object_keys=["k1"], device="EFR32MG24")
+    commander.nvm3.deletedevice(object_keys=["k1"], target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
       "mock", "nvm3", "deletedevice",

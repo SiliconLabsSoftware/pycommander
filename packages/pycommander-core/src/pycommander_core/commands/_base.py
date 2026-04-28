@@ -96,8 +96,8 @@ class BaseCommand:
       args += ["--drpre", str(kwargs["debug_drpre"])]
 
     # Other temporary options
-    if kwargs.get("device"):
-      args += ["--device", kwargs["device"]]
+    if kwargs.get("target_device"):
+      args += ["--device", kwargs["target_device"]]
 
     if kwargs.get("force", False):
       args += ["--force"]

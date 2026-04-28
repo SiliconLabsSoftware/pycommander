@@ -26,7 +26,7 @@ class TestCtune(unittest.TestCase):
 
   def test_ctune_autoset_command_with_device(self):
     commander = MockCommander(serial_number="123456789")
-    commander.ctune.autoset(device="EFR32MG24")
+    commander.ctune.autoset(target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "ctune", "autoset", "--serialno", "123456789", "--device", "EFR32MG24", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
