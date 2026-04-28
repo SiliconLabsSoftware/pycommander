@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from collections import namedtuple
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
   from .commands import *
 
@@ -134,7 +134,7 @@ class CommanderBase:
 
     return version_info
 
-  def runCommand(self, *args : str, json_formatted_output: bool = True) -> CommanderResult | dict:
+  def runCommand(self, *args : str, json_formatted_output: bool = True, **kwargs: Any) -> CommanderResult | dict:
     """Run a command and return the result.
 
     Args:
@@ -145,11 +145,44 @@ class CommanderBase:
       The result of the command.
     """
 
+    args = list(args) + self._get_kwargs(**kwargs)
+
     result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=json_formatted_output)
     if json_formatted_output:
       return json.loads(result.output)
     else:
       return CommanderResult(result.returncode, result.output)
+
+
+  def _get_kwargs(self, **kwargs: Any) -> list[str]:
+    args = []
+
+    # Temporary connection options
+    if kwargs.get("serial_number"):
+      args += ["--serialno", kwargs["serial_number"]]
+    if kwargs.get("ip_address"):
+      args += ["--ip", kwargs["ip_address"]]
+    if kwargs.get("serial_port"):
+      args += ["--identifybyserialport", kwargs["serial_port"]]
+
+    # Temporary debug options
+    if kwargs.get("debug_speed"):
+      args += ["--speed", str(kwargs["debug_speed"])]
+    if kwargs.get("debug_tif"):
+      args += ["--tif", kwargs["debug_tif"]]
+    if kwargs.get("debug_irpre"):
+      args += ["--irpre", str(kwargs["debug_irpre"])]
+    if kwargs.get("debug_drpre"):
+      args += ["--drpre", str(kwargs["debug_drpre"])]
+
+    # Other temporary options
+    if kwargs.get("target_device"):
+      args += ["--device", kwargs["target_device"]]
+
+    if kwargs.get("force", False):
+      args += ["--force"]
+
+    return args
 
   def _get_serial_number_option(self) -> list[str]:
     if self._serial_number:
