@@ -26,7 +26,7 @@ class TestAem(unittest.TestCase):
 
   def test_aem_calibrate_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    commander.aem.calibrate(device="EFR32MG24")
+    commander.aem.calibrate(target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "calibrate", "--serialno", "123456789", "--device", "EFR32MG24", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
@@ -49,7 +49,7 @@ class TestAem(unittest.TestCase):
       pretrigger_ms=100,
       header=False,
       calibrate=True,
-      device="EFR32MG24",
+      target_device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [
@@ -73,7 +73,7 @@ class TestAem(unittest.TestCase):
 
   def test_aem_measure_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    commander.aem.measure(windowlength_ms=200, calibrate=True, device="EFR32MG24")
+    commander.aem.measure(windowlength_ms=200, calibrate=True, target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "measure", "--serialno", "123456789", "--device", "EFR32MG24", "--windowlength", "200", "--calibrate", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)
@@ -87,7 +87,7 @@ class TestAem(unittest.TestCase):
 
   def test_aem_analyze_command_with_options(self):
     commander = MockCommander(serial_number="123456789")
-    commander.aem.analyze(file="data.csv", windowlength_ms=200, get_distribution=True, cluster=True, cluster_filename="clusters.csv", find_period=True, device="EFR32MG24")
+    commander.aem.analyze(file="data.csv", windowlength_ms=200, get_distribution=True, cluster=True, cluster_filename="clusters.csv", find_period=True, target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "aem", "analyze", "--serialno", "123456789", "--device", "EFR32MG24", "--file", "data.csv", "--windowlength", "200", "--showdistribution", "--cluster", "--clusterfile", "clusters.csv", "--findperiod", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)

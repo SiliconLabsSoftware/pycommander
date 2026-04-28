@@ -55,7 +55,7 @@ from pycommander_gui import Commander
 commander = Commander(serial_number="44055955")
 
 # Perform the 'commander device info' command
-print(commander.device.info(device="EFR32MG24"))
+print(commander.device.info(target_device="EFR32MG24"))
 
 # Perform the 'commander util appinfo' command
 print(commander.util.appinfo(filename="firmware.hex"))

@@ -57,7 +57,7 @@ class Target:
       True if the reset was successful, False otherwise.
     """
 
-    result = self._commander.device.reset(device=self.part_number)
+    result = self._commander.device.reset(target_device=self.part_number)
     return result["success"]
 
   def masserase(self) -> bool:
@@ -67,7 +67,7 @@ class Target:
       True if the mass erase was successful, False otherwise.
     """
 
-    result = self._commander.device.masserase(device=self.part_number)
+    result = self._commander.device.masserase(target_device=self.part_number)
     return result["success"]
 
   def pageerase(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
@@ -80,7 +80,7 @@ class Target:
     Returns:
       True if the page erase was successful, False otherwise.
     """
-    result = self._commander.device.pageerase(ranges=ranges, regions=regions, device=self.part_number)
+    result = self._commander.device.pageerase(ranges=ranges, regions=regions, target_device=self.part_number)
     return result["success"]
 
   def writeManufacturingTokens(self,
@@ -111,7 +111,7 @@ class Target:
       tokengroup=tokengroup,
       tokendefs=str(tokendefs) if tokendefs is not None else None,
       securerange=securerange,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -182,7 +182,7 @@ class Target:
       halt=halt,
       close=close,
       verify=verify,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -221,7 +221,7 @@ class Target:
       force=force,
       reset=False,
       halt=halt,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -246,7 +246,7 @@ class Target:
       force=force,
       reset=reset,
       halt=halt,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -256,7 +256,7 @@ class Target:
     Returns:
       A CtuneValue object containing the CTUNE values from the DI, board and token, or None if the CTUNE values could not be retrieved.
     """
-    result : dict = self._commander.ctune.get(device=self.part_number)
+    result : dict = self._commander.ctune.get(target_device=self.part_number)
     if not result["success"]:
       return None
 
@@ -302,14 +302,14 @@ class Target:
         # Desired value is already set, so get out early
         return True
 
-      result = self._commander.ctune.autoset(device=self.part_number)
+      result = self._commander.ctune.autoset(target_device=self.part_number)
     else:
       # Set the CTUNE token value
       if not force and existing_ctune.token == value:
         # Desired value is already set, so get out early
         return True
 
-      result = self._commander.ctune.set(f"0x{value:08X}", device=self.part_number)
+      result = self._commander.ctune.set(f"0x{value:08X}", target_device=self.part_number)
 
     return result["success"]
 
@@ -327,7 +327,7 @@ class Target:
     if len(ranges) == 0 and len(regions) == 0:
       raise ValueError("At least one range or region must be specified")
 
-    result = self._commander.device.protect(write=True, ranges=ranges, regions=regions, device=self.part_number)
+    result = self._commander.device.protect(write=True, ranges=ranges, regions=regions, target_device=self.part_number)
     return result["success"]
 
   def enableReadProtection(self, ranges: list[tuple[int | str, int | str]] = [], regions: list[str] = []) -> bool:
@@ -344,7 +344,7 @@ class Target:
     if len(ranges) == 0 and len(regions) == 0:
       raise ValueError("At least one range or region must be specified")
 
-    result = self._commander.device.protect(read=True, ranges=ranges, regions=regions, device=self.part_number)
+    result = self._commander.device.protect(read=True, ranges=ranges, regions=regions, target_device=self.part_number)
     return result["success"]
 
   def disableWriteProtection(self) -> bool:
@@ -354,7 +354,7 @@ class Target:
       True if the write protection was disabled successfully, False otherwise.
     """
 
-    result = self._commander.device.protect(write=True, disable=True, device=self.part_number)
+    result = self._commander.device.protect(write=True, disable=True, target_device=self.part_number)
     return result["success"]
 
   def disableReadProtection(self) -> bool:
@@ -364,7 +364,7 @@ class Target:
       True if the read protection was disabled successfully, False otherwise.
     """
 
-    result = self._commander.device.protect(read=True, disable=True, device=self.part_number)
+    result = self._commander.device.protect(read=True, disable=True, target_device=self.part_number)
     return result["success"]
 
   def readRegionConfig(self, allow_reset: bool = True) -> RegionConfig | None:
@@ -376,7 +376,7 @@ class Target:
     Returns:
       A RegionConfig object containing the region configuration, or None if the region configuration could not be retrieved.
     """
-    result = self._commander.security.readregionconfig(reset=allow_reset, device=self.part_number)
+    result = self._commander.security.readregionconfig(reset=allow_reset, target_device=self.part_number)
 
     if not result["success"]:
       return None
@@ -428,7 +428,7 @@ class Target:
     Returns:
       True if the region configuration was read successfully and written to the file, False otherwise.
     """
-    result = self._commander.security.readregionconfig(outfile=str(outfile), reset=allow_reset, device=self.part_number)
+    result = self._commander.security.readregionconfig(outfile=str(outfile), reset=allow_reset, target_device=self.part_number)
 
     return result["success"]
 
@@ -488,7 +488,7 @@ class Target:
     with tempfile.NamedTemporaryFile(dir=".", suffix=".yaml") as tf:
       tf.write(yaml.dump(config_dict, indent=2).encode())
       tf.flush()
-      result = self._commander.security.writeregionconfig(file=str(Path(tf.name)), reset=allow_reset, device=self.part_number)
+      result = self._commander.security.writeregionconfig(file=str(Path(tf.name)), reset=allow_reset, target_device=self.part_number)
       return result["success"]
 
   def writeRegionConfigFromFile(self, config_file: Path, allow_reset: bool = True, force: bool = False) -> bool:
@@ -539,7 +539,7 @@ class Target:
         return True
 
     # Write the region configuration to the target device
-    result = self._commander.security.writeregionconfig(file=str(config_file), reset=allow_reset, device=self.part_number)
+    result = self._commander.security.writeregionconfig(file=str(config_file), reset=allow_reset, target_device=self.part_number)
     return result["success"]
 
   def closeCodeRegion(self, index: int, code_version: int | None = None, allow_reset: bool = True, force: bool = False) -> bool:
@@ -572,7 +572,7 @@ class Target:
       if existing_config.code_regions[index].closed:
         return True
 
-    result = self._commander.security.closeregion(index=index, codeversion=code_version, reset=allow_reset, device=self.part_number)
+    result = self._commander.security.closeregion(index=index, codeversion=code_version, reset=allow_reset, target_device=self.part_number)
     return result["success"]
 
   def getSecurityStatus(self, show_trustzone_status: bool = False, allow_reset: bool = True) -> SecurityStatus | None:
@@ -581,7 +581,7 @@ class Target:
     Returns:
       A SecurityStatus object containing the security status of the target device, or None if the security status could not be retrieved.
     """
-    result = self._commander.security.status(reset=allow_reset, trustzone=show_trustzone_status, device=self.part_number)
+    result = self._commander.security.status(reset=allow_reset, trustzone=show_trustzone_status, target_device=self.part_number)
     if not result["success"]:
       return None
 
@@ -635,7 +635,7 @@ class Target:
     Returns:
       True if the GBL decryption key was generated successfully and written to the file, False otherwise.
     """
-    result = self._commander.util.genkey(type="aes-ccm", outfile=str(outfile), device=self.part_number)
+    result = self._commander.util.genkey(type="aes-ccm", outfile=str(outfile), target_device=self.part_number)
     return result["success"]
 
   def writeGblDecryptionKey(self, key_file: Path, confirm: bool = False) -> bool:
@@ -654,7 +654,7 @@ class Target:
     result = self._commander.security.writekey(
       decrypt_keyfile=str(key_file),
       prompt=not confirm,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -674,7 +674,7 @@ class Target:
       pubkey=str(pubkey_file),
       privkey=str(privkey_file),
       tokenfile=str(tokenfile) if tokenfile is not None else None,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -684,7 +684,7 @@ class Target:
     Returns:
       The public signing key as a bytes object, or None if the public signing key could not be retrieved.
     """
-    result = self._commander.security.readkey(sign=True, device=self.part_number)
+    result = self._commander.security.readkey(sign=True, target_device=self.part_number)
     if not result["success"]:
       return None
 
@@ -713,7 +713,7 @@ class Target:
     result = self._commander.security.writekey(
       sign_keyfile=str(key_file),
       prompt=not confirm,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -733,7 +733,7 @@ class Target:
       pubkey=str(pubkey_file),
       privkey=str(privkey_file),
       tokenfile=str(tokenfile) if tokenfile is not None else None, 
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
   
@@ -743,7 +743,7 @@ class Target:
     Returns:
       The public command key as a bytes object, or None if the public command key could not be retrieved.
     """
-    result = self._commander.security.readkey(command=True, device=self.part_number)
+    result = self._commander.security.readkey(command=True, target_device=self.part_number)
     if not result["success"]:
       return None
 
@@ -772,7 +772,7 @@ class Target:
     result = self._commander.security.writekey(
       command_keyfile=str(key_file),
       prompt=not confirm,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -788,7 +788,7 @@ class Target:
     result = self._commander.security.lockconfig(
       secure_debug_unlock="enable",
       reset=allow_reset,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -806,7 +806,7 @@ class Target:
       secure_debug_unlock="disable",
       reset=allow_reset,
       prompt=not confirm,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -834,7 +834,7 @@ class Target:
     result = self._commander.security.lock(
       trustzone=trustzone,
       reset=allow_reset,
-      device=self.part_number,
+      target_device=self.part_number,
     )
 
     if not result["success"]:
@@ -844,7 +844,7 @@ class Target:
       result = self._commander.security.disabledeviceerase(
         reset=allow_reset,
         prompt=not confirm,
-        device=self.part_number,
+        target_device=self.part_number,
       )
 
     return result["success"]
@@ -884,7 +884,7 @@ class Target:
       command_signature=str(command_signature) if command_signature is not None else None,
       authorization=authorization,
       unlock_param=unlock_param,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -905,7 +905,7 @@ class Target:
       outfile=str(outfile) if outfile is not None else None,
       store=store,
       deviceserialno=device_serial_number,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -915,7 +915,7 @@ class Target:
     Returns:
       A SecurityConfig object containing the security configuration, or None if the security configuration could not be retrieved.
     """
-    result = self._commander.security.readconfig(device=self.part_number)
+    result = self._commander.security.readconfig(target_device=self.part_number)
     
     if not result["success"]:
       return None
@@ -942,7 +942,7 @@ class Target:
       reset=allow_reset,
       store=True,
       prompt=not confirm,
-      device=self.part_number,
+      target_device=self.part_number,
     )
 
     return result["success"]
@@ -964,7 +964,7 @@ class Target:
     result = self._commander.security.provision(
       sefw=str(sefw_file),
       reset=allow_reset,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -989,7 +989,7 @@ class Target:
       address=address,
       reset=allow_reset,
       prompt=not confirm,
-      device=self.part_number,
+      target_device=self.part_number,
     )
     return result["success"]
 
@@ -1002,7 +1002,7 @@ class Target:
     Returns:
       A tuple containing a boolean indicating if a new Secure Engine firmware is available, the current Secure Engine firmware version, and the latest Secure Engine firmware version.
     """
-    result = self._commander.security.fwupgradecheck(reset=allow_reset, device=self.part_number)
+    result = self._commander.security.fwupgradecheck(reset=allow_reset, target_device=self.part_number)
     if not result["success"]:
       return None
 

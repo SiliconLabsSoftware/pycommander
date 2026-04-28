@@ -30,7 +30,7 @@ class TestVerify(unittest.TestCase):
       reset=False,
       regions=["@main"],
       binary=True,
-      device="EFR32MG24",
+      target_device="EFR32MG24",
     )
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = [

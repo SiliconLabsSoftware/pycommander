@@ -26,7 +26,7 @@ class TestGbl3(unittest.TestCase):
 
   def test_gbl3_aat_usageinfo_command_with_device(self):
     commander = MockCommander()
-    commander.gbl3.aat_usageinfo(device="EFR32MG24")
+    commander.gbl3.aat_usageinfo(target_device="EFR32MG24")
     self.assertEqual(len(commander._runner.logged_commands), 1)
     expected = ["mock", "gbl3", "aat-usageinfo", "--device", "EFR32MG24", "--json"]
     self.assertEqual(commander._runner.logged_commands[0], expected)

@@ -61,7 +61,7 @@ class TestTarget(unittest.TestCase):
     )
 
     self.assertEqual(device.info(), expected_device_info)
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_info_failed(self):
     commander = MockCommander(serial_number="123456789")
@@ -70,7 +70,7 @@ class TestTarget(unittest.TestCase):
     device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to get device information"}'))
     
     self.assertEqual(device.info(), None)
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_reset(self):
     commander = MockCommander(serial_number="123456789")
@@ -599,7 +599,7 @@ class TestTarget(unittest.TestCase):
     )
 
     self.assertIsNone(device.info())
-    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--json"]])
+    self.assertEqual(commander._runner.logged_commands, [["mock", "device", "info", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
   def test_target_writeManufacturingTokens(self):
     commander = MockCommander(serial_number="123456789")
