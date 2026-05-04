@@ -17,6 +17,43 @@ from ..mock_commander import MockCommander
 
 
 class TestNvm3(unittest.TestCase):
+  def test_get_general_args(self):
+    # Initialized with device
+    commander = MockCommander(target_device="EFR32MG24B020F1536IM48")
+    args = commander.nvm3._get_general_args()
+    self.assertEqual(args, ["--device", "EFR32MG24B020F1536IM48"])
+
+    # Device as kwarg
+    commander = MockCommander()
+    args = commander.nvm3._get_general_args(target_device="EFR32MG24B020F1536IM48")
+    self.assertEqual(args, ["--device", "EFR32MG24B020F1536IM48"])
+
+    # No args
+    commander = MockCommander()
+    args = commander.nvm3._get_general_args()
+    self.assertEqual(args, [])
+
+  def test_get_on_device_args(self):
+    # Initialized with serial number and debug options
+    commander = MockCommander(serial_number="123456789", debug_speed=4000, debug_tif="SWD")
+    args = commander.nvm3._get_on_device_args()
+    self.assertEqual(args, ["--serialno", "123456789", "--speed", "4000", "--tif", "SWD"])
+
+    # Initialized with ip address
+    commander = MockCommander(ip_address="192.168.1.100")
+    args = commander.nvm3._get_on_device_args()
+    self.assertEqual(args, ["--ip", "192.168.1.100"])
+
+    # Serial number as kwarg
+    commander = MockCommander()
+    args = commander.nvm3._get_on_device_args(serial_number="123456789")
+    self.assertEqual(args, ["--serialno", "123456789"])
+
+    # Debug options as kwargs
+    commander = MockCommander()
+    args = commander.nvm3._get_on_device_args(debug_speed=4000, debug_tif="SWD", debug_irpre=2, debug_drpre=1)
+    self.assertEqual(args, ["--speed", "4000", "--tif", "SWD", "--irpre", "2", "--drpre", "1"])
+
   def test_nvm3_delete_command(self):
     commander = MockCommander()
     commander.nvm3.delete("in.nvm3", "out.nvm3", object_keys=["key1"], delete_all=True, address=0x08000000, range=(0x0, 0x2000))

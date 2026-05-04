@@ -17,6 +17,22 @@ from ..mock_commander import MockCommander
 
 
 class TestGbl4(unittest.TestCase):
+  def test_get_general_args(self):
+    # Initialized with device
+    commander = MockCommander(target_device="EFR32MG24B020F1536IM48")
+    args = commander.gbl4._get_general_args()
+    self.assertEqual(args, ["--device", "EFR32MG24B020F1536IM48"])
+
+    # Device as kwarg
+    commander = MockCommander()
+    args = commander.gbl4._get_general_args(target_device="EFR32MG24B020F1536IM48")
+    self.assertEqual(args, ["--device", "EFR32MG24B020F1536IM48"])
+
+    # No args
+    commander = MockCommander()
+    args = commander.gbl4._get_general_args()
+    self.assertEqual(args, [])
+
   def test_gbl4_create_command(self):
     commander = MockCommander()
     commander.gbl4.create(

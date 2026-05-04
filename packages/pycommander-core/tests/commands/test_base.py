@@ -65,6 +65,11 @@ class TestBase(unittest.TestCase):
     base_command = BaseCommand(commander)
     self.assertEqual(base_command._get_adapter_connection_args(), ["--identifybyserialport", "/dev/tty.usbmodem141101"])
 
+  def test_base_get_device_args(self):
+    commander = MockCommander(target_device="EFR32MG24B020F1536IM48")
+    base_command = BaseCommand(commander)
+    self.assertEqual(base_command._get_device_args(), ["--device", "EFR32MG24B020F1536IM48"])
+
   def test_base_get_debug_args(self):
     commander = MockCommander(debug_speed=1000000, debug_tif="SWD", debug_irpre=1000000, debug_drpre=1000000)
     base_command = BaseCommand(commander)
