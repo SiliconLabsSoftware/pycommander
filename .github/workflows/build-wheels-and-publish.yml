@@ -153,3 +153,12 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           python -m twine upload --verbose --repository testpypi packages/*/dist/*.whl
+
+  clean-up:
+    needs: publish-to-pypi
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete artifacts
+        uses: geekyeggo/delete-artifacts@v6
+        with:
+          name: dist-*
