@@ -24,6 +24,46 @@ from pycommander_core.runner import RunnerResult
 
 class TestCommanderBase(unittest.TestCase):
 
+  def test_commander_base_get_kwargs(self):
+    commander = MockCommander()
+    self.assertEqual(commander._get_kwargs(), [])
+    self.assertEqual(commander._get_kwargs(serial_number="123456789"), ["--serialno", "123456789"])
+    self.assertEqual(commander._get_kwargs(ip_address="192.168.1.100"), ["--ip", "192.168.1.100"])
+    self.assertEqual(commander._get_kwargs(serial_port="/dev/tty.usbmodem141101"), ["--identifybyserialport", "/dev/tty.usbmodem141101"])
+    self.assertEqual(commander._get_kwargs(debug_speed=1000000), ["--speed", "1000000"])
+    self.assertEqual(commander._get_kwargs(debug_tif="SWD"), ["--tif", "SWD"])
+    self.assertEqual(commander._get_kwargs(debug_irpre=1000000), ["--irpre", "1000000"])
+    self.assertEqual(commander._get_kwargs(debug_drpre=1000000), ["--drpre", "1000000"])
+    self.assertEqual(commander._get_kwargs(target_device="123456789"), ["--device", "123456789"])
+    self.assertEqual(commander._get_kwargs(force=True), ["--force"])
+    self.assertEqual(commander._get_kwargs(target_device=None), [])
+    self.assertEqual(commander._get_kwargs(force=False), [])
+    self.assertEqual(commander._get_kwargs(devicexml="/Applications/Commander.app/Contents/Resources/jlink/"), ["--devicexml", "/Applications/Commander.app/Contents/Resources/jlink/"])
+    self.assertEqual(commander._get_kwargs(devicexml=None), [])
+    self.assertEqual(commander._get_kwargs(devicexml=""), [])
+
+    self.assertEqual(commander._get_kwargs(
+      serial_number="123456789",
+      ip_address="192.168.1.100",
+      serial_port="/dev/tty.usbmodem141101",
+      debug_speed=1000000,
+      debug_tif="SWD",
+      debug_irpre=1000000,
+      debug_drpre=1000000,
+      target_device="123456789",
+      force=True,
+      devicexml="/Applications/Commander.app/Contents/Resources/jlink/",
+    ), [
+      "--serialno", "123456789",
+      "--ip", "192.168.1.100",
+      "--identifybyserialport", "/dev/tty.usbmodem141101",
+      "--speed", "1000000",
+      "--tif", "SWD",
+      "--irpre", "1000000",
+      "--drpre", "1000000",
+      "--device", "123456789",
+      "--force", "--devicexml", "/Applications/Commander.app/Contents/Resources/jlink/",])
+
   def test_commander_base_executable_path_and_cli_true(self):
     command = shutil.which("echo")
     if command is None:

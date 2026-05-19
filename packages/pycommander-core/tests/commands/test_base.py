@@ -89,6 +89,9 @@ class TestBase(unittest.TestCase):
     self.assertEqual(base_command._get_kwargs(force=True), ["--force"])
     self.assertEqual(base_command._get_kwargs(target_device=None), [])
     self.assertEqual(base_command._get_kwargs(force=False), [])
+    self.assertEqual(base_command._get_kwargs(devicexml="/Applications/Commander.app/Contents/Resources/jlink/"), ["--devicexml", "/Applications/Commander.app/Contents/Resources/jlink/"])
+    self.assertEqual(base_command._get_kwargs(devicexml=None), [])
+    self.assertEqual(base_command._get_kwargs(devicexml=""), [])
     self.assertEqual(base_command._get_kwargs(
       target_device="Cortex-M4",
       force=True,
@@ -99,6 +102,7 @@ class TestBase(unittest.TestCase):
       serial_number="123456789",
       ip_address="192.168.1.100",
       serial_port="/dev/tty.usbmodem141101",
+      devicexml="/Applications/Commander.app/Contents/Resources/jlink/",
     ), [
       "--serialno", "123456789",
       "--ip", "192.168.1.100",
@@ -109,6 +113,7 @@ class TestBase(unittest.TestCase):
       "--drpre", "1000000",
       "--device", "Cortex-M4",
       "--force",
+      "--devicexml", "/Applications/Commander.app/Contents/Resources/jlink/",
     ])
 
   def test_base_get_address_string(self):
