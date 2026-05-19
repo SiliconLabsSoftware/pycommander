@@ -38,6 +38,9 @@ dist/
 packages/pycommander-*/src/pycommander_*/_archive/*
 !packages/pycommander-*/src/pycommander_*/_archive/__init__.py
 
+# Utility scripts
+scripts/*
+!scripts/run_tests.py
 
 # Mac OS X
 .DS_Store
