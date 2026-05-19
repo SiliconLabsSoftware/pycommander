@@ -182,6 +182,9 @@ class CommanderBase:
     if kwargs.get("force", False):
       args += ["--force"]
 
+    if kwargs.get("devicexml"):
+      args += ["--devicexml", kwargs["devicexml"]]
+
     return args
 
   def _get_serial_number_option(self) -> list[str]:

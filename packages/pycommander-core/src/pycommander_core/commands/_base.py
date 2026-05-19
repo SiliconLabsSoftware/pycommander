@@ -102,6 +102,9 @@ class BaseCommand:
     if kwargs.get("force", False):
       args += ["--force"]
 
+    if kwargs.get("devicexml"):
+      args += ["--devicexml", kwargs["devicexml"]]
+
     return args
 
   # Helper methods for common arguments
