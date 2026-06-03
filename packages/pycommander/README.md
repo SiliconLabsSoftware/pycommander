@@ -8,7 +8,7 @@ This Python package wraps Simplicity Commander functionality and exposes a nativ
 
 ## Requirements
 
-This package was developed using Python 3.10. Required PyPI packages are:
+This package requires Python 3.10 or newer. Required PyPI packages are:
 
 - platformdirs
 - pyyaml
@@ -56,7 +56,21 @@ print(commander.util.appinfo(filename="firmware.hex"))
 print(commander.flash.flash(filenames=["firmware.hex"], address=0x08000000))
 ```
 
+The `Commander` class also exposes a few standalone helpers; for example, `getVersion()` returns the embedded Simplicity Commander, J-Link, EMDLL and other component versions as a `CommanderVersionInfo` object:
+
+```python
+print(commander.getVersion())
+```
+
 Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom`, `vuart`, `rtt` and `swo`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below.
+
+For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
+
+```python
+# Run a raw Commander CLI command and capture its output
+result = commander.runCommand("rtt", "--help", json_formatted_output=False)
+print(result.output)
+```
 
 #### The `Adapter` and `Target` classes
 
@@ -73,10 +87,35 @@ pycommander exposes several convenience methods for common tasks related to the 
 
 When instantiating the `Adapter` class, a `Commander` class instance is created and made available as an attribute of the `Adapter` class. If a `target_device` is provided to the `Adapter` class, a `Target` class instance is created and made available as an attribute of the `Adapter` class as well.
 
-An `Adapter` class instance (with a potential `Target` class instance) should be used to represent a connection to a single adapter (with target device). Multiple `Adapter` class instances can be used to represent connections to multiple adapters (with or without their respective target devices).
+An `Adapter` class instance (with a potential `Target` class instance) should be used to represent a connection to a single adapter (with target device). Multiple `Adapter` class instances can be used to represent connections to multiple adapters (with or without their respective target devices):
 
 ```python
-from pycommander import Adapter, Target
+from pycommander import Adapter
+
+serial_numbers = ["44055955", "44055956", "44055957"]
+adapters = [Adapter(serial_number=sn, target_device="EFR32MG24") for sn in serial_numbers]
+for adapter in adapters:
+  print(adapter.info())
+```
+
+The serial numbers above can be obtained by scanning for available adapters. `Commander.listAvailableAdapters()` does a non-intrusive scan and returns a list of `BasicAdapterInfo` objects, each carrying `jlink_serial_number`, `ip_address` and `nickname` (any of which may be `None`). Exactly one of `list_usb_adapters` or `list_network_adapters` must be set to `True`:
+
+```python
+from pycommander import Commander
+
+commander = Commander()
+
+usb_adapters = commander.listAvailableAdapters(list_usb_adapters=True)
+network_adapters = commander.listAvailableAdapters(list_network_adapters=True)
+
+for adapter in usb_adapters or []:
+  print(adapter.jlink_serial_number, adapter.nickname)
+```
+
+A typical session against a single adapter may look like this:
+
+```python
+from pycommander import Adapter
 from pycommander_core.types import AdapterInfo, AdapterVoltageInfo, VcomHandshake, CtuneValue
 
 # Instantiate the Adapter class with a serial number and target device
@@ -96,6 +135,17 @@ ctune_value: CtuneValue = adapter.target.getCTUNE()
 
 # Set the CTUNE value of the target device
 adapter.target.setCTUNE(ctune_value.board)
+```
+
+A common high-level task is flashing firmware. `Target.flashApplication()` accepts one or more files (`.hex`, `.s37`, `.bin`, `.gbl` or `.rps`) and handles the underlying flash, verify and reset steps:
+
+```python
+from pathlib import Path
+from pycommander import Adapter
+
+adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
+
+success: bool = adapter.target.flashApplication(filenames=[Path("firmware.hex")])
 ```
 
 #### The `AemStream` class
@@ -144,4 +194,40 @@ for measurement in aem_stream:
 
 # Close the AEM stream
 aem_stream.close()
+```
+
+#### Error handling
+
+Failed Commander invocations raise typed exceptions, so your automation scripts can react to them in a structured way. Three exception classes are exposed from `pycommander_core.errors`:
+
+- `PyCommanderInputError` — Commander rejected the arguments (return code -1 / 255).
+- `PyCommanderRuntimeError` — Commander failed at runtime, e.g. the adapter could not be reached or the operation timed out (return code -2 / 254).
+- `PyCommanderError` — base class for any other non-zero return code, and parent of the two above.
+
+```python
+from pathlib import Path
+from pycommander import Adapter
+from pycommander_core.errors import PyCommanderError, PyCommanderRuntimeError
+
+adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
+
+try:
+  adapter.target.flashApplication(filenames=[Path("firmware.hex")])
+except PyCommanderRuntimeError as e:
+  print(f"Commander failed at runtime: {e}")
+except PyCommanderError as e:
+  print(f"Other Commander error: {e}")
+```
+
+#### Logging
+
+All Commander invocations can be logged to a file by passing the `log_file_path` argument to the `Commander` constructor. Each invocation is recorded with a timestamp, which is handy when diagnosing issues in long-running automations or production-test rigs.
+
+```python
+from pathlib import Path
+from pycommander import Adapter, Commander
+
+# Build a Commander with logging enabled, then attach it to an Adapter
+commander = Commander(serial_number="44055955", log_file_path=Path("pycommander.log"))
+adapter = Adapter(commander=commander, target_device="EFR32MG24")
 ```
