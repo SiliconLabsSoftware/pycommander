@@ -1,6 +1,6 @@
 # Silicon Labs PyCommander
 
-[![Unit tests](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest.yml/badge.svg)](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest.yml)
+[![Unit tests](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest-and-coverage.yml/badge.svg)](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest-and-coverage.yml)
 
 ## Introduction
 
