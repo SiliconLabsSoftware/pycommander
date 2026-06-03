@@ -62,6 +62,24 @@ The `Commander` class also exposes a few standalone helpers; for example, `getVe
 print(commander.getVersion())
 ```
 
+`listAvailableAdapters()` is a helper method that can be used to (unintrusively) scan for available adapters. This method returns a list of `BasicAdapterInfo` objects, each carrying `jlink_serial_number`, `ip_address` and `nickname` (any of which may be `None`):
+
+```python
+from pycommander import Commander
+
+commander = Commander()
+
+# List USB adapters
+adapters = commander.listAvailableAdapters(list_usb_adapters=True)
+for adapter in adapters:
+  print(adapter.jlink_serial_number, adapter.nickname)
+
+# List network adapters
+adapters = commander.listAvailableAdapters(list_network_adapters=True)
+for adapter in adapters:
+  print(adapter.ip_address, adapter.nickname)
+```
+
 Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom`, `vuart`, `rtt` and `swo`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below.
 
 For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
@@ -96,20 +114,6 @@ serial_numbers = ["44055955", "44055956", "44055957"]
 adapters = [Adapter(serial_number=sn, target_device="EFR32MG24") for sn in serial_numbers]
 for adapter in adapters:
   print(adapter.info())
-```
-
-The serial numbers above can be obtained by scanning for available adapters. `Commander.listAvailableAdapters()` does a non-intrusive scan and returns a list of `BasicAdapterInfo` objects, each carrying `jlink_serial_number`, `ip_address` and `nickname` (any of which may be `None`). Exactly one of `list_usb_adapters` or `list_network_adapters` must be set to `True`:
-
-```python
-from pycommander import Commander
-
-commander = Commander()
-
-usb_adapters = commander.listAvailableAdapters(list_usb_adapters=True)
-network_adapters = commander.listAvailableAdapters(list_network_adapters=True)
-
-for adapter in usb_adapters or []:
-  print(adapter.jlink_serial_number, adapter.nickname)
 ```
 
 A typical session against a single adapter may look like this:
