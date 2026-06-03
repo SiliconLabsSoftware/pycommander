@@ -67,6 +67,11 @@ print(commander.flash.flash(filenames=["firmware.hex"], address=0x08000000))
 The `Commander` class also exposes a few standalone helpers; for example, `getVersion()` returns the embedded Simplicity Commander, J-Link, EMDLL and other component versions as a `CommanderVersionInfo` object:
 
 ```python
+from pycommander_gui import Commander
+
+commander = Commander()
+
+# Get the version of the embedded Simplicity Commander, J-Link, EMDLL and other components
 print(commander.getVersion())
 ```
 
