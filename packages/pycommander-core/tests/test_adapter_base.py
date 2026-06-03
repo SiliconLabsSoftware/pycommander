@@ -74,6 +74,7 @@ class TestAdapterBase(unittest.TestCase):
             "kit_name": "Wireless Pro Kit",
             "kit_part_number": "",
             "mac_address": "D0:CF:5E:01:E1:29",
+            "nickname": "Adapter 1",
             "vcom_port": "tty.usbmodem0001234567891",
             "vcom_supported": true
         }
@@ -109,6 +110,7 @@ class TestAdapterBase(unittest.TestCase):
       ip_supported=True,
       ip_address="10.5.161.83",
       mac_address="D0:CF:5E:01:E1:29",
+      nickname="Adapter 1",
       kit_name="Wireless Pro Kit",
       kit_part_number="",
       aem_supported=True,
@@ -156,6 +158,7 @@ class TestAdapterBase(unittest.TestCase):
             "kit_name": "Wireless Pro Kit",
             "kit_part_number": "",
             "mac_address": "D0:CF:5E:01:E1:29",
+            "nickname": "Adapter 1",
             "vcom_port": "tty.usbmodem0001234567891",
             "vcom_supported": true
         }
@@ -201,6 +204,7 @@ class TestAdapterBase(unittest.TestCase):
             "kit_name": "Wireless Pro Kit",
             "kit_part_number": "",
             "mac_address": "D0:CF:5E:01:E1:29",
+            "nickname": "Adapter 1",
             "vcom_port": "tty.usbmodem0001234567891",
             "vcom_supported": true
         }

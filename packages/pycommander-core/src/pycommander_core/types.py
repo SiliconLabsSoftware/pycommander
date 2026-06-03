@@ -59,6 +59,7 @@ class AdapterInfo:
   ip_supported:        bool                   | None = None
   ip_address:          str                    | None = None
   mac_address:         str                    | None = None
+  nickname:            str                    | None = None
   kit_name:            str                    | None = None
   kit_part_number:     str                    | None = None
   aem_supported:       bool                   | None = None
