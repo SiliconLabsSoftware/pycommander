@@ -142,7 +142,7 @@ class CommanderBase:
       list_network_adapters (bool): Whether to list network adapters.
 
     Returns:
-      A list of AvailableAdapterInfo objects, or None if the list could not be retrieved.
+      A list of BasicAdapterInfo objects, or None if the list could not be retrieved.
     """
     if list_usb_adapters and list_network_adapters:
       raise ValueError("Only one of list_usb_adapters or list_network_adapters can be True")
