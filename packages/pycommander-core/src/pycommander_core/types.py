@@ -44,6 +44,12 @@ class AdapterFwInfo:
   upgrade_available: bool | None = None
 
 @dataclass
+class BasicAdapterInfo:
+  jlink_serial_number: str
+  ip_address: str
+  nickname: str
+
+@dataclass
 class AdapterInfo:
   board_list:          list[AdapterBoardInfo] | None = None
   fw_info:             AdapterFwInfo          | None = None
