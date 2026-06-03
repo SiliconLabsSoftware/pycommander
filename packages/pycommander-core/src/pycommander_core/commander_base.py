@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
   from .commands import *
 
-from .types import CommanderVersionInfo
+from .types import CommanderVersionInfo, BasicAdapterInfo
 from .runner import Runner, RunnerResult
 from ._ensure_commander import ensure_commander
 from ._utils import sanitize_args
@@ -133,6 +133,40 @@ class CommanderBase:
     )
 
     return version_info
+
+  def listAvailableAdapters(self, list_usb_adapters: bool = False, list_network_adapters: bool = False) -> list[BasicAdapterInfo] | None:
+    """Do an unintrusive scan for available adapters across the USB interface or the network.
+
+    Args:
+      list_usb_adapters (bool): Whether to list USB adapters.
+      list_network_adapters (bool): Whether to list network adapters.
+
+    Returns:
+      A list of AvailableAdapterInfo objects, or None if the list could not be retrieved.
+    """
+    if list_usb_adapters and list_network_adapters:
+      raise ValueError("Only one of list_usb_adapters or list_network_adapters can be True")
+
+    args = ["--noconnect"]
+    if list_network_adapters:
+      args += ["--net"]
+    result : RunnerResult = self._runner.run("adapter", "list", *args)
+
+    if result.returncode != 0:
+      return None
+
+    json_output = json.loads(result.output)
+    if "result" not in json_output or "devices" not in json_output["result"]:
+      return None
+    
+    adapter_list : list[BasicAdapterInfo] = []
+    for device in json_output["result"]["devices"]:
+       ip_address    : str | None = device.get("adapter_ip", None)
+       nickname      : str | None = device.get("adapter_nickname", None)
+       serial_number : str | None = device.get("serial_number", None)
+       adapter_list.append(BasicAdapterInfo(jlink_serial_number=serial_number, ip_address=ip_address, nickname=nickname))
+
+    return adapter_list
 
   def runCommand(self, *args : str, json_formatted_output: bool = True, **kwargs: Any) -> CommanderResult | dict:
     """Run a command and return the result.
