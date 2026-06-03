@@ -80,6 +80,7 @@ class AdapterBase:
       ip_supported=result["result"]["kit_info"].get("ip_supported", None),
       ip_address=result["result"]["kit_info"].get("ip_address", None),
       mac_address=result["result"]["kit_info"].get("mac_address", None),
+      nickname=result["result"]["kit_info"].get("nickname", None),
       kit_name=result["result"]["kit_info"].get("kit_name", None),
       kit_part_number=result["result"]["kit_info"].get("kit_part_number", None),
       aem_supported=result["result"]["kit_info"].get("aem_supported", None),
