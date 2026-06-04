@@ -26,11 +26,17 @@ To install `pycommander` on your system, you can use the following command:
 pip install silabs-pycommander
 ```
 
-By default this pulls in the CLI flavor of Simplicity Commander. To also install the GUI flavor, use the `gui` extra:
+By default this pulls in the CLI flavor of Simplicity Commander.
+
+To install the GUI version of Simplicity Commander, use the `gui` extra:
 
 ```bash
 pip install silabs-pycommander[gui]
 ```
+
+This will install the GUI version of Simplicity Commander _in addition to_ the CLI version.
+
+Both the CLI and GUI versions can coexist peacefully on the same system, but do note that when importing the `pycommander` package or when running the `pycommander` command from the terminal, the GUI version will be used over the CLI version. The flavor to use can be explicitly selected by importing the appropriate package, e.g. `import pycommander_cli` or `import pycommander_gui`, or by using the `pycommander-cli` or `pycommander-gui` commands from the terminal.
 
 ## Usage
 
