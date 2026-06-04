@@ -144,6 +144,9 @@ class CommanderBase:
     Returns:
       A list of BasicAdapterInfo objects, or None if the list could not be retrieved.
     """
+    if not list_usb_adapters and not list_network_adapters:
+      raise ValueError("At least one of list_usb_adapters or list_network_adapters must be True")
+
     if list_usb_adapters and list_network_adapters:
       raise ValueError("Only one of list_usb_adapters or list_network_adapters can be True")
 

@@ -158,6 +158,19 @@ class TestCommanderBase(unittest.TestCase):
     commander = MockCommander()
     with self.assertRaises(ValueError):
       commander.listAvailableAdapters(list_usb_adapters=True, list_network_adapters=True)
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_commander_base_listAvailableAdapters_none(self):
+    commander = MockCommander()
+    with self.assertRaises(ValueError):
+      commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=False)
+    self.assertEqual(commander._runner.logged_commands, [])
+
+  def test_commander_base_listAvailableAdapters_no_adapters(self):
+    commander = MockCommander()
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": []}}'))
+    self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [])
+    self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_failed(self):
     commander = MockCommander()
