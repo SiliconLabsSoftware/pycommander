@@ -18,6 +18,12 @@ from .runner import Runner
 from .types import AemMeasurement
 
 class AemStreamBase:
+  """High-level interface for continuous AEM data captures.
+
+  AEM (Advanced Energy Monitor) is only available on Silicon Labs adapters, so this
+  class cannot be used with a generic J-Link adapter.
+  """
+
   def __init__(self,
                commander: CommanderBase,
                datarate_hz: int | None = None,

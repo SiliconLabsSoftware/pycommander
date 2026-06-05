@@ -19,7 +19,7 @@ from pycommander_core.commands._base import BaseCommand
 
 
 class AdapterCommand(BaseCommand):
-  """Commands that affect a debug adapter (kit/debugger)."""
+  """Commands that affect a debug adapter (kit/debugger). Only available on Silicon Labs adapters."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = self._get_adapter_connection_args()

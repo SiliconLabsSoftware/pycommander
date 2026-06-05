@@ -19,7 +19,8 @@ class AemStream(AemStreamBase):
   """
   High-level interface for continuous AEM data captures.
   This class can be used in a context manager to simplify the handling
-  of opening and closing the AemStream.
+  of opening and closing the AemStream. This class can only be used with
+  Silicon Labs adapters.
 
   Args:
     serial_number: Serial number of the adapter

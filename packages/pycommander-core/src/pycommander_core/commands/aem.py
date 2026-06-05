@@ -19,7 +19,7 @@ from pycommander_core.commands._base import BaseCommand
 
 
 class AemCommand(BaseCommand):
-  """Advanced Energy Monitor (AEM) commands."""
+  """Advanced Energy Monitor (AEM) commands. Only available on Silicon Labs adapters."""
 
   def _get_general_args(self, **kwargs: Any) -> list[str]:
     args = self._get_adapter_connection_args()

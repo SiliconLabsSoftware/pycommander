@@ -29,6 +29,9 @@ class Adapter(AdapterBase):
               commander:     Commander | None = None):
     """Initialize the Adapter class. Either serial_number, ip_address, or serial_port must be provided.
 
+    The convenience methods on this class are only available on Silicon Labs adapters,
+    and are not available when using a generic J-Link adapter.
+
     Args:
       serial_number (str): The serial number of the adapter.
       ip_address (str): The IP address of the adapter.
