@@ -287,6 +287,213 @@ class TestAdapterBase(unittest.TestCase):
     self.assertEqual(adapter.reset(), False)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "reset", "--serialno", "123456789", "--json"]])
 
+  def test_adapter_base_upgradeFirmware_with_file(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    # probe (current version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
+      )
+    )
+    # fwupgrade
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"success": true}'
+      )
+    )
+    # probe (new version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
+      )
+    )
+
+    self.assertEqual(
+      adapter.upgradeFirmware(filename=Path("firmware.emz")),
+      AdapterFwUpgradeResult(
+        package_was_installed=True,
+        currently_installed_version="2v0p1",
+      ),
+    )
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgrade", "firmware.emz", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+    ])
+
+  def test_adapter_base_upgradeFirmware_with_empty_filename(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    # probe (current version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
+      )
+    )
+    # fwupgradecheck
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"upgrade_available": true}, "success": true}'
+      )
+    )
+    # fwupgrade
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"success": true}'
+      )
+    )
+    # probe (new version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
+      )
+    )
+
+    self.assertEqual(
+      adapter.upgradeFirmware(filename=""),
+      AdapterFwUpgradeResult(
+      package_was_installed=True,
+      currently_installed_version="2v0p1",
+    ))
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgradecheck", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgrade", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+    ])
+
+  def test_adapter_base_upgradeFirmware_with_file_failed(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    # probe (current version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
+      )
+    )
+    # fwupgrade
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        254,
+        '{"success": false}'
+      )
+    )
+
+    self.assertEqual(adapter.upgradeFirmware(filename=Path("firmware.emz")), None)
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgrade", "firmware.emz", "--serialno", "123456789", "--json"],
+    ])
+
+  def test_adapter_base_upgradeFirmware_bundled(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    # probe (current version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
+      )
+    )
+    # fwupgradecheck
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"upgrade_available": true}, "success": true}'
+      )
+    )
+    # fwupgrade
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"success": true}'
+      )
+    )
+    # probe (new version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
+      )
+    )
+
+    self.assertEqual(
+      adapter.upgradeFirmware(),
+      AdapterFwUpgradeResult(
+        package_was_installed=True,
+        currently_installed_version="2v0p1",
+      ),
+    )
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgradecheck", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgrade", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+    ])
+
+  def test_adapter_base_upgradeFirmware_bundled_no_upgrade_available(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    # probe (current version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
+      )
+    )
+    # fwupgradecheck
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"upgrade_available": false}, "success": true}'
+      )
+    )
+
+    self.assertEqual(
+      adapter.upgradeFirmware(),
+      AdapterFwUpgradeResult(
+        package_was_installed=False,
+        currently_installed_version="2v0p1",
+      ),
+    )
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgradecheck", "--serialno", "123456789", "--json"],
+    ])
+
+  def test_adapter_base_upgradeFirmware_bundled_check_failed(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    # probe (current version)
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
+      )
+    )
+    # fwupgradecheck
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        254,
+        '{"success": false}'
+      )
+    )
+
+    self.assertEqual(adapter.upgradeFirmware(), None)
+    self.assertEqual(adapter._commander._runner.logged_commands, [
+      ["mock", "adapter", "probe", "--serialno", "123456789", "--json"],
+      ["mock", "adapter", "fwupgradecheck", "--serialno", "123456789", "--json"],
+    ])
+
   def test_adapter_base_getVoltage(self):
     adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
     
@@ -810,4 +1017,43 @@ class TestAdapterBase(unittest.TestCase):
     self.assertEqual(len(result.period_detection.result.intervals), 5)
     self.assertEqual(result.period_detection.result.num_cycles, 6)
     self.assertEqual(len(result.period_detection.result.method_results), 3)
+
+  def test_adapter_base_get_current_firmware_version(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
+      )
+    )
+
+    self.assertEqual(adapter._AdapterBase__get_current_firmware_version(), "1v0p0")
+    self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "probe", "--serialno", "123456789", "--json"]])
+
+  def test_adapter_base_get_current_firmware_version_failed(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        254,
+        '{"success": false}'
+      )
+    )
+
+    self.assertIsNone(adapter._AdapterBase__get_current_firmware_version())
+    self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "probe", "--serialno", "123456789", "--json"]])
+
+  def test_adapter_base_get_current_firmware_version_missing_firmware_info(self):
+    adapter = MockAdapter(serial_number="123456789", target_device="EFR32MG24B020F1536IM48")
+
+    adapter._commander._runner.queue_result(
+      RunnerResult(
+        0,
+        '{"result": {}, "success": true}'
+      )
+    )
+
+    self.assertIsNone(adapter._AdapterBase__get_current_firmware_version())
+    self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "probe", "--serialno", "123456789", "--json"]])
   
