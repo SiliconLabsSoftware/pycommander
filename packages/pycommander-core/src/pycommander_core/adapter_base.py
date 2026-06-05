@@ -17,6 +17,13 @@ from .commander_base import CommanderBase
 from .target import Target
 
 class AdapterBase:
+  """High-level interface for interacting with a Silicon Labs adapter (kit/debugger).
+
+  The convenience methods on this class (adapter info, reset, supply voltage, VCOM
+  configuration, and energy analysis) rely on features that are only present on
+  Silicon Labs adapters, and are not available when using a generic J-Link adapter.
+  """
+
   def __init__(self,
               serial_number: str       | None = None,
               ip_address: str          | None = None,
@@ -36,7 +43,7 @@ class AdapterBase:
     self.target : Target | None = target
 
   def info(self) -> types.AdapterInfo | None:
-    """Get information about the adapter.
+    """Get information about the adapter. Only available on Silicon Labs adapters.
 
     Returns:
       An AdapterInfo object containing the information about the adapter, or None if the information could not be retrieved.
@@ -91,7 +98,7 @@ class AdapterBase:
     return adapter_info
 
   def reset(self) -> bool:
-    """Reset the adapter.
+    """Reset the adapter. Only available on Silicon Labs adapters.
 
     Returns:
       True if the adapter was reset successfully, False otherwise.
@@ -100,12 +107,12 @@ class AdapterBase:
     return result["success"]
 
   def getVoltage(self) -> types.AdapterVoltageInfo | None:
-    """Get the voltage for the target device.
+    """Get the supply voltage for the target device. Only available on Silicon Labs adapters.
 
     Returns:
-      A dictionary of rail indices and AdapterVoltageInfo objects containing the voltage 
-      information for each rail, or None if the voltage information could not be retrieved. 
-      If no voltage information is available for a rail, the rail index will not be present in the dictionary.
+      A dictionary of rail indices and AdapterVoltageInfo objects containing the supply voltage 
+      information for each rail, or None if the supply voltage information could not be retrieved. 
+      If no supply voltage information is available for a rail, the rail index will not be present in the dictionary.
     """
     result : dict = self._commander.adapter.voltage()
 
@@ -124,20 +131,20 @@ class AdapterBase:
     return voltage_info
 
   def setVoltage(self, voltage: float, calibrate: bool = True) -> bool:
-    """Set the voltage for the target device.
+    """Set the supply voltage for the target device. Only available on Silicon Labs adapters.
 
     Args:
-      voltage (float): Voltage to set.
+      voltage (float): Supply voltage to set.
       calibrate (bool): If True, automatically calibrate if voltage has changed.
 
     Returns:
-      True if the voltage was set successfully, False otherwise.
+      True if the supply voltage was set successfully, False otherwise.
     """
     result : dict = self._commander.adapter.voltage(voltage=voltage, calibrate=calibrate)
     return result["success"]
 
   def setVcomConfig(self, baudrate: int, handshake: types.VcomHandshake, store: bool = False) -> bool:
-    """Set the VCOM configuration for the adapter.
+    """Set the VCOM configuration for the adapter. Only available on Silicon Labs adapters.
 
     Args:
       baudrate (int): VCOM baudrate.
@@ -154,7 +161,7 @@ class AdapterBase:
     return result["success"]
 
   def analyzeEnergyUsage(self, duration_s: float, get_distribution: bool = False, cluster_states: bool = False, detect_period: bool = False) -> types.AemAnalysisResult | None:
-    """Analyze the energy usage of the target device.
+    """Analyze the energy usage of the target device. Only available on Silicon Labs adapters.
 
     Args:
       duration_s: Duration of the measurement in seconds.

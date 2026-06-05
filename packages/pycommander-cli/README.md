@@ -97,12 +97,21 @@ print(result.output)
 
 #### The `Adapter` and `Target` classes
 
-pycommander-cli exposes several convenience methods for common tasks related to the adapter and the target device. These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module, and the tasks include:
+pycommander-cli exposes several convenience methods for common tasks, split across two classes. These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module.
+
+The `Adapter` class handles tasks related to the adapter itself. These methods are only available on Silicon Labs adapters, and are not available when using a generic J-Link adapter:
+
+- Reading adapter and kit information
+- Resetting the adapter
+- Configuring the target device's supply voltage
+- Setting the adapter's VCOM configuration
+- Analyzing the target device's energy usage
+- +++
+
+The `Target` class handles tasks related to the target device (a Silicon Labs MCU), and works with any supported debug adapter:
 
 - Locking/unlocking the device for debug access
 - Setting the CTUNE value
-- Setting the adapter's VCOM configuration
-- Configuring the target device's voltage
 - Flashing firmware to the device
 - Erasing the device's flash
 - Configuring code regions (Series 3 only)
@@ -159,7 +168,7 @@ success: bool = adapter.target.flashApplication(filenames=[Path("firmware.hex")]
 
 #### The `AemStream` class
 
-The `AemStream` class provides a pythonic way of streaming AEM measurements from the device. The measurements are returned as `AemMeasurement` objects, which contain the timestamp, current, voltage, and the calculated power. An `AemStream` object is suitable for streaming AEM measurements from an adapter, and there is no limitation to the duration of the streaming. The stream may be stopped at any time.
+The `AemStream` class provides a pythonic way of streaming AEM measurements from the device. The measurements are returned as `AemMeasurement` objects, which contain the timestamp, current, voltage, and the calculated power. An `AemStream` object is suitable for streaming AEM measurements from a Silicon Labs adapter, and there is no limitation to the duration of the streaming. The stream may be stopped at any time.
 
 Like the underlying Simplicity Commander CLI, the `AemStream` class supports a variety of options for configuring the AEM data capture process, like setting up simple triggers to start the data capture process and specifying the data output rate.
 
