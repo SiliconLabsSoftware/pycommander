@@ -107,9 +107,10 @@ print(result.output)
 
 pycommander-gui exposes several convenience methods for common tasks, split across two classes. These methods return different data types depending on the command. The types are available in the `pycommander_core.types` module.
 
-The `Adapter` class handles tasks related to the adapter itself. These methods are only available on Silicon Labs adapters, and are not available when using a generic J-Link adapter:
+The `Adapter` class handles tasks related to the adapter itself. These methods are only available on Silicon Labs adapters, and are not functional when using a generic J-Link adapter:
 
 - Reading adapter and kit information
+- Upgrading the adapter's firmware
 - Resetting the adapter
 - Configuring the target device's supply voltage
 - Setting the adapter's VCOM configuration
@@ -127,7 +128,7 @@ The `Target` class handles tasks related to the target device (a Silicon Labs MC
 
 When instantiating the `Adapter` class, a `Commander` class instance is created and made available as an attribute of the `Adapter` class. If a `target_device` is provided to the `Adapter` class, a `Target` class instance is created and made available as an attribute of the `Adapter` class as well.
 
-An `Adapter` class instance (with a potential `Target` class instance) should be used to represent a connection to a single adapter (with target device). Multiple `Adapter` class instances can be used to represent connections to multiple adapters (with or without their respective target devices):
+An `Adapter` class instance (with a potential `Target` class instance) should be used to represent a connection to a single Silicon Labs adapter (with an attached target device). Multiple `Adapter` class instances can be used to represent multiple adapters (with or without their respective target devices):
 
 ```python
 from pycommander_gui import Adapter
@@ -147,6 +148,9 @@ from pycommander_core.types import AdapterInfo, AdapterVoltageInfo, VcomHandshak
 # Instantiate the Adapter class with a serial number and target device
 adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
 
+# Ensure we're running the latest firmware on the adapter
+adapter.upgradeFirmware()
+
 # Get the adapter information
 adapter_info: AdapterInfo = adapter.info()
 
@@ -163,7 +167,7 @@ ctune_value: CtuneValue = adapter.target.getCTUNE()
 adapter.target.setCTUNE(ctune_value.board)
 ```
 
-A common high-level task is flashing firmware. `Target.flashApplication()` accepts one or more files (`.hex`, `.s37`, `.bin`, `.gbl` or `.rps`) and handles the underlying flash, verify and reset steps:
+A common high-level task is flashing application firmware to the target device. `Target.flashApplication()` accepts one or more files (`.hex`, `.s37`, `.bin`, `.gbl` or `.rps`) and handles the underlying flash, verify and reset steps:
 
 ```python
 from pathlib import Path
@@ -176,13 +180,13 @@ success: bool = adapter.target.flashApplication(filenames=[Path("firmware.hex")]
 
 #### The `AemStream` class
 
-The `AemStream` class provides a pythonic way of streaming AEM measurements from the device. The measurements are returned as `AemMeasurement` objects, which contain the timestamp, current, voltage, and the calculated power. An `AemStream` object is suitable for streaming AEM measurements from a Silicon Labs adapter, and there is no limitation to the duration of the streaming. The stream may be stopped at any time.
+The `AemStream` class provides a pythonic way of streaming AEM measurements from a Silicon Labs adapter. The measurements are returned as `AemMeasurement` objects, which contain the timestamp, current, voltage, and the calculated power. An `AemStream` object is suitable for streaming AEM measurements from a Silicon Labs adapter, and there is no limitation to the duration of the streaming. The stream may be stopped at any time.
 
 Like the underlying Simplicity Commander CLI, the `AemStream` class supports a variety of options for configuring the AEM data capture process, like setting up simple triggers to start the data capture process and specifying the data output rate.
 
 ##### Context Manager Syntax
 
-If using the context manager syntax, the `AemStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
+When using the context manager syntax, the `AemStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
 
 ```python
 from pycommander_gui import AemStream
