@@ -11,6 +11,8 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
+from pathlib import Path
+
 from . import types
 
 from .commander_base import CommanderBase
@@ -105,6 +107,44 @@ class AdapterBase:
     """
     result : dict = self._commander.adapter.reset()
     return result["success"]
+
+  def upgradeFirmware(self, filename: Path | None = None) -> types.AdapterFwUpgradeResult | None:
+    """Upgrade the firmware of the adapter. Only available on Silicon Labs adapters.
+
+    Args:
+      filename (Path | None): The path to the firmware package to upgrade (*.emz). If not provided, Commander's bundled firmware will be used; in this case, the upgrade will only be performed if the bundled version is newer than the installed version.
+
+    Returns:
+      An AdapterFwUpgradeResult object containing the result of the firmware upgrade, or None if the firmware upgrade could not be performed.
+    """
+
+    current_version : str | None = self.__get_current_firmware_version()
+
+    args = []
+    if filename is None or str(filename) == "":
+      # Check if a firmware upgrade is available first
+      result : dict = self._commander.adapter.fwupgradecheck()
+      if not result["success"]:
+        return None
+
+      if not result["result"].get("upgrade_available", False):
+        return types.AdapterFwUpgradeResult(
+          package_was_installed=False,
+          currently_installed_version=current_version,
+        )
+    else:
+      args.append(str(filename))
+
+    result : dict = self._commander.adapter.fwupgrade(*args)
+    if not result["success"]:
+      return None
+
+    new_version : str | None = self.__get_current_firmware_version()
+
+    return types.AdapterFwUpgradeResult(
+      package_was_installed=True,
+      currently_installed_version=new_version,
+    )
 
   def getVoltage(self) -> types.AdapterVoltageInfo | None:
     """Get the supply voltage for the target device. Only available on Silicon Labs adapters.
@@ -320,3 +360,9 @@ class AdapterBase:
       period_detection       = aem_period_detection,
       signal_characteristics = aem_signal_characteristics,
     )
+
+  def __get_current_firmware_version(self) -> str | None:
+    result : dict = self._commander.adapter.probe()
+    if not result["success"]:
+      return None
+    return result["result"].get("firmware_info", {}).get("fw_version", None)

@@ -45,9 +45,9 @@ class AdapterFwInfo:
 
 @dataclass
 class BasicAdapterInfo:
-  jlink_serial_number: str
-  ip_address: str
-  nickname: str
+  jlink_serial_number: str | None = None
+  ip_address:          str | None = None
+  nickname:            str | None = None
 
 @dataclass
 class AdapterInfo:
@@ -65,6 +65,11 @@ class AdapterInfo:
   aem_supported:       bool                   | None = None
   debug_mode:          str                    | None = None
   debug_part:          str                    | None = None
+
+@dataclass
+class AdapterFwUpgradeResult:
+  package_was_installed:       bool
+  currently_installed_version: str  | None
 
 @dataclass
 class AdapterRailInfo:
