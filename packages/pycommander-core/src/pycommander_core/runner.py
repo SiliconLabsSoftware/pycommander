@@ -11,6 +11,7 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
+import os
 import sys
 import subprocess
 import datetime
@@ -73,7 +74,11 @@ class Runner:
     try:
       self._write_log_file(f"{self._executable} {' '.join(args)}")
 
-      result = subprocess.run([str(self._executable), *args], **run_kwargs)
+      env = os.environ.copy()
+      # Don't load any settings files; this keeps the Commander class from being affected by the "human-interfaced" Commander outside of the Python context
+      env["COMMANDER_SETTINGS_FILE"] = ""
+
+      result = subprocess.run([str(self._executable), *args], env=env, **run_kwargs)
 
       returncode = result.returncode
       output     = result.stdout
@@ -114,7 +119,11 @@ class Runner:
 
     self._write_log_file(f"{self._executable} {' '.join(args)}")
 
-    return subprocess.Popen([str(self._executable), *args], **popen_kwargs)
+    env = os.environ.copy()
+    # Don't load any settings files; this keeps the Commander class from being affected by the "human-interfaced" Commander outside of the Python context
+    env["COMMANDER_SETTINGS_FILE"] = ""
+
+    return subprocess.Popen([str(self._executable), *args], env=env, **popen_kwargs)
 
   def isAlive(self, process: subprocess.Popen) -> bool:
     return process is not None and process.poll() is None
