@@ -40,7 +40,9 @@ This will install the GUI version of Simplicity Commander _in addition to_ the C
 
 Both the CLI and GUI versions can coexist peacefully on the same system, but do note that when importing the `pycommander` package or when running the `pycommander` command from the terminal, the GUI version will be used over the CLI version. The flavor to use can be explicitly selected by importing the appropriate package, e.g. `import pycommander_cli` or `import pycommander_gui`, or by using the `pycommander-cli` or `pycommander-gui` commands from the terminal.
 
-Installing PyCommander does not interfere with any existing installations of Simplicity Commander on your system, but do note that the different Commander instances will all share the same configuration file, i.e. the `commander.ini` file. For example, if command logging is enabled using one Commander instance, it will also be enabled for all the other Commander instances.
+Installing PyCommander does not interfere with any existing installations of Simplicity Commander on your system, but do note that the different user-facing Commander CLI and GUI instances (e.g. when running the `pycommander` command from the terminal) will all share the same underlying configuration file, i.e. the `commander.ini` file. For example, if command logging is enabled using one Commander instance, it will also be enabled for all the other Commander instances.
+
+Using Commander via the Python API is on the other hand completely independent of the configuration file, meaning that any configuration settings (e.g. command logging) will not be applied to Commander invocations going through the Python API. This is intentional and ensures that the Python API is completely stateless between individual invocations.
 
 ## Usage
 
