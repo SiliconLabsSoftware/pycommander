@@ -1,6 +1,10 @@
 name: Unit tests and Coverage Report
 
 on:
+  push:
+    branches:
+      - main
+      - develop/**
   workflow_dispatch:
 
 permissions:
