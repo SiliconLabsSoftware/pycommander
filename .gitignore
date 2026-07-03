@@ -34,9 +34,10 @@
 # Wheels
 dist/
 
-# Commander archives (keep __init__.py for package)
+# Commander archives (keep __init__.py for package and README.md info)
 packages/pycommander-*/src/pycommander_*/_archive/*
 !packages/pycommander-*/src/pycommander_*/_archive/__init__.py
+!packages/pycommander-*/src/pycommander_*/_archive/README.md
 
 # Utility scripts
 scripts/*
