@@ -113,7 +113,7 @@ Another line of really good description
 ```
 
 ## Pull Request Guideline
-Okay you finished your work committed all your changes to your branch. Time to create a pull request.
+Okay, you finished your work and committed all your changes to your branch. Time to create a pull request.
 Refer to the general pull request [guideline](https://opensource.guide/how-to-contribute/#opening-a-pull-request) from GitHub.
 What to consider when raising a Pull Request:
 1. **Pull Request Naming**
@@ -124,10 +124,8 @@ What to consider when raising a Pull Request:
    GitHub assigns reviewers based on the [CODEOWNERS](CODEOWNERS) file.
    Add more reviewers if needed. Do not remove reviewers from the PR. Ask the repository owner for updates to the code owners.
 4. **Evaluate the Action Workflow Results**
-   The following workflows are included in every repository:
-   - **[Coding Convention Check](workflows/00-Check-Code-Convention.yml)**: Analyzes the code formatting and fails if any rules are broken.
-   - **[Firmware Build](workflows/02-Build-Firmware.yml)**: Builds the firmware inside the [Dockerfile](../Dockerfile).
-   - **[Secret Scanner](workflows/04-TruffleHog-Security-Scan.yml)**: Runs the TruffleHog security scanner to look for API keys and committed secrets.
+   The following workflows are included in this repository:
+   - **[Unit tests and Coverage Report](workflows/unittest-and-coverage.yml)**: Runs the unit tests and generates the coverage report. Total coverage should remain in the high 90s.
 
 ### As a Reviewer
 
