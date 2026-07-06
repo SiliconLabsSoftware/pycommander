@@ -42,6 +42,7 @@ packages/pycommander-*/src/pycommander_*/_archive/*
 # Utility scripts
 scripts/*
 !scripts/run_tests.py
+!scripts/download_commander_archives.py
 
 # Mac OS X
 .DS_Store
