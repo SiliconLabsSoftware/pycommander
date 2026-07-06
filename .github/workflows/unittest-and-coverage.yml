@@ -43,23 +43,28 @@ jobs:
       - name: Pick Commander Executables
         if: matrix.platform != ''
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token}}
         run: |
+          COMMANDER_VERSION=$(cat .github/commander-version)
+          echo "Commander version: $COMMANDER_VERSION"
           echo "platform: ${{ matrix.platform }}"
+          
           CLI_TARGET_DIR="packages/pycommander-cli/src/pycommander_cli/_archive/"
           GUI_TARGET_DIR="packages/pycommander-gui/src/pycommander_gui/_archive/"
 
           if [[ "${{ matrix.platform }}" == windows-* ]]; then
-            CLI_ARCHIVE=$(ls archives/Commander-cli_win32_x64_*.zip 2>/dev/null | head -1)
-            GUI_ARCHIVE=$(ls archives/Commander_win32_x64_*.zip 2>/dev/null | head -1)
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander-cli_win32_x64_*.zip" --dir $CLI_TARGET_DIR
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander_win32_x64_*.zip" --dir $GUI_TARGET_DIR
           elif [[ "${{ matrix.platform }}" == macos-* ]]; then
-            CLI_ARCHIVE=$(ls archives/Commander-cli_osx_*.zip 2>/dev/null | head -1)
-            GUI_ARCHIVE=$(ls archives/Commander_osx_*.zip 2>/dev/null | head -1)
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander-cli_osx_*.zip" --dir $CLI_TARGET_DIR
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander_osx_*.zip" --dir $GUI_TARGET_DIR
           elif [[ "${{ matrix.platform }}" == linux-x86_64 ]]; then
-            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
-            GUI_ARCHIVE=$(ls archives/Commander_linux_x86_64_*.tar.bz 2>/dev/null | head -1)
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander-cli_linux_x86_64_*.tar.bz" --dir $CLI_TARGET_DIR
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander_linux_x86_64_*.tar.bz" --dir $GUI_TARGET_DIR
           elif [[ "${{ matrix.platform }}" == linux-aarch64 ]]; then
-            CLI_ARCHIVE=$(ls archives/Commander-cli_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
-            GUI_ARCHIVE=$(ls archives/Commander_linux_aarch64_*.tar.bz 2>/dev/null | head -1)
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander-cli_linux_aarch64_*.tar.bz" --dir $CLI_TARGET_DIR
+            gh release download "$COMMANDER_VERSION" --repo ${{ github.repository }} --pattern "Commander_linux_aarch64_*.tar.bz" --dir $GUI_TARGET_DIR
           else
             echo "Unsupported platform: ${{ matrix.platform }}"
             exit 1
