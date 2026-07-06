@@ -70,14 +70,8 @@ jobs:
             exit 1
           fi
 
-          echo "Copying CLI archive: $CLI_ARCHIVE"
-          cp "$CLI_ARCHIVE" "$CLI_TARGET_DIR"
-
           echo "Listing contents of $CLI_TARGET_DIR:"
           ls -la "$CLI_TARGET_DIR"
-
-          echo "Copying GUI archive: $GUI_ARCHIVE"
-          cp "$GUI_ARCHIVE" "$GUI_TARGET_DIR"
 
           echo "Listing contents of $GUI_TARGET_DIR:"
           ls -la "$GUI_TARGET_DIR"
