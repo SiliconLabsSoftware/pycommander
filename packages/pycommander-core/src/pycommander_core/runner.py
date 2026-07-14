@@ -51,13 +51,14 @@ class Runner:
     if not Path(self._executable).is_file():
       raise ValueError(f"Commander executable is not a file: {self._executable}")
 
-  def run(self, *args: str, json_format: bool = True) -> RunnerResult:
+  def run(self, *args: str, json_format: bool = True, env: dict[str, str] | None = None) -> RunnerResult:
     """
     Run the command synchronously.
 
     Args:
-      args: Arguments to pass to the command
-      json_format: Whether to return the output as JSON
+      args (str): Arguments to pass to the command
+      json_format (bool): Whether to return the output as JSON
+      env (dict[str, str]): The environment variables to set for the command execution.
 
     Returns:
       RunnerResult: The result of the command
@@ -74,9 +75,8 @@ class Runner:
     try:
       self._write_log_file(f"{self._executable} {' '.join(args)}")
 
-      env = os.environ.copy()
-      # Don't load any settings files; this keeps the Commander class from being affected by the "human-interfaced" Commander outside of the Python context
-      env["COMMANDER_SETTINGS_FILE"] = ""
+      if env is None:
+        env = self._get_default_env()
 
       result = subprocess.run([str(self._executable), *args], env=env, **run_kwargs)
 
@@ -103,7 +103,7 @@ class Runner:
     Open the command asynchronously.
 
     Args:
-      args: Arguments to pass to the command
+      args (str): Arguments to pass to the command
 
     Returns:
       subprocess.Popen: The subprocess object
@@ -119,11 +119,7 @@ class Runner:
 
     self._write_log_file(f"{self._executable} {' '.join(args)}")
 
-    env = os.environ.copy()
-    # Don't load any settings files; this keeps the Commander class from being affected by the "human-interfaced" Commander outside of the Python context
-    env["COMMANDER_SETTINGS_FILE"] = ""
-
-    return subprocess.Popen([str(self._executable), *args], env=env, **popen_kwargs)
+    return subprocess.Popen([str(self._executable), *args], env=self._get_default_env(), **popen_kwargs)
 
   def isAlive(self, process: subprocess.Popen) -> bool:
     return process is not None and process.poll() is None
@@ -178,6 +174,15 @@ class Runner:
     # No mercy, kill
     self.kill(process)
     self.wait(process)
+
+  def _get_default_env(self) -> dict[str, str]:
+    env = os.environ.copy()
+    # Unless specifically overridden, don't load the settings file. This keeps the Commander class from affecting 
+    # and being affected by the "human-facing" Commander outside of the Python context, which is what we want
+    # for our Pythonic interface.
+    if "OVERRIDE_COMMANDER_SETTINGS_FILE" not in env:
+      env["COMMANDER_SETTINGS_FILE"] = ""
+    return env
 
   def _write_log_file(self, entry: str) -> None:
     if self._log_file_path is None:

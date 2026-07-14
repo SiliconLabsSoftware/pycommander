@@ -171,12 +171,13 @@ class CommanderBase:
 
     return adapter_list
 
-  def runCommand(self, *args : str, json_formatted_output: bool = True, **kwargs: Any) -> CommanderResult | dict:
+  def runCommand(self, *args : str, json_formatted_output: bool = True, env: dict[str, str] | None = None, **kwargs: Any) -> CommanderResult | dict:
     """Run a command and return the result.
 
     Args:
       args (str): The arguments to pass to the command.
       json_formatted_output (bool): Whether to return the output as JSON.
+      env (dict[str, str]): Environment variables used during the command execution. Overrides the default environment.
 
     Returns:
       The result of the command.
@@ -184,7 +185,7 @@ class CommanderBase:
 
     args = list(args) + self._get_kwargs(**kwargs)
 
-    result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=json_formatted_output)
+    result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=json_formatted_output, env=env)
     if json_formatted_output:
       return json.loads(result.output)
     else:
