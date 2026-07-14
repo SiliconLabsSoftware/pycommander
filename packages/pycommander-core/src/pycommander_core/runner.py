@@ -22,7 +22,7 @@ from pathlib import Path
 
 from .errors import PyCommanderError, PyCommanderInputError, PyCommanderRuntimeError
 
-RunnerResult = namedtuple("RunnerResult", ["returncode", "output"])
+RunnerResult = namedtuple("RunnerResult", ["returncode", "stdout", "stderr"])
 
 class Runner:
   def __init__(self, executable: Path, log_file_path: Path | None = None, timeout_s: int = 300):
@@ -82,21 +82,22 @@ class Runner:
 
       returncode = result.returncode
       output     = result.stdout
-      return RunnerResult(returncode, output)
+      stderr     = result.stderr
+      return RunnerResult(returncode, output, stderr)
 
     except subprocess.TimeoutExpired as e:
       self._write_log_file(f"Command timed out: {e.cmd}")
       raise TimeoutError(f"Command timed out: {e.cmd}")
 
     except subprocess.CalledProcessError as e:
-      self._write_log_file(f"Command failed with return code {e.returncode}: {e.output}")
+      self._write_log_file(f"Command failed with return code {e.returncode}, stdout: {e.stdout}, stderr: {e.stderr}")
 
       if e.returncode == -1 or e.returncode == 255:
-        raise PyCommanderInputError(e.output)
+        raise PyCommanderInputError(e.stdout, e.stderr)
       elif e.returncode == -2 or e.returncode == 254:
-        raise PyCommanderRuntimeError(e.output)
+        raise PyCommanderRuntimeError(e.stdout, e.stderr)
       else:
-        raise PyCommanderError(e.output)
+        raise PyCommanderError(e.stdout, e.stderr)
 
   def open(self, *args: str) -> subprocess.Popen:
     """

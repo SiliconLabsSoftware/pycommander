@@ -82,7 +82,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-    )
+    , "")
   )
 
     expected_adapter_info : AdapterInfo = AdapterInfo(
@@ -128,7 +128,7 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         254,
         '{"success": false, "error": "Failed to get adapter information"}'
-      )
+      , "")
     )
     
     self.assertEqual(adapter.info(), None)
@@ -166,7 +166,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     
     self.assertEqual(adapter.info(), None)
@@ -212,7 +212,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     
     self.assertEqual(adapter.info(), None)
@@ -249,7 +249,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     
     self.assertEqual(adapter.info(), None)
@@ -266,7 +266,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.reset(), True)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "reset", "--serialno", "123456789", "--json"]])
@@ -282,7 +282,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": false
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.reset(), False)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "reset", "--serialno", "123456789", "--json"]])
@@ -295,21 +295,21 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
-      )
+      , "")
     )
     # fwupgrade
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"success": true}'
-      )
+      , "")
     )
     # probe (new version)
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
-      )
+      , "")
     )
 
     self.assertEqual(
@@ -333,28 +333,28 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
-      )
+      , "")
     )
     # fwupgradecheck
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"result": {"upgrade_available": true}, "success": true}'
-      )
+      , "")
     )
     # fwupgrade
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"success": true}'
-      )
+      , "")
     )
     # probe (new version)
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
-      )
+      , "")
     )
 
     self.assertEqual(
@@ -378,14 +378,14 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
-      )
+      , "")
     )
     # fwupgrade
     adapter._commander._runner.queue_result(
       RunnerResult(
         254,
         '{"success": false}'
-      )
+      , "")
     )
 
     self.assertEqual(adapter.upgradeFirmware(filename=Path("firmware.emz")), None)
@@ -402,28 +402,28 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
-      )
+      , "")
     )
     # fwupgradecheck
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"result": {"upgrade_available": true}, "success": true}'
-      )
+      , "")
     )
     # fwupgrade
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"success": true}'
-      )
+      , "")
     )
     # probe (new version)
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
-      )
+      , "")
     )
 
     self.assertEqual(
@@ -448,14 +448,14 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "2v0p1"}}, "success": true}'
-      )
+      , "")
     )
     # fwupgradecheck
     adapter._commander._runner.queue_result(
       RunnerResult(
         0,
         '{"result": {"upgrade_available": false}, "success": true}'
-      )
+      , "")
     )
 
     self.assertEqual(
@@ -478,14 +478,14 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
-      )
+      , "")
     )
     # fwupgradecheck
     adapter._commander._runner.queue_result(
       RunnerResult(
         254,
         '{"success": false}'
-      )
+      , "")
     )
 
     self.assertEqual(adapter.upgradeFirmware(), None)
@@ -515,7 +515,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.getVoltage(), AdapterVoltageInfo(
       rails=[
@@ -556,7 +556,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
 
     expected_voltage_info : AdapterVoltageInfo = AdapterVoltageInfo(
@@ -605,7 +605,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
 
     expected_voltage_info : AdapterVoltageInfo = AdapterVoltageInfo(
@@ -639,7 +639,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": false
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.getVoltage(), None)
 
@@ -654,7 +654,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.setVoltage(3.3), True)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "voltage", "3.3", "--serialno", "123456789", "--json"]])
@@ -670,7 +670,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": false
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.setVoltage(3.3), False)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "adapter", "voltage", "3.3", "--serialno", "123456789", "--json"]])
@@ -686,7 +686,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": true
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.setVcomConfig(baudrate=115200, handshake=VcomHandshake.RTSCTS, store=True), True)
     self.assertEqual(adapter._commander._runner.logged_commands, [
@@ -704,7 +704,7 @@ class TestAdapterBase(unittest.TestCase):
     "success": false
 }
 """
-      )
+      , "")
     )
     self.assertEqual(adapter.setVcomConfig(baudrate=115200, handshake=VcomHandshake.RTSCTS, store=True), False)
     self.assertEqual(adapter._commander._runner.logged_commands, [
@@ -727,7 +727,7 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         test_json.read_text()
-      )
+      , "")
     )
 
     expected_aem_analysis_result : AemAnalysisResult = AemAnalysisResult(
@@ -951,7 +951,7 @@ class TestAdapterBase(unittest.TestCase):
           "success": false
         }
         """
-      )
+      , "")
     )
     self.assertEqual(adapter.analyzeEnergyUsage(duration_s=10, get_distribution=True, cluster_states=True, detect_period=True), None)
     self.assertEqual(adapter._commander._runner.logged_commands, [["mock", "aem", "analyze", "--serialno", "123456789", "--windowlength", "10000", "--showdistribution", "--cluster", "--findperiod", "--json"]])
@@ -1025,7 +1025,7 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {"firmware_info": {"fw_version": "1v0p0"}}, "success": true}'
-      )
+      , "")
     )
 
     self.assertEqual(adapter._AdapterBase__get_current_firmware_version(), "1v0p0")
@@ -1038,7 +1038,7 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         254,
         '{"success": false}'
-      )
+      , "")
     )
 
     self.assertIsNone(adapter._AdapterBase__get_current_firmware_version())
@@ -1051,7 +1051,7 @@ class TestAdapterBase(unittest.TestCase):
       RunnerResult(
         0,
         '{"result": {}, "success": true}'
-      )
+      , "")
     )
 
     self.assertIsNone(adapter._AdapterBase__get_current_firmware_version())

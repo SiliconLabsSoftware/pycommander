@@ -40,16 +40,16 @@ class TestBase(unittest.TestCase):
 
   def test_base_run_bad_json_returncode_zero(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, "This is not JSON"))
+    commander._runner.queue_result(RunnerResult(0, "This is not JSON", ""))
     base_command = BaseCommand(commander)
     self.assertEqual(base_command._run("command", "arg1", "arg2"), CommandResult(0, {"success": True, "output": "This is not JSON"}))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
 
   def test_base_run_bad_json_returncode_non_zero(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(1, "This is not JSON"))
+    commander._runner.queue_result(RunnerResult(1, "This is not JSON", "Error message"))
     base_command = BaseCommand(commander)
-    self.assertEqual(base_command._run("command", "arg1", "arg2"), CommandResult(1, {"success": False, "error": "This is not JSON"}))
+    self.assertEqual(base_command._run("command", "arg1", "arg2"), CommandResult(1, {"success": False, "output": "This is not JSON", "error": "Error message"}))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2", "--json"]])
 
   def test_base_get_adapter_connection_args(self):

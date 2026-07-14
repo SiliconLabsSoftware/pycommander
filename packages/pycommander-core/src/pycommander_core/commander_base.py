@@ -25,7 +25,7 @@ from .runner import Runner, RunnerResult
 from ._ensure_commander import ensure_commander
 from ._utils import sanitize_args
 
-CommanderResult = namedtuple("CommanderResult", ["returncode", "output"])
+CommanderResult = namedtuple("CommanderResult", ["returncode", "stdout", "stderr"])
 
 class CommanderBase:
   # Command overview. These are for type hinting only.
@@ -120,7 +120,7 @@ class CommanderBase:
     if result.returncode != 0:
       return None
 
-    json_output = json.loads(result.output)
+    json_output = json.loads(result.stdout)
     if "result" not in json_output or "version" not in json_output["result"]:
       return None
 
@@ -158,7 +158,7 @@ class CommanderBase:
     if result.returncode != 0:
       return None
 
-    json_output = json.loads(result.output)
+    json_output = json.loads(result.stdout)
     if "result" not in json_output or "devices" not in json_output["result"]:
       return None
     
@@ -187,9 +187,9 @@ class CommanderBase:
 
     result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=json_formatted_output, env=env)
     if json_formatted_output:
-      return json.loads(result.output)
+      return json.loads(result.stdout)
     else:
-      return CommanderResult(result.returncode, result.output)
+      return CommanderResult(result.returncode, result.stdout, result.stderr)
 
 
   def _get_kwargs(self, **kwargs: Any) -> list[str]:

@@ -63,7 +63,7 @@ class TestRunner(unittest.TestCase):
     runner = Runner(executable=command)
     result = runner.run("command", "arg1", "arg2", json_format=False)
     self.assertEqual(result.returncode, 0)
-    self.assertEqual(result.output, "command arg1 arg2\n")
+    self.assertEqual(result.stdout, "command arg1 arg2\n")
 
   def test_runner_run_command_json(self):
     # Find the path to the echo command
@@ -74,7 +74,7 @@ class TestRunner(unittest.TestCase):
     runner = Runner(executable=command)
     result = runner.run("command", "arg1", "arg2", json_format=True)
     self.assertEqual(result.returncode, 0)
-    self.assertEqual(result.output, 'command arg1 arg2 --json\n')
+    self.assertEqual(result.stdout, 'command arg1 arg2 --json\n')
 
   def test_runner_run_command_timeout(self):
     # Find the path to the sleep command
@@ -140,7 +140,7 @@ class TestRunner(unittest.TestCase):
     with self.assertRaises(PyCommanderInputError):
       runner.run("-c", "exit 255", json_format=False)
     with open(tf.name, "r") as f:
-      self.assertIn("Command failed with return code 255:", f.read())
+      self.assertIn("Command failed with return code 255,", f.read())
 
   def test_runner_log_file_on_timeout(self):
     command = shutil.which("sleep")

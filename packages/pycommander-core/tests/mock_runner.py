@@ -37,7 +37,7 @@ class MockRunner(Runner):
     self.logged_commands: list[list[str]] = []
     self.queued_results: list[RunnerResult] = []
 
-  def run(self, *args: str, json_format: bool = True) -> RunnerResult:
+  def run(self, *args: str, json_format: bool = True, env: dict[str, str] | None = None) -> RunnerResult:
     if json_format:
       args = (*args, "--json")
 
@@ -51,7 +51,7 @@ class MockRunner(Runner):
     else:
       output = ""
 
-    return RunnerResult(0, output)
+    return RunnerResult(0, output, "")
 
   def open(self, *args: str) -> None:
     self.logged_commands.append([str(self._executable), *args])

@@ -32,14 +32,14 @@ class BaseCommand:
     result : RunnerResult = self._runner.run(*sanitize_args(args), json_format=True)
     command_result : CommandResult | None = None
     try:
-      json_output = json.loads(result.output) 
+      json_output = json.loads(result.stdout) 
       command_result = CommandResult(result.returncode, json_output)
     except json.JSONDecodeError:
       # If the output wasn't pure JSON, we shoehorn it regardless.
       if result.returncode == 0:
-        command_result = CommandResult(result.returncode, {"success": True, "output": result.output})
+        command_result = CommandResult(result.returncode, {"success": True, "output": result.stdout})
       else:
-        command_result = CommandResult(result.returncode, {"success": False, "error": result.output})
+        command_result = CommandResult(result.returncode, {"success": False, "output": result.stdout, "error": result.stderr})
 
     return command_result
 

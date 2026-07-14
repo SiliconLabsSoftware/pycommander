@@ -111,7 +111,7 @@ class TestCommanderBase(unittest.TestCase):
   "success": true
 }
 """
-    ))
+    , ""))
 
     expected_version_info = CommanderVersionInfo(
       simplicity_commander_version="1v2p3b456",
@@ -126,31 +126,31 @@ class TestCommanderBase(unittest.TestCase):
 
   def test_commander_base_getVersion_failed(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(1, ""))
+    commander._runner.queue_result(RunnerResult(1, "", ""))
     self.assertEqual(commander.getVersion(), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "--version", "--json"]])
 
   def test_commander_base_getVersion_missing_result(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    commander._runner.queue_result(RunnerResult(0, '{"success": true}', ""))
     self.assertEqual(commander.getVersion(), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "--version", "--json"]])
 
   def test_commander_base_getVersion_missing_version(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": ""}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": ""}', ""))
     self.assertEqual(commander.getVersion(), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "--version", "--json"]])
 
   def test_commander_base_listAvailableAdapters_network(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789", "adapter_nickname": "Adapter 1"}]}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789", "adapter_nickname": "Adapter 1"}]}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [BasicAdapterInfo(jlink_serial_number="123456789", ip_address="192.168.1.100", nickname="Adapter 1")])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_usb(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789", "adapter_nickname": "Adapter 1"}]}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789", "adapter_nickname": "Adapter 1"}]}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=True, list_network_adapters=False), [BasicAdapterInfo(jlink_serial_number="123456789", ip_address="192.168.1.100", nickname="Adapter 1")])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--json"]])
 
@@ -168,49 +168,49 @@ class TestCommanderBase(unittest.TestCase):
 
   def test_commander_base_listAvailableAdapters_no_adapters(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": []}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": []}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_failed(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(1, ""))
+    commander._runner.queue_result(RunnerResult(1, "", ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_missing_result(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"success": true}'))
+    commander._runner.queue_result(RunnerResult(0, '{"success": true}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_missing_devices(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": ""}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": ""}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), None)
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_missing_adapter_ip(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"serial_number": "123456789", "adapter_nickname": "Adapter 1"}]}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"serial_number": "123456789", "adapter_nickname": "Adapter 1"}]}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [BasicAdapterInfo(jlink_serial_number="123456789", ip_address=None, nickname="Adapter 1")])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_missing_serial_number(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "adapter_nickname": "Adapter 1"}]}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "adapter_nickname": "Adapter 1"}]}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [BasicAdapterInfo(jlink_serial_number=None, ip_address="192.168.1.100", nickname="Adapter 1")])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_missing_nickname(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789"}]}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789"}]}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [BasicAdapterInfo(jlink_serial_number="123456789", ip_address="192.168.1.100", nickname=None)])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
   def test_commander_base_listAvailableAdapters_multiple_devices(self):
     commander = MockCommander()
-    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789", "adapter_nickname": "Adapter 1"}, {"adapter_ip": "192.168.1.101", "serial_number": "123456790", "adapter_nickname": "Adapter 2"}]}}'))
+    commander._runner.queue_result(RunnerResult(0, '{"result": {"devices": [{"adapter_ip": "192.168.1.100", "serial_number": "123456789", "adapter_nickname": "Adapter 1"}, {"adapter_ip": "192.168.1.101", "serial_number": "123456790", "adapter_nickname": "Adapter 2"}]}}', ""))
     self.assertEqual(commander.listAvailableAdapters(list_usb_adapters=False, list_network_adapters=True), [BasicAdapterInfo(jlink_serial_number="123456789", ip_address="192.168.1.100", nickname="Adapter 1"), BasicAdapterInfo(jlink_serial_number="123456790", ip_address="192.168.1.101", nickname="Adapter 2")])
     self.assertEqual(commander._runner.logged_commands, [["mock", "adapter", "list", "--noconnect", "--net", "--json"]])
 
@@ -236,7 +236,7 @@ class TestCommanderBase(unittest.TestCase):
 
   def test_commander_base_runCommand_json_formatted_output_false(self):
     commander = MockCommander()
-    self.assertEqual(commander.runCommand("command", "arg1", "arg2", json_formatted_output=False), CommanderResult(0, ""))
+    self.assertEqual(commander.runCommand("command", "arg1", "arg2", json_formatted_output=False), CommanderResult(0, "", ""))
     self.assertEqual(commander._runner.logged_commands, [["mock", "command", "arg1", "arg2"]])
 
   def test_commander_base_runCommand_json_formatted_output_true(self):
