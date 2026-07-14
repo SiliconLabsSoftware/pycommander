@@ -116,7 +116,7 @@ jobs:
     permissions:
       id-token: write
 
-    environment: testpypi # Switch to 'pypi' to publish to the real PyPI
+    environment: pypi
 
     steps:
       - name: Set up Python
@@ -150,7 +150,7 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          python -m twine upload --verbose --repository testpypi packages/*/dist/*.whl
+          python -m twine upload --verbose --repository pypi packages/*/dist/*.whl
 
   clean-up:
     needs: publish-to-pypi
