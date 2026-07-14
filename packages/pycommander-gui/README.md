@@ -100,7 +100,8 @@ For ad-hoc invocations of commands that are not exposed by the typed API, you ca
 ```python
 # Run a raw Commander CLI command and capture its output
 result = commander.runCommand("rtt", "--help", json_formatted_output=False)
-print(result.output)
+print(result.stdout)
+print(result.stderr)
 ```
 
 #### The `Adapter` and `Target` classes
