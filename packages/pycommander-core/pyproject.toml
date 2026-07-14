@@ -1,6 +1,6 @@
 [project]
 name = "silabs-pycommander-core"
-version = "0.1.16"
+version = "1.0.0"
 description = "Python library for Silicon Labs Simplicity Commander (core)"
 authors = [{ name = "Silicon Labs"}]
 license = "LicenseRef-MSLA"
