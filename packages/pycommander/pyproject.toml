@@ -1,6 +1,6 @@
 [project]
 name = "silabs-pycommander"
-version = "1.0.1"
+version = "1.1.0"
 description = "Python library for Silicon Labs Simplicity Commander"
 authors = [{ name = "Silicon Labs"}]
 license = "LicenseRef-MSLA"
@@ -8,8 +8,8 @@ license-files = ["LICENSE.md"]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-  "silabs-pycommander-core==1.0.1",
-  "silabs-pycommander-cli==1.0.1"
+  "silabs-pycommander-core==1.1.0",
+  "silabs-pycommander-cli==1.1.0"
 ]
 
 [build-system]
@@ -23,7 +23,7 @@ packages = ["src/pycommander"]
 path = "build_hook.py"
 
 [project.optional-dependencies]
-gui = ["silabs-pycommander-gui==1.0.1"]
+gui = ["silabs-pycommander-gui==1.1.0"]
 
 [project.scripts]
 pycommander = "pycommander.cli:main"
