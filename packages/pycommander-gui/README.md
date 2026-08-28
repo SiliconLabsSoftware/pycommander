@@ -52,7 +52,7 @@ At the lowest level, the `Commander` class provides all the CLI commands as meth
 from pycommander_gui import Commander
 
 # Instantiate the Commander class with a serial number
-commander = Commander(serial_number="44055955")
+commander = Commander(serial_number="440055955")
 
 # Perform the 'commander device info' command
 print(commander.device.info(target_device="EFR32MG24"))
@@ -134,7 +134,7 @@ An `Adapter` class instance (with a potential `Target` class instance) should be
 ```python
 from pycommander_gui import Adapter
 
-serial_numbers = ["44055955", "44055956", "44055957"]
+serial_numbers = ["440055955", "440055956", "440055957"]
 adapters = [Adapter(serial_number=sn, target_device="EFR32MG24") for sn in serial_numbers]
 for adapter in adapters:
   print(adapter.info())
@@ -147,7 +147,7 @@ from pycommander_gui import Adapter
 from pycommander_core.types import AdapterInfo, AdapterVoltageInfo, VcomHandshake, CtuneValue
 
 # Instantiate the Adapter class with a serial number and target device
-adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
+adapter = Adapter(serial_number="440055955", target_device="EFR32MG24")
 
 # Ensure we're running the latest firmware on the adapter
 adapter.upgradeFirmware()
@@ -174,7 +174,7 @@ A common high-level task is flashing application firmware to the target device. 
 from pathlib import Path
 from pycommander_gui import Adapter
 
-adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
+adapter = Adapter(serial_number="440055955", target_device="EFR32MG24")
 
 success: bool = adapter.target.flashApplication(filenames=[Path("firmware.hex")])
 ```
@@ -194,7 +194,7 @@ from pycommander_gui import AemStream
 from pycommander_core.types import AemMeasurement
 
 # Instantiate a 10 second AEM stream with a data output rate of 100 Hz
-with AemStream(serial_number="44055955", datarate_hz=100, duration_s=10) as aem_stream:
+with AemStream(serial_number="440055955", datarate_hz=100, duration_s=10) as aem_stream:
   for measurement in aem_stream:
     print(measurement)
 ```
@@ -208,7 +208,7 @@ from pycommander_gui import AemStream
 from pycommander_core.types import AemMeasurement
 
 # Instantiate the AemStream class with a serial number and a set data rate
-aem_stream : AemStream = AemStream(serial_number="44055955", datarate_hz=100)
+aem_stream : AemStream = AemStream(serial_number="440055955", datarate_hz=100)
 
 # Open the AEM stream
 aem_stream.open()
@@ -240,7 +240,7 @@ from pathlib import Path
 from pycommander_gui import Adapter
 from pycommander_core.errors import PyCommanderError, PyCommanderRuntimeError
 
-adapter = Adapter(serial_number="44055955", target_device="EFR32MG24")
+adapter = Adapter(serial_number="440055955", target_device="EFR32MG24")
 
 try:
   adapter.target.flashApplication(filenames=[Path("firmware.hex")])
@@ -259,6 +259,6 @@ from pathlib import Path
 from pycommander_gui import Adapter, Commander
 
 # Build a Commander with logging enabled, then attach it to an Adapter
-commander = Commander(serial_number="44055955", log_file_path=Path("pycommander.log"))
+commander = Commander(serial_number="440055955", log_file_path=Path("pycommander.log"))
 adapter = Adapter(commander=commander, target_device="EFR32MG24")
 ```
