@@ -17,6 +17,7 @@ import subprocess
 import datetime
 import signal
 
+from typing import Any
 from collections import namedtuple
 from pathlib import Path
 
@@ -27,7 +28,8 @@ RunnerResult = namedtuple("RunnerResult", ["returncode", "stdout", "stderr"])
 class Runner:
   def __init__(self, executable: Path, log_file_path: Path | None = None, timeout_s: int = 300):
 
-    self._common_subprocess_kwargs = {
+    self._common_subprocess_kwargs : dict[str, Any] = {
+      "stdin": subprocess.DEVNULL,
       "stdout": subprocess.PIPE,
       "stderr": subprocess.STDOUT,
       "text": True,
