@@ -85,7 +85,7 @@ for adapter in adapters:
   print(adapter.ip_address, adapter.nickname)
 ```
 
-Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom`, `vuart`, `rtt` and `swo`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below.
+Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom`, `vuart` and `rtt`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below.
 
 For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
 
@@ -217,6 +217,52 @@ for measurement in aem_stream:
 
 # Close the AEM stream
 aem_stream.close()
+```
+
+#### The `SwoStream` class
+
+The `SwoStream` class provides a pythonic way of streaming Serial Wire Output (SWO) data from a target device. Each iteration yields a line of text written by the target application. The stream may be stopped at any time; exiting the context manager (or calling `close()`) sends a clean shutdown to Commander.
+
+Like the underlying Simplicity Commander `swo read` command, `SwoStream` supports configuring the SWO speed, ITM channel, an idle timeout, an end marker, monitoring all channels for end conditions, hexadecimal output, and skipping the target reset that is otherwise performed when the capture starts.
+
+##### Context Manager Syntax
+
+When using the context manager syntax, the `SwoStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
+
+```python
+from pycommander_cli import SwoStream
+
+# Read SWO until the target prints --finished--, or 5 seconds pass with no data
+with SwoStream(serial_number="440055955", timeout_s=5, endmarker="--finished--") as swo_stream:
+  for line in swo_stream:
+    print(line, end="", flush=True)
+```
+
+##### Manual Syntax
+
+The `SwoStream` class can also be instantiated without using the context manager syntax. In this case, the `open()` method must be called to open the connection to the adapter and start the capture, and the `close()` method must be called to gracefully stop the capture and close the connection.
+
+```python
+from pycommander_cli import SwoStream
+
+# Instantiate the SwoStream class with a serial number and SWO speed
+swo_stream : SwoStream = SwoStream(serial_number="440055955", swospeed_hz=875000)
+
+# Open the SWO stream
+swo_stream.open()
+
+
+some_condition : bool = False
+# Read the SWO output
+for line in swo_stream:
+  # Do something
+  # ...
+
+  if some_condition:
+    break
+
+# Close the SWO stream
+swo_stream.close()
 ```
 
 #### Error handling
