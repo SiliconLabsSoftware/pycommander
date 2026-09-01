@@ -181,13 +181,13 @@ success: bool = adapter.target.flashApplication(filenames=[Path("firmware.hex")]
 
 #### Stream classes
 
-Long-running Commander captures are wrapped as iterable stream objects: `AemStream`, `SwoStream`, `RttStream`, `VcomStream` and `VuartStream`. They share the same lifecycle.
+Long-running Commander captures are wrapped as iterable stream objects: `AemStream`, `SwoConsoleStream`, `RttConsoleStream`, `VcomConsoleStream` and `VuartConsoleStream`. They share the same lifecycle.
 
 Entering a `with` block (or calling `open()`) starts Commander. Iterate the object to receive data as it arrives, and stop at any time. Leaving the `with` block, or calling `close()`, shuts Commander down cleanly.
 
 `AemStream` yields `AemMeasurement` objects (timestamp, current, voltage, and calculated power). The console streams yield output data as it arrives, while filtering out Commander status and warning lines. Error lines raise a `RuntimeError` exception.
 
-Most streams accept `serial_number` or `ip_address` as connection parameters. `VuartStream` is IP-only and therefore requires `ip_address`. Options such as `timeout_s`, `endmarker`, `lineending`, `command` and `hex_output` are available where the underlying Commander command supports them.
+Most streams accept `serial_number` or `ip_address` as connection parameters. `VuartConsoleStream` is IP-only and therefore requires `ip_address`. Options such as `timeout_s`, `endmarker`, `lineending`, `command` and `hex_output` are available where the underlying Commander command supports them.
 
 ##### `AemStream`
 
@@ -211,88 +211,88 @@ for measurement in aem_stream:
 aem_stream.close()
 ```
 
-##### `SwoStream`
+##### `SwoConsoleStream`
 
 Serial Wire Output (SWO) from the target device. Supports SWO speed, ITM channel, idle timeout, end marker, monitoring all channels for end conditions, hexadecimal output, and skipping the target reset.
 
 ```python
-from pycommander_gui import SwoStream
+from pycommander_gui import SwoConsoleStream
 
-with SwoStream(serial_number="440055955", timeout_s=5, endmarker="--finished--") as swo_stream:
+with SwoConsoleStream(serial_number="440055955", timeout_s=5, endmarker="--finished--") as swo_stream:
   for line in swo_stream:
     print(line, end="", flush=True)
 ```
 
 ```python
-from pycommander_gui import SwoStream
+from pycommander_gui import SwoConsoleStream
 
-swo_stream = SwoStream(serial_number="440055955", swospeed_hz=875000)
+swo_stream = SwoConsoleStream(serial_number="440055955", swospeed_hz=875000)
 swo_stream.open()
 for line in swo_stream:
   print(line, end="", flush=True)
 swo_stream.close()
 ```
 
-##### `RttStream`
+##### `RttConsoleStream`
 
 Segger Real Time Transfer (RTT) from the target device. Supports control-block address, read and write buffers, virtual terminal, idle timeout, end marker, line endings, skipping the target reset, and one-shot startup commands.
 
 ```python
-from pycommander_gui import RttStream
+from pycommander_gui import RttConsoleStream
 
-with RttStream(serial_number="440055955", timeout_s=5, endmarker="DONE", command="status") as rtt_stream:
+with RttConsoleStream(serial_number="440055955", timeout_s=5, endmarker="DONE", command="status") as rtt_stream:
   for line in rtt_stream:
     print(line, end="", flush=True)
 ```
 
 ```python
-from pycommander_gui import RttStream
+from pycommander_gui import RttConsoleStream
 
-rtt_stream = RttStream(serial_number="440055955")
+rtt_stream = RttConsoleStream(serial_number="440055955")
 rtt_stream.open()
 for line in rtt_stream:
   print(line, end="", flush=True)
 rtt_stream.close()
 ```
 
-##### `VcomStream`
+##### `VcomConsoleStream`
 
 Virtual COM port on Silicon Labs adapters. Supports hexadecimal output, restarting the target in ISP mode, line endings, and one-shot startup commands. Configure baudrate and handshake separately with `Commander.vcom.config` or `Adapter.setVcomConfig`.
 
 ```python
-from pycommander_gui import VcomStream
+from pycommander_gui import VcomConsoleStream
 
-with VcomStream(serial_number="440055955", command="status") as vcom_stream:
+with VcomConsoleStream(serial_number="440055955", command="status") as vcom_stream:
   for line in vcom_stream:
     print(line, end="", flush=True)
 ```
 
 ```python
-from pycommander_gui import VcomStream
+from pycommander_gui import VcomConsoleStream
 
-vcom_stream = VcomStream(serial_number="440055955")
+vcom_stream = VcomConsoleStream(serial_number="440055955")
 vcom_stream.open()
 for line in vcom_stream:
   print(line, end="", flush=True)
 vcom_stream.close()
 ```
 
-##### `VuartStream`
+##### `VuartConsoleStream`
 
 Virtual UART (VUART) over IP (requires `ip_address`). Supports idle timeout, end marker, line endings, and one-shot startup commands.
 
 ```python
-from pycommander_gui import VuartStream
+from pycommander_gui import VuartConsoleStream
 
-with VuartStream(ip_address="192.168.1.100", timeout_s=5, endmarker="DONE", command="status") as vuart_stream:
+with VuartConsoleStream(ip_address="192.168.1.100", timeout_s=5, endmarker="DONE", command="status") as vuart_stream:
   for line in vuart_stream:
     print(line, end="", flush=True)
 ```
 
 ```python
-from pycommander_gui import VuartStream
+from pycommander_gui import VuartConsoleStream
 
-vuart_stream = VuartStream(ip_address="192.168.1.100")
+vuart_stream = VuartConsoleStream(ip_address="192.168.1.100")
 vuart_stream.open()
 for line in vuart_stream:
   print(line, end="", flush=True)

@@ -11,15 +11,15 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-from pycommander_core.rttstream_base import RttStreamBase
+from pycommander_core.rttconsolestream_base import RttConsoleStreamBase
 
-from pycommander_gui.commander import Commander
+from pycommander_cli.commander import Commander
 
-class RttStream(RttStreamBase):
+class RttConsoleStream(RttConsoleStreamBase):
   """
   High-level read-only interface for RTT (Real Time Transfer) captures.
   This class can be used in a context manager to simplify the handling
-  of opening and closing the RttStream. The stream works with any adapter
+  of opening and closing the RttConsoleStream. The stream works with any adapter
   that exposes a debug connection (Silicon Labs adapters and generic J-Link).
 
   Startup commands can be sent once after connect via ``command``. The stream
@@ -40,7 +40,7 @@ class RttStream(RttStreamBase):
     command: Command(s) sent to the target immediately after connecting.
 
   Examples:
-    with RttStream(serial_number="123456789", timeout_s=5, endmarker="DONE", command="status") as stream:
+    with RttConsoleStream(serial_number="123456789", timeout_s=5, endmarker="DONE", command="status") as stream:
       for line in stream:
         print(line, end="", flush=True)
   """

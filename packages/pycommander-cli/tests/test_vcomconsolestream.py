@@ -13,49 +13,36 @@ sections of the MSLA applicable to Source Code.
 
 import unittest
 
-from pycommander_cli.rttstream import RttStream
+from pycommander_cli.vcomconsolestream import VcomConsoleStream
 
-class TestRttStream(unittest.TestCase):
-  def test_rttstream_init_serial_number(self):
-    stream = RttStream(serial_number="123456789")
+class TestVcomConsoleStream(unittest.TestCase):
+  def test_vcomconsolestream_init_serial_number(self):
+    stream = VcomConsoleStream(serial_number="123456789")
     self.assertEqual(stream._commander._serial_number, "123456789")
     self.assertEqual(stream._commander._runner, stream._runner)
     self.assertEqual(stream._process, None)
-    self.assertEqual(stream._args, ["rtt", "connect", "--serialno", "123456789"])
+    self.assertEqual(stream._args, ["vcom", "connect", "--serialno", "123456789"])
 
-  def test_rttstream_init_ip_address(self):
-    stream = RttStream(ip_address="192.168.1.100")
+  def test_vcomconsolestream_init_ip_address(self):
+    stream = VcomConsoleStream(ip_address="192.168.1.100")
     self.assertEqual(stream._commander._ip_address, "192.168.1.100")
     self.assertEqual(stream._commander._runner, stream._runner)
     self.assertEqual(stream._process, None)
-    self.assertEqual(stream._args, ["rtt", "connect", "--ip", "192.168.1.100"])
+    self.assertEqual(stream._args, ["vcom", "connect", "--ip", "192.168.1.100"])
 
-  def test_rttstream_init_options(self):
-    stream = RttStream(
+  def test_vcomconsolestream_init_options(self):
+    stream = VcomConsoleStream(
       serial_number="123456789",
-      target_device="EFR32MG24",
-      timeout_s=5,
-      endmarker="DONE",
-      blockaddress=0x20000000,
-      readbuffer="Terminal",
-      writebuffer=0,
-      terminal=1,
-      noreset=True,
+      hex_output=True,
+      restartinisp=True,
       lineending="none",
       command="status",
     )
-    self.assertEqual(stream._commander._target_device, "EFR32MG24")
     self.assertEqual(stream._args, [
-      "rtt", "connect",
+      "vcom", "connect",
       "--serialno", "123456789",
-      "--device", "EFR32MG24",
-      "--timeout", "5",
-      "--endmarker", "DONE",
-      "--blockaddress", "0x20000000",
-      "--readbuffer", "Terminal",
-      "--writebuffer", "0",
-      "--terminal", "1",
-      "--noreset",
+      "--hex",
+      "--restartinisp",
       "--lineending", "none",
       "--command", "status",
     ])

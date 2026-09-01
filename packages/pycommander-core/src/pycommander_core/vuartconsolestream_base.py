@@ -15,66 +15,49 @@ from .commander_base import CommanderBase
 from .consolestream import ConsoleStream
 
 
-class RttStreamBase(ConsoleStream):
-  """High-level read-only interface for RTT (Real Time Transfer) captures.
+class VuartConsoleStreamBase(ConsoleStream):
+  """High-level read-only interface for VUART captures.
 
-  RTT is available on adapters that expose a debug connection (Silicon Labs
-  adapters and generic J-Link probes). The stream yields decoded data from
-  the target as it arrives. Incoming data is not required to contain line
-  endings.
+  VUART is available only over IP. The stream yields decoded data from
+  the target as it arrives. Incoming data is not required to contain
+  line endings.
 
   Startup commands can be sent once after connect via ``command``; the
   stream itself does not accept further input.
   """
 
-  _STREAM_NAME = "RttStream"
-  _COMMAND = ("rtt", "connect")
+  _STREAM_NAME = "VuartConsoleStream"
+  _COMMAND = ("vuart", "connect")
+  _INCLUDE_CONNECTION_OPTIONS = False
+  _INCLUDE_DEBUG_OPTIONS = False
 
   # Status and error messages are intertwined with the actual data output,
   # so we filter them out.
   _STATUS_LINE_PREFIXES = ConsoleStream._STATUS_LINE_PREFIXES + (
-    "RTT successfully initialized.",
-    "RTT block address:",
-    "RTT status:",
-    "Read buffers:",
-    "Write buffers:",
-    "RTT read buffer",
-    "RTT write buffer",
-    "RTT console connected",
+    "Connection established!",
+    "Attempting to connect to IP",
+    "Socket was disconnected.",
     "Connection terminated by user.",
     "Timeout: No data received",
   )
 
   def __init__(self,
                commander: CommanderBase,
+               ip_address: str,
                timeout_s: float | None = None,
                endmarker: str | None = None,
-               blockaddress: int | str | None = None,
-               readbuffer: int | str | None = None,
-               writebuffer: int | str | None = None,
-               terminal: int | None = None,
-               noreset: bool = False,
                lineending: str | None = None,
                command: str | list[str] | None = None):
+    if not ip_address:
+      raise ValueError("ip_address is required")
+
     super().__init__(commander)
+    self._args += [ip_address]
 
     if timeout_s:
       self._args += ["--timeout", str(timeout_s)]
     if endmarker:
       self._args += ["--endmarker", endmarker]
-    if blockaddress is not None:
-      if isinstance(blockaddress, str) and blockaddress.lower().startswith("0x"):
-        self._args += ["--blockaddress", blockaddress]
-      else:
-        self._args += ["--blockaddress", f"0x{int(blockaddress):08X}"]
-    if readbuffer is not None:
-      self._args += ["--readbuffer", str(readbuffer)]
-    if writebuffer is not None:
-      self._args += ["--writebuffer", str(writebuffer)]
-    if terminal is not None:
-      self._args += ["--terminal", str(terminal)]
-    if noreset:
-      self._args += ["--noreset"]
     if lineending:
       self._args += ["--lineending", lineending]
     if command is not None:

@@ -11,15 +11,15 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-from pycommander_core.swostream_base import SwoStreamBase
+from pycommander_core.swoconsolestream_base import SwoConsoleStreamBase
 
-from pycommander_cli.commander import Commander
+from pycommander_gui.commander import Commander
 
-class SwoStream(SwoStreamBase):
+class SwoConsoleStream(SwoConsoleStreamBase):
   """
   High-level interface for continuous SWO (Serial Wire Output) captures.
   This class can be used in a context manager to simplify the handling
-  of opening and closing the SwoStream. The stream works with any adapter
+  of opening and closing the SwoConsoleStream. The stream works with any adapter
   that exposes a debug connection (Silicon Labs adapters and generic J-Link).
 
   Args:
@@ -35,7 +35,7 @@ class SwoStream(SwoStreamBase):
     monitorall: If True, watch all channels for the end marker and timeout. Has no effect unless ``endmarker`` or ``timeout_s`` is set.
 
   Examples:
-    with SwoStream(serial_number="123456789", timeout_s=5, endmarker="DONE") as stream:
+    with SwoConsoleStream(serial_number="123456789", timeout_s=5, endmarker="DONE") as stream:
       for line in stream:
         print(line, end="", flush=True)
   """

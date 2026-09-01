@@ -11,15 +11,15 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-from pycommander_core.vcomstream_base import VcomStreamBase
+from pycommander_core.vcomconsolestream_base import VcomConsoleStreamBase
 
-from pycommander_cli.commander import Commander
+from pycommander_gui.commander import Commander
 
-class VcomStream(VcomStreamBase):
+class VcomConsoleStream(VcomConsoleStreamBase):
   """
   High-level read-only interface for VCOM (Virtual COM port) captures.
   This class can be used in a context manager to simplify the handling
-  of opening and closing the VcomStream. The stream works with Silicon
+  of opening and closing the VcomConsoleStream. The stream works with Silicon
   Labs adapters that expose a serial VCOM port.
 
   Startup commands can be sent once after connect via ``command``. The stream
@@ -35,7 +35,7 @@ class VcomStream(VcomStreamBase):
     command: Command(s) sent to the target immediately after connecting.
 
   Examples:
-    with VcomStream(serial_number="123456789", command="status") as stream:
+    with VcomConsoleStream(serial_number="123456789", command="status") as stream:
       for line in stream:
         print(line, end="", flush=True)
   """

@@ -15,7 +15,7 @@ from .commander_base import CommanderBase
 from .consolestream import ConsoleStream
 
 
-class SwoStreamBase(ConsoleStream):
+class SwoConsoleStreamBase(ConsoleStream):
   """High-level interface for continuous SWO (Serial Wire Output) captures.
 
   SWO is available on adapters that expose a debug connection (Silicon Labs
@@ -24,7 +24,7 @@ class SwoStreamBase(ConsoleStream):
   is enabled.
   """
 
-  _STREAM_NAME = "SwoStream"
+  _STREAM_NAME = "SwoConsoleStream"
   _COMMAND = ("swo", "read")
 
   # Status and error messages are intertwined with the actual data output,

@@ -13,36 +13,45 @@ sections of the MSLA applicable to Source Code.
 
 import unittest
 
-from pycommander_gui.vcomstream import VcomStream
+from pycommander_cli.swoconsolestream import SwoConsoleStream
 
-class TestVcomStream(unittest.TestCase):
-  def test_vcomstream_init_serial_number(self):
-    stream = VcomStream(serial_number="123456789")
+class TestSwoConsoleStream(unittest.TestCase):
+  def test_swoconsolestream_init_serial_number(self):
+    stream = SwoConsoleStream(serial_number="123456789")
     self.assertEqual(stream._commander._serial_number, "123456789")
     self.assertEqual(stream._commander._runner, stream._runner)
     self.assertEqual(stream._process, None)
-    self.assertEqual(stream._args, ["vcom", "connect", "--serialno", "123456789"])
+    self.assertEqual(stream._args, ["swo", "read", "--serialno", "123456789"])
 
-  def test_vcomstream_init_ip_address(self):
-    stream = VcomStream(ip_address="192.168.1.100")
+  def test_swoconsolestream_init_ip_address(self):
+    stream = SwoConsoleStream(ip_address="192.168.1.100")
     self.assertEqual(stream._commander._ip_address, "192.168.1.100")
     self.assertEqual(stream._commander._runner, stream._runner)
     self.assertEqual(stream._process, None)
-    self.assertEqual(stream._args, ["vcom", "connect", "--ip", "192.168.1.100"])
+    self.assertEqual(stream._args, ["swo", "read", "--ip", "192.168.1.100"])
 
-  def test_vcomstream_init_options(self):
-    stream = VcomStream(
+  def test_swoconsolestream_init_options(self):
+    stream = SwoConsoleStream(
       serial_number="123456789",
+      target_device="EFR32MG24",
+      swospeed_hz=1000000,
+      timeout_s=2,
+      endmarker="cafeface",
       hex_output=True,
-      restartinisp=True,
-      lineending="none",
-      command="status",
+      noreset=True,
+      channel=3,
+      monitorall=True,
     )
+    self.assertEqual(stream._commander._target_device, "EFR32MG24")
     self.assertEqual(stream._args, [
-      "vcom", "connect",
+      "swo", "read",
       "--serialno", "123456789",
+      "--device", "EFR32MG24",
+      "--swospeed", "1000000",
+      "--timeout", "2",
+      "--endmarker", "cafeface",
       "--hex",
-      "--restartinisp",
-      "--lineending", "none",
-      "--command", "status",
+      "--noreset",
+      "--channel", "3",
+      "--monitorall",
     ])

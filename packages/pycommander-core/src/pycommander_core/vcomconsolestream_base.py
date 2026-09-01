@@ -15,20 +15,22 @@ from .commander_base import CommanderBase
 from .consolestream import ConsoleStream
 
 
-class VuartStreamBase(ConsoleStream):
-  """High-level read-only interface for VUART captures.
+class VcomConsoleStreamBase(ConsoleStream):
+  """High-level read-only interface for VCOM (Virtual COM port) captures.
 
-  VUART is available only over IP. The stream yields decoded data from
-  the target as it arrives. Incoming data is not required to contain
-  line endings.
+  VCOM is available on Silicon Labs adapters that expose a serial VCOM
+  port. The stream yields decoded data from the target as it arrives, or
+  hexadecimal strings when ``hex_output`` is enabled. Incoming data is
+  not required to contain line endings.
 
   Startup commands can be sent once after connect via ``command``; the
-  stream itself does not accept further input.
+  stream itself does not accept further input. Adapter VCOM baudrate and
+  handshake are configured separately (for example via
+  ``commander.vcom.config``).
   """
 
-  _STREAM_NAME = "VuartStream"
-  _COMMAND = ("vuart", "connect")
-  _INCLUDE_CONNECTION_OPTIONS = False
+  _STREAM_NAME = "VcomConsoleStream"
+  _COMMAND = ("vcom", "connect")
   _INCLUDE_DEBUG_OPTIONS = False
 
   # Status and error messages are intertwined with the actual data output,
@@ -36,28 +38,25 @@ class VuartStreamBase(ConsoleStream):
   _STATUS_LINE_PREFIXES = ConsoleStream._STATUS_LINE_PREFIXES + (
     "Connection established!",
     "Attempting to connect to IP",
+    "Opening serial port",
     "Socket was disconnected.",
+    "Serial port was disconnected.",
     "Connection terminated by user.",
-    "Timeout: No data received",
+    "Target restarted in ISP mode.",
   )
 
   def __init__(self,
                commander: CommanderBase,
-               ip_address: str,
-               timeout_s: float | None = None,
-               endmarker: str | None = None,
+               hex_output: bool = False,
+               restartinisp: bool = False,
                lineending: str | None = None,
                command: str | list[str] | None = None):
-    if not ip_address:
-      raise ValueError("ip_address is required")
-
     super().__init__(commander)
-    self._args += [ip_address]
 
-    if timeout_s:
-      self._args += ["--timeout", str(timeout_s)]
-    if endmarker:
-      self._args += ["--endmarker", endmarker]
+    if hex_output:
+      self._args += ["--hex"]
+    if restartinisp:
+      self._args += ["--restartinisp"]
     if lineending:
       self._args += ["--lineending", lineending]
     if command is not None:

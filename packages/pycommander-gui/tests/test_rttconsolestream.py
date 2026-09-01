@@ -13,45 +13,49 @@ sections of the MSLA applicable to Source Code.
 
 import unittest
 
-from pycommander_gui.swostream import SwoStream
+from pycommander_gui.rttconsolestream import RttConsoleStream
 
-class TestSwoStream(unittest.TestCase):
-  def test_swostream_init_serial_number(self):
-    stream = SwoStream(serial_number="123456789")
+class TestRttConsoleStream(unittest.TestCase):
+  def test_rttconsolestream_init_serial_number(self):
+    stream = RttConsoleStream(serial_number="123456789")
     self.assertEqual(stream._commander._serial_number, "123456789")
     self.assertEqual(stream._commander._runner, stream._runner)
     self.assertEqual(stream._process, None)
-    self.assertEqual(stream._args, ["swo", "read", "--serialno", "123456789"])
+    self.assertEqual(stream._args, ["rtt", "connect", "--serialno", "123456789"])
 
-  def test_swostream_init_ip_address(self):
-    stream = SwoStream(ip_address="192.168.1.100")
+  def test_rttconsolestream_init_ip_address(self):
+    stream = RttConsoleStream(ip_address="192.168.1.100")
     self.assertEqual(stream._commander._ip_address, "192.168.1.100")
     self.assertEqual(stream._commander._runner, stream._runner)
     self.assertEqual(stream._process, None)
-    self.assertEqual(stream._args, ["swo", "read", "--ip", "192.168.1.100"])
+    self.assertEqual(stream._args, ["rtt", "connect", "--ip", "192.168.1.100"])
 
-  def test_swostream_init_options(self):
-    stream = SwoStream(
+  def test_rttconsolestream_init_options(self):
+    stream = RttConsoleStream(
       serial_number="123456789",
       target_device="EFR32MG24",
-      swospeed_hz=1000000,
-      timeout_s=2,
-      endmarker="cafeface",
-      hex_output=True,
+      timeout_s=5,
+      endmarker="DONE",
+      blockaddress=0x20000000,
+      readbuffer="Terminal",
+      writebuffer=0,
+      terminal=1,
       noreset=True,
-      channel=3,
-      monitorall=True,
+      lineending="none",
+      command="status",
     )
     self.assertEqual(stream._commander._target_device, "EFR32MG24")
     self.assertEqual(stream._args, [
-      "swo", "read",
+      "rtt", "connect",
       "--serialno", "123456789",
       "--device", "EFR32MG24",
-      "--swospeed", "1000000",
-      "--timeout", "2",
-      "--endmarker", "cafeface",
-      "--hex",
+      "--timeout", "5",
+      "--endmarker", "DONE",
+      "--blockaddress", "0x20000000",
+      "--readbuffer", "Terminal",
+      "--writebuffer", "0",
+      "--terminal", "1",
       "--noreset",
-      "--channel", "3",
-      "--monitorall",
+      "--lineending", "none",
+      "--command", "status",
     ])

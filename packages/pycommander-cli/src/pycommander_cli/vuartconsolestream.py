@@ -11,15 +11,15 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-from pycommander_core.vuartstream_base import VuartStreamBase
+from pycommander_core.vuartconsolestream_base import VuartConsoleStreamBase
 
-from pycommander_gui.commander import Commander
+from pycommander_cli.commander import Commander
 
-class VuartStream(VuartStreamBase):
+class VuartConsoleStream(VuartConsoleStreamBase):
   """
   High-level read-only interface for VUART captures.
   This class can be used in a context manager to simplify the handling
-  of opening and closing the VuartStream. VUART is available only over IP.
+  of opening and closing the VuartConsoleStream. VUART is available only over IP.
 
   Startup commands can be sent once after connect via ``command``. The stream
   itself does not accept further input.
@@ -32,7 +32,7 @@ class VuartStream(VuartStreamBase):
     command: Command(s) sent to the target immediately after connecting.
 
   Examples:
-    with VuartStream(ip_address="192.168.1.100", timeout_s=5, endmarker="DONE", command="status") as stream:
+    with VuartConsoleStream(ip_address="192.168.1.100", timeout_s=5, endmarker="DONE", command="status") as stream:
       for line in stream:
         print(line, end="", flush=True)
   """
