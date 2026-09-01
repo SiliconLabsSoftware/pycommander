@@ -68,6 +68,22 @@ class TestVuartConsoleStreamBase(unittest.TestCase):
     vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
     self.assertEqual(vuartconsolestream._args, ["vuart", "connect", "1.2.3.4"])
 
+  def test_vuartconsolestream_base_forwards_explicit_empty_values(self):
+    commander = MockCommander()
+    vuartconsolestream = VuartConsoleStreamBase(
+      commander=commander,
+      ip_address="1.2.3.4",
+      timeout_s=0,
+      endmarker="",
+      lineending="",
+    )
+    self.assertEqual(vuartconsolestream._args, [
+      "vuart", "connect", "1.2.3.4",
+      "--timeout", "0",
+      "--endmarker", "",
+      "--lineending", "",
+    ])
+
   def test_vuartconsolestream_base_init_command_string(self):
     commander = MockCommander()
     vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4", command="status")

@@ -58,9 +58,9 @@ class RttConsoleStreamBase(ConsoleStream):
                command: str | list[str] | None = None):
     super().__init__(commander)
 
-    if timeout_s:
+    if timeout_s is not None:
       self._args += ["--timeout", str(timeout_s)]
-    if endmarker:
+    if endmarker is not None:
       self._args += ["--endmarker", endmarker]
     if blockaddress is not None:
       if isinstance(blockaddress, str) and blockaddress.lower().startswith("0x"):
@@ -75,7 +75,7 @@ class RttConsoleStreamBase(ConsoleStream):
       self._args += ["--terminal", str(terminal)]
     if noreset:
       self._args += ["--noreset"]
-    if lineending:
+    if lineending is not None:
       self._args += ["--lineending", lineending]
     if command is not None:
       commands = [command] if isinstance(command, str) else list(command)

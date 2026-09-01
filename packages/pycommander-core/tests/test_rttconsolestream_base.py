@@ -107,6 +107,21 @@ class TestRttConsoleStreamBase(unittest.TestCase):
     rttconsolestream = RttConsoleStreamBase(commander=commander)
     self.assertEqual(rttconsolestream._args, ["rtt", "connect"])
 
+  def test_rttconsolestream_base_forwards_explicit_empty_values(self):
+    commander = MockCommander()
+    rttconsolestream = RttConsoleStreamBase(
+      commander=commander,
+      timeout_s=0,
+      endmarker="",
+      lineending="",
+    )
+    self.assertEqual(rttconsolestream._args, [
+      "rtt", "connect",
+      "--timeout", "0",
+      "--endmarker", "",
+      "--lineending", "",
+    ])
+
   def test_rttconsolestream_base_init_blockaddress_hex_string(self):
     commander = MockCommander()
     rttconsolestream = RttConsoleStreamBase(commander=commander, blockaddress="0x20000000")

@@ -47,11 +47,11 @@ class SwoConsoleStreamBase(ConsoleStream):
                monitorall: bool = False):
     super().__init__(commander)
 
-    if swospeed_hz:
+    if swospeed_hz is not None:
       self._args += ["--swospeed", str(swospeed_hz)]
-    if timeout_s:
+    if timeout_s is not None:
       self._args += ["--timeout", str(timeout_s)]
-    if endmarker:
+    if endmarker is not None:
       self._args += ["--endmarker", endmarker]
     if hex_output:
       self._args += ["--hex"]

@@ -57,7 +57,7 @@ class VcomConsoleStreamBase(ConsoleStream):
       self._args += ["--hex"]
     if restartinisp:
       self._args += ["--restartinisp"]
-    if lineending:
+    if lineending is not None:
       self._args += ["--lineending", lineending]
     if command is not None:
       commands = [command] if isinstance(command, str) else list(command)

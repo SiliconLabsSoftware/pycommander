@@ -108,6 +108,21 @@ class TestSwoConsoleStreamBase(unittest.TestCase):
     swoconsolestream = SwoConsoleStreamBase(commander=commander)
     self.assertEqual(swoconsolestream._args, ["swo", "read"])
 
+  def test_swoconsolestream_base_forwards_explicit_zero_and_empty_values(self):
+    commander = MockCommander()
+    swoconsolestream = SwoConsoleStreamBase(
+      commander=commander,
+      swospeed_hz=0,
+      timeout_s=0,
+      endmarker="",
+    )
+    self.assertEqual(swoconsolestream._args, [
+      "swo", "read",
+      "--swospeed", "0",
+      "--timeout", "0",
+      "--endmarker", "",
+    ])
+
   def test_swoconsolestream_base_init_channel_zero(self):
     commander = MockCommander()
     swoconsolestream = SwoConsoleStreamBase(commander=commander, channel=0)

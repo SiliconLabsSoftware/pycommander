@@ -89,6 +89,14 @@ class TestVcomConsoleStreamBase(unittest.TestCase):
     vcomconsolestream = VcomConsoleStreamBase(commander=commander)
     self.assertEqual(vcomconsolestream._args, ["vcom", "connect"])
 
+  def test_vcomconsolestream_base_forwards_explicit_empty_lineending(self):
+    commander = MockCommander()
+    vcomconsolestream = VcomConsoleStreamBase(commander=commander, lineending="")
+    self.assertEqual(vcomconsolestream._args, [
+      "vcom", "connect",
+      "--lineending", "",
+    ])
+
   def test_is_status_line(self):
     commander = MockCommander()
     vcomconsolestream = VcomConsoleStreamBase(commander=commander)
