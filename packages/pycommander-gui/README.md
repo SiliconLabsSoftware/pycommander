@@ -93,7 +93,7 @@ for adapter in adapters:
   print(adapter.ip_address, adapter.nickname)
 ```
 
-Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom` and `vuart`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below. For streaming RTT data, please see the `RttStream` class below.
+Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vuart`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below. For streaming RTT data, please see the `RttStream` class below. For streaming VCOM data, please see the `VcomStream` class below.
 
 For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
 
@@ -317,6 +317,52 @@ for line in rtt_stream:
 
 # Close the RTT stream
 rtt_stream.close()
+```
+
+#### The `VcomStream` class
+
+The `VcomStream` class provides a pythonic, read-only way of streaming Virtual COM port (VCOM) data from a target device. Each iteration yields data written by the target application. The stream may be stopped at any time; exiting the context manager (or calling `close()`) sends a clean shutdown to Commander.
+
+Like the underlying Simplicity Commander `vcom connect` command, `VcomStream` supports hexadecimal output, restarting the target in ISP mode, line endings, and sending one-shot startup command(s) after connect. Adapter VCOM baudrate and handshake are configured separately, for example via `Commander.vcom.config`.
+
+##### Context Manager Syntax
+
+When using the context manager syntax, the `VcomStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
+
+```python
+from pycommander_gui import VcomStream
+
+# Read VCOM after sending a one-shot startup command
+with VcomStream(serial_number="440055955", command="status") as vcom_stream:
+  for line in vcom_stream:
+    print(line, end="", flush=True)
+```
+
+##### Manual Syntax
+
+The `VcomStream` class can also be instantiated without using the context manager syntax. In this case, the `open()` method must be called to open the connection to the adapter and start the capture, and the `close()` method must be called to gracefully stop the capture and close the connection.
+
+```python
+from pycommander_gui import VcomStream
+
+# Instantiate the VcomStream class with a serial number
+vcom_stream : VcomStream = VcomStream(serial_number="440055955")
+
+# Open the VCOM stream
+vcom_stream.open()
+
+
+some_condition : bool = False
+# Read the VCOM output
+for line in vcom_stream:
+  # Do something
+  # ...
+
+  if some_condition:
+    break
+
+# Close the VCOM stream
+vcom_stream.close()
 ```
 
 #### Error handling
