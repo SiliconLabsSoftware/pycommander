@@ -18,6 +18,7 @@ from .aemstream import AemStream
 from .swostream import SwoStream
 from .rttstream import RttStream
 from .vcomstream import VcomStream
+from .vuartstream import VuartStream
 
 from pycommander_core.commander_base import CommanderResult
 from pycommander_core._version import __version__
@@ -30,6 +31,7 @@ __all__ = [
   "SwoStream",
   "RttStream",
   "VcomStream",
+  "VuartStream",
   "CommanderResult",
   "__version__",
 ]

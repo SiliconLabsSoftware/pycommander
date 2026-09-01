@@ -85,7 +85,7 @@ for adapter in adapters:
   print(adapter.ip_address, adapter.nickname)
 ```
 
-Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vuart`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below. For streaming RTT data, please see the `RttStream` class below. For streaming VCOM data, please see the `VcomStream` class below.
+Please note that not all commands are available to the `Commander` class. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below. For streaming RTT data, please see the `RttStream` class below. For streaming VCOM data, please see the `VcomStream` class below. For streaming VUART data, please see the `VuartStream` class below.
 
 For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
 
@@ -342,6 +342,52 @@ for line in vcom_stream:
 
 # Close the VCOM stream
 vcom_stream.close()
+```
+
+#### The `VuartStream` class
+
+The `VuartStream` class provides a pythonic, read-only way of streaming VUART data from a target device over IP. Each iteration yields data written by the target application. The stream may be stopped at any time; exiting the context manager (or calling `close()`) sends a clean shutdown to Commander.
+
+Like the underlying Simplicity Commander `vuart connect` command, `VuartStream` requires an IP address and supports an idle timeout, an end marker, line endings, and sending one-shot startup command(s) after connect.
+
+##### Context Manager Syntax
+
+If using the context manager syntax, the `VuartStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
+
+```python
+from pycommander import VuartStream
+
+# Read VUART until the target prints DONE, or 5 seconds pass with no data
+with VuartStream(ip_address="192.168.1.100", timeout_s=5, endmarker="DONE", command="status") as vuart_stream:
+  for line in vuart_stream:
+    print(line, end="", flush=True)
+```
+
+##### Manual Syntax
+
+The `VuartStream` class can also be instantiated without using the context manager syntax. In this case, the `open()` method must be called to open the connection to the adapter and start the capture, and the `close()` method must be called to gracefully stop the capture and close the connection.
+
+```python
+from pycommander import VuartStream
+
+# Instantiate the VuartStream class with an IP address
+vuart_stream : VuartStream = VuartStream(ip_address="192.168.1.100")
+
+# Open the VUART stream
+vuart_stream.open()
+
+
+some_condition : bool = False
+# Read the VUART output
+for line in vuart_stream:
+  # Do something
+  # ...
+
+  if some_condition:
+    break
+
+# Close the VUART stream
+vuart_stream.close()
 ```
 
 #### Error handling

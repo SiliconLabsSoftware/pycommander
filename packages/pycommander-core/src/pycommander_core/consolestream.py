@@ -19,7 +19,7 @@ from .runner import Runner
 
 
 class ConsoleStream(ABC):
-  """Common base for read-only Commander console streams (SWO, RTT, VCOM, ...).
+  """Common base for read-only Commander console streams (SWO, RTT, VCOM, VUART, ...).
 
   Subclasses set ``_STREAM_NAME``, ``_COMMAND``, and any extra status
   prefixes, then append command-specific options after ``super().__init__()``.
@@ -27,6 +27,7 @@ class ConsoleStream(ABC):
 
   _STREAM_NAME = "ConsoleStream"
   _COMMAND : tuple[str, ...] = ()
+  _INCLUDE_CONNECTION_OPTIONS = True
   _INCLUDE_DEBUG_OPTIONS = True
 
   _STATUS_LINE_PREFIXES = (
@@ -48,10 +49,12 @@ class ConsoleStream(ABC):
     self._process : subprocess.Popen | None = None
 
     self._args : list[str] = list(self._COMMAND)
-    self._args += self._commander._get_serial_number_option()
-    self._args += self._commander._get_ip_address_option()
-    self._args += self._commander._get_serial_port_option()
-    self._args += self._commander._get_device_option()
+
+    if self._INCLUDE_CONNECTION_OPTIONS:
+      self._args += self._commander._get_serial_number_option()
+      self._args += self._commander._get_ip_address_option()
+      self._args += self._commander._get_serial_port_option()
+      self._args += self._commander._get_device_option()
 
     if self._INCLUDE_DEBUG_OPTIONS:
       self._args += self._commander._get_debug_speed_option()
