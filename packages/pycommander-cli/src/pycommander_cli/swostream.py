@@ -37,7 +37,7 @@ class SwoStream(SwoStreamBase):
   Examples:
     with SwoStream(serial_number="123456789", timeout_s=5, endmarker="DONE") as stream:
       for line in stream:
-        print(line)
+        print(line, end="", flush=True)
   """
   def __init__(self,
                serial_number: str | None = None,
