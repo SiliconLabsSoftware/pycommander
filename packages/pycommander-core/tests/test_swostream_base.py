@@ -117,24 +117,24 @@ class TestSwoStreamBase(unittest.TestCase):
     commander = MockCommander()
     swostream = SwoStreamBase(commander=commander)
 
-    self.assertTrue(swostream._SwoStreamBase__is_status_line(""))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("   "))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("DONE"))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("SWO connection terminated."))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("CTRL+C entered, terminating SWO connection..."))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("Timeout: No SWO output for 1 seconds."))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("Timeout: No SWO output for 1 seconds on any channel."))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("End marker '--finished--' found."))
-    self.assertTrue(swostream._SwoStreamBase__is_status_line("End marker '--finished--' found on channel 3."))
-    self.assertFalse(swostream._SwoStreamBase__is_status_line("Hello from target"))
+    self.assertTrue(swostream._is_status_line(""))
+    self.assertTrue(swostream._is_status_line("   "))
+    self.assertTrue(swostream._is_status_line("DONE"))
+    self.assertTrue(swostream._is_status_line("SWO connection terminated."))
+    self.assertTrue(swostream._is_status_line("CTRL+C entered, terminating SWO connection..."))
+    self.assertTrue(swostream._is_status_line("Timeout: No SWO output for 1 seconds."))
+    self.assertTrue(swostream._is_status_line("Timeout: No SWO output for 1 seconds on any channel."))
+    self.assertTrue(swostream._is_status_line("End marker '--finished--' found."))
+    self.assertTrue(swostream._is_status_line("End marker '--finished--' found on channel 3."))
+    self.assertFalse(swostream._is_status_line("Hello from target"))
 
   def test_is_error_line(self):
     commander = MockCommander()
     swostream = SwoStreamBase(commander=commander)
 
-    self.assertTrue(swostream._SwoStreamBase__is_error_line("ERROR: Failed to open JLink"))
-    self.assertTrue(swostream._SwoStreamBase__is_error_line("ERROR: Failed to connect to SWO."))
-    self.assertFalse(swostream._SwoStreamBase__is_error_line("Hello from target"))
+    self.assertTrue(swostream._is_error_line("ERROR: Failed to open JLink"))
+    self.assertTrue(swostream._is_error_line("ERROR: Failed to connect to SWO."))
+    self.assertFalse(swostream._is_error_line("Hello from target"))
 
   def test_iter_yields_data_and_skips_status(self):
     commander = MockCommander()

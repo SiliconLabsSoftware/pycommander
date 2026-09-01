@@ -136,23 +136,23 @@ class TestRttStreamBase(unittest.TestCase):
     commander = MockCommander()
     rttstream = RttStreamBase(commander=commander)
 
-    self.assertTrue(rttstream._RttStreamBase__is_status_line(""))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("DONE"))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("RTT successfully initialized."))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("RTT block address: 0x20000000"))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("RTT console connected, enter CTRL+C to terminate."))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("Connection terminated by user."))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("End marker 'END' found."))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("Timeout: No data received for 5 seconds."))
-    self.assertTrue(rttstream._RttStreamBase__is_status_line("RTT read buffer 'Terminal' found."))
-    self.assertFalse(rttstream._RttStreamBase__is_status_line("Hello from target"))
+    self.assertTrue(rttstream._is_status_line(""))
+    self.assertTrue(rttstream._is_status_line("DONE"))
+    self.assertTrue(rttstream._is_status_line("RTT successfully initialized."))
+    self.assertTrue(rttstream._is_status_line("RTT block address: 0x20000000"))
+    self.assertTrue(rttstream._is_status_line("RTT console connected, enter CTRL+C to terminate."))
+    self.assertTrue(rttstream._is_status_line("Connection terminated by user."))
+    self.assertTrue(rttstream._is_status_line("End marker 'END' found."))
+    self.assertTrue(rttstream._is_status_line("Timeout: No data received for 5 seconds."))
+    self.assertTrue(rttstream._is_status_line("RTT read buffer 'Terminal' found."))
+    self.assertFalse(rttstream._is_status_line("Hello from target"))
 
   def test_is_error_line(self):
     commander = MockCommander()
     rttstream = RttStreamBase(commander=commander)
 
-    self.assertTrue(rttstream._RttStreamBase__is_error_line("ERROR: Could not initialize RTT connection over JLink!"))
-    self.assertFalse(rttstream._RttStreamBase__is_error_line("Hello from target"))
+    self.assertTrue(rttstream._is_error_line("ERROR: Could not initialize RTT connection over JLink!"))
+    self.assertFalse(rttstream._is_error_line("Hello from target"))
 
   def test_iter_yields_data_and_skips_status(self):
     commander = MockCommander()
