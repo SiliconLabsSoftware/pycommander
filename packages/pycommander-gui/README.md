@@ -93,7 +93,7 @@ for adapter in adapters:
   print(adapter.ip_address, adapter.nickname)
 ```
 
-Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom`, `vuart` and `rtt`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below.
+Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom` and `vuart`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below. For streaming SWO data, please see the `SwoStream` class below. For streaming RTT data, please see the `RttStream` class below.
 
 For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
 
@@ -271,6 +271,52 @@ for line in swo_stream:
 
 # Close the SWO stream
 swo_stream.close()
+```
+
+#### The `RttStream` class
+
+The `RttStream` class provides a pythonic, read-only way of streaming Real Time Transfer (RTT) data from a target device. Each iteration yields data written by the target application. The stream may be stopped at any time; exiting the context manager (or calling `close()`) sends a clean shutdown to Commander.
+
+Like the underlying Simplicity Commander `rtt connect` command, `RttStream` supports configuring the RTT control block address, read and write buffers, virtual terminal, an idle timeout, an end marker, line endings, skipping the target reset, and sending one-shot startup command(s) after connect.
+
+##### Context Manager Syntax
+
+When using the context manager syntax, the `RttStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
+
+```python
+from pycommander_gui import RttStream
+
+# Read RTT until the target prints DONE, or 5 seconds pass with no data
+with RttStream(serial_number="440055955", timeout_s=5, endmarker="DONE", command="status") as rtt_stream:
+  for line in rtt_stream:
+    print(line, end="", flush=True)
+```
+
+##### Manual Syntax
+
+The `RttStream` class can also be instantiated without using the context manager syntax. In this case, the `open()` method must be called to open the connection to the adapter and start the capture, and the `close()` method must be called to gracefully stop the capture and close the connection.
+
+```python
+from pycommander_gui import RttStream
+
+# Instantiate the RttStream class with a serial number
+rtt_stream : RttStream = RttStream(serial_number="440055955")
+
+# Open the RTT stream
+rtt_stream.open()
+
+
+some_condition : bool = False
+# Read the RTT output
+for line in rtt_stream:
+  # Do something
+  # ...
+
+  if some_condition:
+    break
+
+# Close the RTT stream
+rtt_stream.close()
 ```
 
 #### Error handling
