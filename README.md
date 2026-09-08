@@ -25,7 +25,7 @@ PyCommander can be used to interact with both Silicon Labs adapters (including t
 To install `pycommander` on your system, you can use the following command:
 
 ```bash
-pip install silabs-pycommander
+pip install "silabs-pycommander"
 ```
 
 By default this pulls in the CLI flavor of Simplicity Commander.
@@ -33,7 +33,7 @@ By default this pulls in the CLI flavor of Simplicity Commander.
 To install the GUI version of Simplicity Commander, use the `gui` extra:
 
 ```bash
-pip install silabs-pycommander[gui]
+pip install "silabs-pycommander[gui]"
 ```
 
 This will install the GUI version of Simplicity Commander _in addition to_ the CLI version.

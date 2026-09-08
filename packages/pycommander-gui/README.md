@@ -18,7 +18,7 @@ Note that this package only contains the GUI version of Simplicity Commander. Th
 ## Installation
 
 ```bash
-pip install silabs-pycommander-gui
+pip install "silabs-pycommander-gui"
 ```
 
 ## Usage
