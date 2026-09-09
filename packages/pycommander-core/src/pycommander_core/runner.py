@@ -101,12 +101,14 @@ class Runner:
       else:
         raise PyCommanderError(e.stdout, e.stderr)
 
-  def open(self, *args: str) -> subprocess.Popen:
+  def open(self, *args: str, pass_fds: tuple[int, ...] = ()) -> subprocess.Popen:
     """
     Open the command asynchronously.
 
     Args:
       args (str): Arguments to pass to the command
+      pass_fds (tuple[int, ...]): Extra file descriptors the child should inherit.
+        POSIX only; ignored when empty.
 
     Returns:
       subprocess.Popen: The subprocess object
@@ -119,6 +121,8 @@ class Runner:
       popen_kwargs["creationflags"] = popen_kwargs.get("creationflags", 0) | subprocess.CREATE_NEW_PROCESS_GROUP
     else:
       popen_kwargs["start_new_session"] = True
+      if pass_fds:
+        popen_kwargs["pass_fds"] = pass_fds
 
     self._write_log_file(f"{self._executable} {' '.join(args)}")
 

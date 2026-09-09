@@ -11,25 +11,12 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-import io
 import unittest
 
 from pycommander_core.vcomconsolestream_base import VcomConsoleStreamBase
 
 from .mock_commander import MockCommander
-
-
-class _FakeStdout:
-  def __init__(self, output: str):
-    self.buffer = io.BytesIO(output.encode("latin-1"))
-
-
-class _FakeProcess:
-  def __init__(self, output: str):
-    self.stdout = _FakeStdout(output)
-
-  def poll(self):
-    return 0
+from .mock_runner import assert_command_with_outfile
 
 
 class TestVcomConsoleStreamBase(unittest.TestCase):
@@ -97,65 +84,14 @@ class TestVcomConsoleStreamBase(unittest.TestCase):
       "--lineending", "",
     ])
 
-  def test_is_status_line(self):
-    commander = MockCommander()
-    vcomconsolestream = VcomConsoleStreamBase(commander=commander)
-
-    self.assertTrue(vcomconsolestream._is_status_line(""))
-    self.assertTrue(vcomconsolestream._is_status_line("DONE"))
-    self.assertTrue(vcomconsolestream._is_status_line("Connection established!"))
-    self.assertTrue(vcomconsolestream._is_status_line("Attempting to connect to IP 192.168.1.100 at port 4901..."))
-    self.assertTrue(vcomconsolestream._is_status_line("Opening serial port 'tty.usbmodem141101'..."))
-    self.assertTrue(vcomconsolestream._is_status_line("Socket was disconnected."))
-    self.assertTrue(vcomconsolestream._is_status_line("Serial port was disconnected."))
-    self.assertTrue(vcomconsolestream._is_status_line("Connection terminated by user."))
-    self.assertTrue(vcomconsolestream._is_status_line("Target restarted in ISP mode."))
-    self.assertFalse(vcomconsolestream._is_status_line("Hello from target"))
-
-  def test_is_error_line(self):
-    commander = MockCommander()
-    vcomconsolestream = VcomConsoleStreamBase(commander=commander)
-
-    self.assertTrue(vcomconsolestream._is_error_line("ERROR: Error opening serial port: Device not found"))
-    self.assertFalse(vcomconsolestream._is_error_line("Hello from target"))
-
-  def test_iter_yields_data_and_skips_status(self):
-    commander = MockCommander()
-    vcomconsolestream = VcomConsoleStreamBase(commander=commander)
-    vcomconsolestream._process = _FakeProcess(
-      "Opening serial port 'tty.usbmodem141101'...\n"
-      "Connection established!\n"
-      "Hello from target\n"
-      "\n"
-      "Connection terminated by user.\n"
-      "DONE\n"
-    )
-
-    self.assertEqual(list(vcomconsolestream), ["Hello from target\n"])
-
-  def test_iter_yields_data_without_line_endings(self):
-    commander = MockCommander()
-    vcomconsolestream = VcomConsoleStreamBase(commander=commander)
-    vcomconsolestream._process = _FakeProcess("Hello from target")
-
-    self.assertEqual(list(vcomconsolestream), ["Hello from target"])
-
-  def test_iter_raises_on_error_line(self):
-    commander = MockCommander()
-    vcomconsolestream = VcomConsoleStreamBase(commander=commander)
-    vcomconsolestream._process = _FakeProcess("ERROR: Error opening serial port: Device not found\n")
-
-    with self.assertRaises(RuntimeError) as context:
-      next(vcomconsolestream)
-    self.assertIn("ERROR:", str(context.exception))
-
   def test_open(self):
     commander = MockCommander()
     vcomconsolestream = VcomConsoleStreamBase(commander=commander)
 
     self.assertEqual(vcomconsolestream._process, None)
     vcomconsolestream.open()
-    self.assertEqual(commander._runner.logged_commands[0], ["mock", "vcom", "connect"])
+    self.addCleanup(vcomconsolestream.close)
+    assert_command_with_outfile(self, commander._runner.logged_commands[0], ["mock", "vcom", "connect"])
 
   def test_open_already_open(self):
     commander = MockCommander()

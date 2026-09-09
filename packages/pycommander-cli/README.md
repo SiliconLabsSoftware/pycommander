@@ -177,7 +177,7 @@ Long-running Commander captures are wrapped as iterable stream objects: `AemStre
 
 Entering a `with` block (or calling `open()`) starts Commander. Iterate the object to receive data as it arrives, and stop at any time. Leaving the `with` block, or calling `close()`, shuts Commander down cleanly.
 
-`AemStream` yields `AemMeasurement` objects (timestamp, current, voltage, and calculated power). The console streams yield output data as it arrives, while filtering out Commander status and warning lines. Error lines raise a `RuntimeError` exception.
+`AemStream` yields `AemMeasurement` objects (timestamp, current, voltage, and calculated power). The console streams yield device output as it arrives. Commander status stays on its own stdout; error lines raise a `RuntimeError` exception.
 
 Most streams accept `serial_number` or `ip_address` as connection parameters. `VuartConsoleStream` is IP-only and therefore requires `ip_address`. Options such as `timeout_s`, `endmarker`, `lineending`, `command` and `hex_output` are available where the underlying Commander command supports them.
 

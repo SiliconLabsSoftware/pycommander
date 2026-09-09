@@ -31,16 +31,6 @@ class VuartConsoleStreamBase(ConsoleStream):
   _INCLUDE_CONNECTION_OPTIONS = False
   _INCLUDE_DEBUG_OPTIONS = False
 
-  # Status and error messages are intertwined with the actual data output,
-  # so we filter them out.
-  _STATUS_LINE_PREFIXES = ConsoleStream._STATUS_LINE_PREFIXES + (
-    "Connection established!",
-    "Attempting to connect to IP",
-    "Socket was disconnected.",
-    "Connection terminated by user.",
-    "Timeout: No data received",
-  )
-
   def __init__(self,
                commander: CommanderBase,
                ip_address: str,

@@ -27,15 +27,6 @@ class SwoConsoleStreamBase(ConsoleStream):
   _STREAM_NAME = "SwoConsoleStream"
   _COMMAND = ("swo", "read")
 
-  # Status and error messages are intertwined with the actual data output,
-  # so we filter them out.
-  _STATUS_LINE_PREFIXES = ConsoleStream._STATUS_LINE_PREFIXES + (
-    "CTRL+C entered, terminating SWO connection",
-    "SWO connection terminated.",
-    "Timeout: No SWO output",
-    "SWO capture resumed.",
-  )
-
   def __init__(self,
                commander: CommanderBase,
                swospeed_hz: int | None = None,

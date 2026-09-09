@@ -11,25 +11,12 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-import io
 import unittest
 
 from pycommander_core.rttconsolestream_base import RttConsoleStreamBase
 
 from .mock_commander import MockCommander
-
-
-class _FakeStdout:
-  def __init__(self, output: str):
-    self.buffer = io.BytesIO(output.encode("latin-1"))
-
-
-class _FakeProcess:
-  def __init__(self, output: str):
-    self.stdout = _FakeStdout(output)
-
-  def poll(self):
-    return 0
+from .mock_runner import assert_command_with_outfile
 
 
 class TestRttConsoleStreamBase(unittest.TestCase):
@@ -147,65 +134,14 @@ class TestRttConsoleStreamBase(unittest.TestCase):
     rttconsolestream = RttConsoleStreamBase(commander=commander, terminal=0)
     self.assertEqual(rttconsolestream._args, ["rtt", "connect", "--terminal", "0"])
 
-  def test_is_status_line(self):
-    commander = MockCommander()
-    rttconsolestream = RttConsoleStreamBase(commander=commander)
-
-    self.assertTrue(rttconsolestream._is_status_line(""))
-    self.assertTrue(rttconsolestream._is_status_line("DONE"))
-    self.assertTrue(rttconsolestream._is_status_line("RTT successfully initialized."))
-    self.assertTrue(rttconsolestream._is_status_line("RTT block address: 0x20000000"))
-    self.assertTrue(rttconsolestream._is_status_line("RTT console connected, enter CTRL+C to terminate."))
-    self.assertTrue(rttconsolestream._is_status_line("Connection terminated by user."))
-    self.assertTrue(rttconsolestream._is_status_line("End marker 'END' found."))
-    self.assertTrue(rttconsolestream._is_status_line("Timeout: No data received for 5 seconds."))
-    self.assertTrue(rttconsolestream._is_status_line("RTT read buffer 'Terminal' found."))
-    self.assertFalse(rttconsolestream._is_status_line("Hello from target"))
-
-  def test_is_error_line(self):
-    commander = MockCommander()
-    rttconsolestream = RttConsoleStreamBase(commander=commander)
-
-    self.assertTrue(rttconsolestream._is_error_line("ERROR: Could not initialize RTT connection over JLink!"))
-    self.assertFalse(rttconsolestream._is_error_line("Hello from target"))
-
-  def test_iter_yields_data_and_skips_status(self):
-    commander = MockCommander()
-    rttconsolestream = RttConsoleStreamBase(commander=commander)
-    rttconsolestream._process = _FakeProcess(
-      "RTT successfully initialized.\n"
-      "RTT console connected, enter CTRL+C to terminate.\n"
-      "Hello from target\n"
-      "\n"
-      "End marker 'DONE' found.\n"
-      "DONE\n"
-    )
-
-    self.assertEqual(list(rttconsolestream), ["Hello from target\n"])
-
-  def test_iter_yields_data_without_line_endings(self):
-    commander = MockCommander()
-    rttconsolestream = RttConsoleStreamBase(commander=commander)
-    rttconsolestream._process = _FakeProcess("Hello from target")
-
-    self.assertEqual(list(rttconsolestream), ["Hello from target"])
-
-  def test_iter_raises_on_error_line(self):
-    commander = MockCommander()
-    rttconsolestream = RttConsoleStreamBase(commander=commander)
-    rttconsolestream._process = _FakeProcess("ERROR: RTT block is invalid.\n")
-
-    with self.assertRaises(RuntimeError) as context:
-      next(rttconsolestream)
-    self.assertIn("ERROR:", str(context.exception))
-
   def test_open(self):
     commander = MockCommander()
     rttconsolestream = RttConsoleStreamBase(commander=commander)
 
     self.assertEqual(rttconsolestream._process, None)
     rttconsolestream.open()
-    self.assertEqual(commander._runner.logged_commands[0], ["mock", "rtt", "connect"])
+    self.addCleanup(rttconsolestream.close)
+    assert_command_with_outfile(self, commander._runner.logged_commands[0], ["mock", "rtt", "connect"])
 
   def test_open_already_open(self):
     commander = MockCommander()

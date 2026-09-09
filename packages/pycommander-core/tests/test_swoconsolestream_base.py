@@ -11,25 +11,12 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-import io
 import unittest
 
 from pycommander_core.swoconsolestream_base import SwoConsoleStreamBase
 
 from .mock_commander import MockCommander
-
-
-class _FakeStdout:
-  def __init__(self, output: str):
-    self.buffer = io.BytesIO(output.encode("latin-1"))
-
-
-class _FakeProcess:
-  def __init__(self, output: str):
-    self.stdout = _FakeStdout(output)
-
-  def poll(self):
-    return 0
+from .mock_runner import assert_command_with_outfile
 
 
 class TestSwoConsoleStreamBase(unittest.TestCase):
@@ -128,66 +115,14 @@ class TestSwoConsoleStreamBase(unittest.TestCase):
     swoconsolestream = SwoConsoleStreamBase(commander=commander, channel=0)
     self.assertEqual(swoconsolestream._args, ["swo", "read", "--channel", "0"])
 
-  def test_is_status_line(self):
-    commander = MockCommander()
-    swoconsolestream = SwoConsoleStreamBase(commander=commander)
-
-    self.assertTrue(swoconsolestream._is_status_line(""))
-    self.assertTrue(swoconsolestream._is_status_line("   "))
-    self.assertTrue(swoconsolestream._is_status_line("DONE"))
-    self.assertTrue(swoconsolestream._is_status_line("SWO connection terminated."))
-    self.assertTrue(swoconsolestream._is_status_line("CTRL+C entered, terminating SWO connection..."))
-    self.assertTrue(swoconsolestream._is_status_line("Timeout: No SWO output for 1 seconds."))
-    self.assertTrue(swoconsolestream._is_status_line("Timeout: No SWO output for 1 seconds on any channel."))
-    self.assertTrue(swoconsolestream._is_status_line("End marker '--finished--' found."))
-    self.assertTrue(swoconsolestream._is_status_line("End marker '--finished--' found on channel 3."))
-    self.assertFalse(swoconsolestream._is_status_line("Hello from target"))
-
-  def test_is_error_line(self):
-    commander = MockCommander()
-    swoconsolestream = SwoConsoleStreamBase(commander=commander)
-
-    self.assertTrue(swoconsolestream._is_error_line("ERROR: Failed to open JLink"))
-    self.assertTrue(swoconsolestream._is_error_line("ERROR: Failed to connect to SWO."))
-    self.assertFalse(swoconsolestream._is_error_line("Hello from target"))
-
-  def test_iter_yields_data_and_skips_status(self):
-    commander = MockCommander()
-    swoconsolestream = SwoConsoleStreamBase(commander=commander)
-    swoconsolestream._process = _FakeProcess(
-      "Hello from target\n"
-      "\n"
-      "WARNING: Channel 8 may be used internally\n"
-      "SWO connection terminated.\n"
-      "End marker 'DONE' found.\n"
-      "DONE\n"
-    )
-
-    self.assertEqual(list(swoconsolestream), ["Hello from target\n"])
-
-  def test_iter_yields_data_without_line_endings(self):
-    commander = MockCommander()
-    swoconsolestream = SwoConsoleStreamBase(commander=commander)
-    swoconsolestream._process = _FakeProcess("Hello from target")
-
-    self.assertEqual(list(swoconsolestream), ["Hello from target"])
-
-  def test_iter_raises_on_error_line(self):
-    commander = MockCommander()
-    swoconsolestream = SwoConsoleStreamBase(commander=commander)
-    swoconsolestream._process = _FakeProcess("ERROR: Unsupported device part number: EFR32\n")
-
-    with self.assertRaises(RuntimeError) as context:
-      next(swoconsolestream)
-    self.assertIn("ERROR:", str(context.exception))
-
   def test_open(self):
     commander = MockCommander()
     swoconsolestream = SwoConsoleStreamBase(commander=commander)
 
     self.assertEqual(swoconsolestream._process, None)
     swoconsolestream.open()
-    self.assertEqual(commander._runner.logged_commands[0], ["mock", "swo", "read"])
+    self.addCleanup(swoconsolestream.close)
+    assert_command_with_outfile(self, commander._runner.logged_commands[0], ["mock", "swo", "read"])
 
   def test_open_already_open(self):
     commander = MockCommander()

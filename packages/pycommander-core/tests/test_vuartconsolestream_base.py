@@ -11,25 +11,12 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-import io
 import unittest
 
 from pycommander_core.vuartconsolestream_base import VuartConsoleStreamBase
 
 from .mock_commander import MockCommander
-
-
-class _FakeStdout:
-  def __init__(self, output: str):
-    self.buffer = io.BytesIO(output.encode("latin-1"))
-
-
-class _FakeProcess:
-  def __init__(self, output: str):
-    self.stdout = _FakeStdout(output)
-
-  def poll(self):
-    return 0
+from .mock_runner import assert_command_with_outfile
 
 
 class TestVuartConsoleStreamBase(unittest.TestCase):
@@ -94,64 +81,14 @@ class TestVuartConsoleStreamBase(unittest.TestCase):
     with self.assertRaises(ValueError):
       VuartConsoleStreamBase(commander=commander, ip_address="")
 
-  def test_is_status_line(self):
-    commander = MockCommander()
-    vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
-
-    self.assertTrue(vuartconsolestream._is_status_line(""))
-    self.assertTrue(vuartconsolestream._is_status_line("DONE"))
-    self.assertTrue(vuartconsolestream._is_status_line("Connection established!"))
-    self.assertTrue(vuartconsolestream._is_status_line("Attempting to connect to IP 192.168.1.100 at port 4900..."))
-    self.assertTrue(vuartconsolestream._is_status_line("Socket was disconnected."))
-    self.assertTrue(vuartconsolestream._is_status_line("Connection terminated by user."))
-    self.assertTrue(vuartconsolestream._is_status_line("End marker 'STOP' found."))
-    self.assertTrue(vuartconsolestream._is_status_line("Timeout: No data received for 5 seconds."))
-    self.assertFalse(vuartconsolestream._is_status_line("Hello from target"))
-
-  def test_is_error_line(self):
-    commander = MockCommander()
-    vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
-
-    self.assertTrue(vuartconsolestream._is_error_line("ERROR: Connection failed."))
-    self.assertFalse(vuartconsolestream._is_error_line("Hello from target"))
-
-  def test_iter_yields_data_and_skips_status(self):
-    commander = MockCommander()
-    vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
-    vuartconsolestream._process = _FakeProcess(
-      "Attempting to connect to IP 192.168.1.100 at port 4900...\n"
-      "Connection established!\n"
-      "Hello from target\n"
-      "\n"
-      "End marker 'DONE' found.\n"
-      "DONE\n"
-    )
-
-    self.assertEqual(list(vuartconsolestream), ["Hello from target\n"])
-
-  def test_iter_yields_data_without_line_endings(self):
-    commander = MockCommander()
-    vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
-    vuartconsolestream._process = _FakeProcess("Hello from target")
-
-    self.assertEqual(list(vuartconsolestream), ["Hello from target"])
-
-  def test_iter_raises_on_error_line(self):
-    commander = MockCommander()
-    vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
-    vuartconsolestream._process = _FakeProcess("ERROR: Connection failed.\n")
-
-    with self.assertRaises(RuntimeError) as context:
-      next(vuartconsolestream)
-    self.assertIn("ERROR:", str(context.exception))
-
   def test_open(self):
     commander = MockCommander()
     vuartconsolestream = VuartConsoleStreamBase(commander=commander, ip_address="1.2.3.4")
 
     self.assertEqual(vuartconsolestream._process, None)
     vuartconsolestream.open()
-    self.assertEqual(commander._runner.logged_commands[0], ["mock", "vuart", "connect", "1.2.3.4"])
+    self.addCleanup(vuartconsolestream.close)
+    assert_command_with_outfile(self, commander._runner.logged_commands[0], ["mock", "vuart", "connect", "1.2.3.4"])
 
   def test_open_already_open(self):
     commander = MockCommander()

@@ -30,21 +30,6 @@ class RttConsoleStreamBase(ConsoleStream):
   _STREAM_NAME = "RttConsoleStream"
   _COMMAND = ("rtt", "connect")
 
-  # Status and error messages are intertwined with the actual data output,
-  # so we filter them out.
-  _STATUS_LINE_PREFIXES = ConsoleStream._STATUS_LINE_PREFIXES + (
-    "RTT successfully initialized.",
-    "RTT block address:",
-    "RTT status:",
-    "Read buffers:",
-    "Write buffers:",
-    "RTT read buffer",
-    "RTT write buffer",
-    "RTT console connected",
-    "Connection terminated by user.",
-    "Timeout: No data received",
-  )
-
   def __init__(self,
                commander: CommanderBase,
                timeout_s: float | None = None,

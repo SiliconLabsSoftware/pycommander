@@ -11,10 +11,25 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
+import io
 import json
 from pathlib import Path
 
 from pycommander_core.runner import Runner, RunnerResult
+
+
+def assert_command_with_outfile(test, logged: list[str], expected_without_outfile: list[str]) -> None:
+  test.assertEqual(logged[:-2], expected_without_outfile)
+  test.assertEqual(logged[-2], "--outfile")
+  test.assertTrue(logged[-1])
+
+
+class _MockOpenedProcess:
+  def __init__(self):
+    self.stdout = io.StringIO("")
+
+  def poll(self):
+    return 0
 
 
 class MockRunner(Runner):
@@ -36,6 +51,7 @@ class MockRunner(Runner):
     self._subprocess_flags = 0
     self.logged_commands: list[list[str]] = []
     self.queued_results: list[RunnerResult] = []
+    self.last_pass_fds: tuple[int, ...] = ()
 
   def run(self, *args: str, json_format: bool = True, env: dict[str, str] | None = None) -> RunnerResult:
     if json_format:
@@ -53,8 +69,10 @@ class MockRunner(Runner):
 
     return RunnerResult(0, output, "")
 
-  def open(self, *args: str) -> None:
+  def open(self, *args: str, pass_fds: tuple[int, ...] = ()) -> _MockOpenedProcess:
     self.logged_commands.append([str(self._executable), *args])
+    self.last_pass_fds = pass_fds
+    return _MockOpenedProcess()
 
   def close(self, process: int) -> None:
     pass

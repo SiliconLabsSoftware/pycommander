@@ -33,18 +33,6 @@ class VcomConsoleStreamBase(ConsoleStream):
   _COMMAND = ("vcom", "connect")
   _INCLUDE_DEBUG_OPTIONS = False
 
-  # Status and error messages are intertwined with the actual data output,
-  # so we filter them out.
-  _STATUS_LINE_PREFIXES = ConsoleStream._STATUS_LINE_PREFIXES + (
-    "Connection established!",
-    "Attempting to connect to IP",
-    "Opening serial port",
-    "Socket was disconnected.",
-    "Serial port was disconnected.",
-    "Connection terminated by user.",
-    "Target restarted in ISP mode.",
-  )
-
   def __init__(self,
                commander: CommanderBase,
                hex_output: bool = False,
