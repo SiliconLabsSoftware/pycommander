@@ -18,7 +18,7 @@ Note that this package only contains the CLI version of Simplicity Commander. Th
 ## Installation
 
 ```bash
-pip install silabs-pycommander-cli
+pip install "silabs-pycommander-cli"
 ```
 
 ## Usage

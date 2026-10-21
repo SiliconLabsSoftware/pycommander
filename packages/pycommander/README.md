@@ -18,7 +18,7 @@ Additionally, Simplicity Commander requires the SEGGER J-Link drivers to be inst
 ## Installation
 
 ```bash
-pip install silabs-pycommander
+pip install "silabs-pycommander"
 ```
 
 ## Usage

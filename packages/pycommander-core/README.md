@@ -7,11 +7,11 @@ Note that this package does not contain the Commander executable, it is not inte
 Preferably, PyCommander should be installed and updated via the [`silabs-pycommander`](../pycommander/README.md) meta-package, which will install the appropriate version of the Simplicity Commander executable based on your system:
 
 ```bash
-pip install silabs-pycommander
+pip install "silabs-pycommander"
 ```
 
 or, if you want to install the GUI version in addition to the CLI version:
 
 ```bash
-pip install silabs-pycommander[gui]
+pip install "silabs-pycommander[gui]"
 ```
