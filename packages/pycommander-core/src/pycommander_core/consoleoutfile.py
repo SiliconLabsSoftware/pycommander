@@ -31,6 +31,7 @@ if sys.platform == "win32":
   _PIPE_WAIT = 0x00000000
   _PIPE_REJECT_REMOTE_CLIENTS = 0x00000008
   _ERROR_PIPE_CONNECTED = 535
+  _ERROR_NO_DATA = 232
   _INVALID_HANDLE_VALUE = wintypes.HANDLE(-1).value
 
   _CreateNamedPipeW = _KERNEL32.CreateNamedPipeW
@@ -114,7 +115,9 @@ class ConsoleOutfile:
     """Wait for Commander to open the Windows named pipe.
 
     ``should_abort`` is polled so a process that exits before opening the pipe
-    does not block forever. POSIX pipes need no handshake.
+    does not block forever. A client that opens the pipe, writes, and closes
+    it before this runs is still a successful connect; those bytes stay
+    readable. POSIX pipes need no handshake.
     """
     if sys.platform != "win32" or self._windows_connected:
       return
@@ -167,9 +170,13 @@ class ConsoleOutfile:
     if handle is None:
       return
 
+    # ConnectNamedPipe returns FALSE when the client arrived first.
+    # 535: it is still connected. 232: it already closed its handle.
+    # Unread bytes remain buffered either way, which is what happens when a
+    # short-lived peer finishes before this thread is scheduled.
     if not _ConnectNamedPipe(handle, None):
       error = ctypes.get_last_error()
-      if error != _ERROR_PIPE_CONNECTED:
+      if error not in (_ERROR_PIPE_CONNECTED, _ERROR_NO_DATA):
         raise OSError(error, f"ConnectNamedPipe failed: {error}")
 
     with self._lock:
