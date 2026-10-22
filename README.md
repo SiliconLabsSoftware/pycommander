@@ -1,5 +1,7 @@
 # pycommander
 
+![PyCommander](graphics/commander256-snake.png)
+
 [![Unit tests](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest-and-coverage.yml/badge.svg)](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest-and-coverage.yml)
 
 ## Introduction
