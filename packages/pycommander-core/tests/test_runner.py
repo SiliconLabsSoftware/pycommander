@@ -169,6 +169,20 @@ class TestRunner(unittest.TestCase):
     self.assertIsInstance(process, subprocess.Popen)
     self.assertIsNone(process.poll())
 
+  def test_runner_open_pass_fds(self):
+    if sys.platform == "win32":
+      self.skipTest("pass_fds is POSIX-only")
+
+    runner = Runner(executable=sys.executable)
+    read_fd, write_fd = os.pipe()
+    self.addCleanup(os.close, read_fd)
+
+    process = runner.open("-c", f"import os; os.write({write_fd}, b'hi')", pass_fds=(write_fd,))
+    os.close(write_fd)
+    process.wait()
+    self.assertEqual(os.read(read_fd, 2), b"hi")
+    self.assertEqual(process.returncode, 0)
+
   def test_runner_isAlive(self):
     command = shutil.which("sleep")
     if command is None:

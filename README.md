@@ -1,5 +1,7 @@
 # pycommander
 
+![PyCommander](graphics/commander256-snake.png)
+
 [![Unit tests](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest-and-coverage.yml/badge.svg)](https://github.com/SiliconLabsSoftware/pycommander/actions/workflows/unittest-and-coverage.yml)
 
 ## Introduction
@@ -54,7 +56,7 @@ pycommander device info --device EFR32MG24 --serialno 440055955
 pycommander flash firmware.hex --device EFR32FG28 --serialno 440055956
 ```
 
-The Python API adds three distinct abstraction layers:
+The Python API adds three distinct abstraction layers, plus stream objects for long-running captures:
 
 - The `Commander` class, which simply mirrors the underlying Simplicity Commander CLI surface. The available methods take the same arguments as the underlying CLI commands, and return a dictionary containing the command output, similarly to what the Simplicity Commander CLI does when the `--json` flag is used.
 
@@ -103,4 +105,14 @@ The Python API adds three distinct abstraction layers:
   target.enableWriteProtection(ranges=[(0x00000000, 0x00008000), (0x0000A000, 0x0000C000)])
   ```
 
-See the per-package READMEs linked above for the full quick-start, including error handling, logging, streaming AEM measurements, and the low-level `Commander` class. More details about Simplicity Commander and its underlying Command Line Interface can be found in the [official documentation for Simplicity Commander](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/). That documentation is also helpful when using the Python API, as the command names and available options mostly match the CLI commands.
+- Stream objects for long-running captures. `AemStream` yields Advanced Energy Monitor measurements from a Silicon Labs adapter. `SwoConsoleStream`, `RttConsoleStream`, `VcomConsoleStream`, and `VuartConsoleStream` yield device console output (SWO, RTT, VCOM, and VUART over IP) as it arrives. Each stream is an iterable context manager: entering a `with` block starts Commander, and leaving it shuts Commander down cleanly.
+
+  ```python
+  from pycommander import SwoConsoleStream
+
+  with SwoConsoleStream(serial_number="440055955", timeout_s=5, endmarker="--finished--") as swo_stream:
+    for line in swo_stream:
+      print(line, end="", flush=True)
+  ```
+
+See the per-package READMEs linked above for the full quick-start, including error handling, logging, the stream classes, and the low-level `Commander` class. More details about Simplicity Commander and its underlying Command Line Interface can be found in the [official documentation for Simplicity Commander](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/). That documentation is also helpful when using the Python API, as the command names and available options mostly match the CLI commands.

@@ -5,12 +5,14 @@ on:
     branches:
       - main
       - develop/**
+      - feature/**
     paths-ignore:
       - ".github/commander-version"
   pull_request:
     branches:
       - main
       - develop/**
+      - feature/**
   workflow_dispatch:
 
 permissions:

@@ -85,7 +85,7 @@ for adapter in adapters:
   print(adapter.ip_address, adapter.nickname)
 ```
 
-Please note that not all commands are available to the `Commander` class. These are typically commands that are intended for interative CLI sessions, and include command suites like `vcom`, `vuart`, `rtt` and `swo`. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts, for the same reasons as mentioned above. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For a more flexible approach to streaming AEM data, please see the `AemStream` class below.
+Please note that not all commands are available to the `Commander` class. Moreover, some commands in the `Commander` class have stricter requirements for the arguments than their CLI counterparts. For example, the `aem dump` command requires the `outfile` and `duration` arguments to be provided. For long-running captures, prefer the [stream classes](#stream-classes) below.
 
 For ad-hoc invocations of commands that are not exposed by the typed API, you can fall back to `Commander.runCommand(...)`, which forwards arguments directly to the underlying Simplicity Commander CLI:
 
@@ -158,52 +158,124 @@ adapter = Adapter(serial_number="440055955", target_device="EFR32MG24")
 success: bool = adapter.target.flashApplication(filenames=[Path("firmware.hex")])
 ```
 
-#### The `AemStream` class
+#### Stream classes
 
-The `AemStream` class provides a pythonic way of streaming AEM measurements from the device. The measurements are returned as `AemMeasurement` objects, which contain the timestamp, current, voltage, and the calculated power. An `AemStream` object is suitable for streaming AEM measurements from an adapter, and there is no limitation to the duration of the streaming. The stream may be stopped at any time.
+Long-running Commander captures are wrapped as iterable stream objects: `AemStream`, `SwoConsoleStream`, `RttConsoleStream`, `VcomConsoleStream` and `VuartConsoleStream`. They share the same lifecycle.
 
-Like the underlying Simplicity Commander CLI, the `AemStream` class supports a variety of options for configuring the AEM data capture process, like setting up simple triggers to start the data capture process and specifying the data output rate.
+Entering a `with` block (or calling `open()`) starts Commander. Iterate the object to receive data as it arrives, and stop at any time. Leaving the `with` block, or calling `close()`, shuts Commander down cleanly.
 
-##### Context Manager Syntax
+`AemStream` yields `AemMeasurement` objects (timestamp, current, voltage, and calculated power). The console streams yield device output as it arrives. Commander status stays on its own stdout; error lines raise a `RuntimeError` exception.
 
-If using the context manager syntax, the `AemStream` object is opened automatically when the context manager is entered, and a connection to the adapter is established. The connection is cleanly closed when the context manager is exited.
+Most streams accept `serial_number` or `ip_address` as connection parameters. `VuartConsoleStream` is IP-only and therefore requires `ip_address`. Options such as `timeout_s`, `endmarker`, `lineending`, `command` and `hex_output` are available where the underlying Commander command supports them.
+
+##### `AemStream`
+
+Advanced Energy Monitor measurements from a Silicon Labs adapter. Configure the data rate, an optional duration, and simple start triggers.
 
 ```python
 from pycommander import AemStream
-from pycommander_core.types import AemMeasurement
 
-# Instantiate a 10 second AEM stream with a data output rate of 100 Hz
 with AemStream(serial_number="440055955", datarate_hz=100, duration_s=10) as aem_stream:
   for measurement in aem_stream:
     print(measurement)
 ```
 
-##### Manual Syntax
-
-The `AemStream` class can also be instantiated without using the context manager syntax. In this case, the `open()` method must be called to open the connection to the adapter and start the data capture process, and the `close()` method must be called to gracefully stop the data capture process and close the connection.
-
 ```python
 from pycommander import AemStream
-from pycommander_core.types import AemMeasurement
 
-# Instantiate the AemStream class with a serial number and a set data rate
-aem_stream : AemStream = AemStream(serial_number="440055955", datarate_hz=100)
-
-# Open the AEM stream
+aem_stream = AemStream(serial_number="440055955", datarate_hz=100)
 aem_stream.open()
-
-
-some_condition : bool = False
-# Read the AEM measurements
 for measurement in aem_stream:
-  # Do something
-  # ...
-
-  if some_condition:
-    break
-
-# Close the AEM stream
+  print(measurement)
 aem_stream.close()
+```
+
+##### `SwoConsoleStream`
+
+Serial Wire Output (SWO) from the target device. Supports SWO speed, ITM channel, idle timeout, end marker, monitoring all channels for end conditions, hexadecimal output, and skipping the target reset.
+
+```python
+from pycommander import SwoConsoleStream
+
+with SwoConsoleStream(serial_number="440055955", timeout_s=5, endmarker="--finished--") as swo_stream:
+  for line in swo_stream:
+    print(line, end="", flush=True)
+```
+
+```python
+from pycommander import SwoConsoleStream
+
+swo_stream = SwoConsoleStream(serial_number="440055955", swospeed_hz=875000)
+swo_stream.open()
+for line in swo_stream:
+  print(line, end="", flush=True)
+swo_stream.close()
+```
+
+##### `RttConsoleStream`
+
+Segger Real Time Transfer (RTT) from the target device. Supports control-block address, read and write buffers, virtual terminal, idle timeout, end marker, line endings, skipping the target reset, and one-shot startup commands.
+
+```python
+from pycommander import RttConsoleStream
+
+with RttConsoleStream(serial_number="440055955", timeout_s=5, endmarker="DONE", command="status") as rtt_stream:
+  for line in rtt_stream:
+    print(line, end="", flush=True)
+```
+
+```python
+from pycommander import RttConsoleStream
+
+rtt_stream = RttConsoleStream(serial_number="440055955")
+rtt_stream.open()
+for line in rtt_stream:
+  print(line, end="", flush=True)
+rtt_stream.close()
+```
+
+##### `VcomConsoleStream`
+
+Virtual COM port on Silicon Labs adapters. Supports hexadecimal output, restarting the target in ISP mode, line endings, and one-shot startup commands. Configure baudrate and handshake separately with `Commander.vcom.config` or `Adapter.setVcomConfig`.
+
+```python
+from pycommander import VcomConsoleStream
+
+with VcomConsoleStream(serial_number="440055955", command="status") as vcom_stream:
+  for line in vcom_stream:
+    print(line, end="", flush=True)
+```
+
+```python
+from pycommander import VcomConsoleStream
+
+vcom_stream = VcomConsoleStream(serial_number="440055955")
+vcom_stream.open()
+for line in vcom_stream:
+  print(line, end="", flush=True)
+vcom_stream.close()
+```
+
+##### `VuartConsoleStream`
+
+Virtual UART (VUART) over IP (requires `ip_address`). Supports idle timeout, end marker, line endings, and one-shot startup commands.
+
+```python
+from pycommander import VuartConsoleStream
+
+with VuartConsoleStream(ip_address="192.168.1.100", timeout_s=5, endmarker="DONE", command="status") as vuart_stream:
+  for line in vuart_stream:
+    print(line, end="", flush=True)
+```
+
+```python
+from pycommander import VuartConsoleStream
+
+vuart_stream = VuartConsoleStream(ip_address="192.168.1.100")
+vuart_stream.open()
+for line in vuart_stream:
+  print(line, end="", flush=True)
+vuart_stream.close()
 ```
 
 #### Error handling

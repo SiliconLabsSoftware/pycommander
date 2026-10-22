@@ -15,6 +15,10 @@ from .commander import Commander
 from .adapter import Adapter
 from .target import Target
 from .aemstream import AemStream
+from .swoconsolestream import SwoConsoleStream
+from .rttconsolestream import RttConsoleStream
+from .vcomconsolestream import VcomConsoleStream
+from .vuartconsolestream import VuartConsoleStream
 
 from pycommander_core.commander_base import CommanderResult
 from pycommander_core._version import __version__
@@ -24,6 +28,10 @@ __all__ = [
   "Adapter",
   "Target",
   "AemStream",
+  "SwoConsoleStream",
+  "RttConsoleStream",
+  "VcomConsoleStream",
+  "VuartConsoleStream",
   "CommanderResult",
   "__version__",
 ]
