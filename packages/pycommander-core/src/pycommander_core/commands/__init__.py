@@ -34,6 +34,7 @@ from .tokens    import TokensCommand
 from .util      import UtilCommand
 from .vcom      import VcomCommand
 from .verify    import VerifyCommand
+from .writemem  import WritememCommand
 
 __all__ = [
   "AdapterCommand",
@@ -59,4 +60,5 @@ __all__ = [
   "UtilCommand",
   "VcomCommand",
   "VerifyCommand",
+  "WritememCommand",
 ]

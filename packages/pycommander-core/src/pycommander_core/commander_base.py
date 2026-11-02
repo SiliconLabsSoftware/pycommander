@@ -53,6 +53,7 @@ class CommanderBase:
   util      : "UtilCommand"
   vcom      : "VcomCommand"
   verify    : "VerifyCommand"
+  writemem  : "WritememCommand"
 
   default_timeout_s : int = 300
 
