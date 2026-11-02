@@ -512,12 +512,17 @@ class Target:
         # Don't write anything to the device, we're already set up as desired
         return True
 
-    # Write the region configuration to a temporary YAML file, then write it to the device
-    with tempfile.NamedTemporaryFile(dir=".", suffix=".yaml") as tf:
-      tf.write(yaml.dump(config_dict, indent=2).encode())
-      tf.flush()
-      result = self._commander.security.writeregionconfig(file=str(Path(tf.name)), reset=allow_reset, target_device=self.part_number)
+    # Write the region configuration to a temporary YAML file, then write it to the device.
+    config_file = tempfile.NamedTemporaryFile(dir=".", suffix=".yaml", delete=False)
+    config_path = Path(config_file.name)
+    try:
+      config_file.write(yaml.dump(config_dict, indent=2).encode())
+      config_file.close()
+      result = self._commander.security.writeregionconfig(file=str(config_path), reset=allow_reset, target_device=self.part_number)
       return result["success"]
+    finally:
+      config_file.close()
+      config_path.unlink(missing_ok=True)
 
   def writeRegionConfigFromFile(self, config_file: Path, allow_reset: bool = True, force: bool = False) -> bool:
     """Write the region configuration to the target device. Series 3 only.
