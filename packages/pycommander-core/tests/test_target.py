@@ -124,6 +124,49 @@ class TestTarget(unittest.TestCase):
     self.assertEqual(device.pageerase(ranges=[(0x0, 0x8000)], regions=["@main"]), False)
     self.assertEqual(commander._runner.logged_commands, [["mock", "device", "pageerase", "--range", "0x00000000:0x00008000", "--region", "@main", "--serialno", "123456789", "--device", "EFR32MG24B020F1536IM48", "--json"]])
 
+  def test_target_readmem(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    payload = b"\x01\x02\x03\x04"
+    original_run = commander._runner.run
+    def run_and_write(*args, **kwargs):
+      arg_list = list(args)
+      outfile = arg_list[arg_list.index("--outfile") + 1]
+      Path(outfile).write_bytes(payload)
+      return original_run(*args, **kwargs)
+    commander._runner.run = run_and_write
+
+    device._commander._runner.queue_result(RunnerResult(0, '{"success": true}', ""))
+
+    data = device.readmem(ranges=[(0x08000000, 0x08000004)], regions=["@mainflash"])
+    self.assertEqual(data, bytearray(payload))
+
+    logged = commander._runner.logged_commands[0]
+    outfile_index = logged.index("--outfile")
+    self.assertTrue(logged[outfile_index + 1].endswith(".bin"))
+    self.assertFalse(Path(logged[outfile_index + 1]).exists())
+    logged_without_outfile = logged[:outfile_index] + logged[outfile_index + 2:]
+    self.assertEqual(logged_without_outfile, [
+      "mock", "readmem",
+      "--serialno", "123456789",
+      "--device", "EFR32MG24B020F1536IM48",
+      "--range", "0x08000000:0x08000004",
+      "--region", "@mainflash",
+      "--json",
+    ])
+
+  def test_target_readmem_failed(self):
+    commander = MockCommander(serial_number="123456789")
+    device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)
+
+    device._commander._runner.queue_result(RunnerResult(254, '{"success": false, "error": "Failed to read memory"}', ""))
+
+    self.assertIsNone(device.readmem(ranges=[(0x08000000, 0x08000004)]))
+    logged = commander._runner.logged_commands[0]
+    outfile_index = logged.index("--outfile")
+    self.assertFalse(Path(logged[outfile_index + 1]).exists())
+
   def test_target_getCTUNE(self):
     commander = MockCommander(serial_number="123456789")
     device = Target(part_number="EFR32MG24B020F1536IM48", commander=commander)

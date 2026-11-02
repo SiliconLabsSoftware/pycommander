@@ -83,6 +83,34 @@ class Target:
     result = self._commander.device.pageerase(ranges=ranges, regions=regions, target_device=self.part_number)
     return result["success"]
 
+  def readmem(self,
+              ranges: list[tuple[int | str, int | str]] = [],
+              regions: list[str] = []) -> bytearray | None:
+    """Read memory from the target device into a bytearray.
+
+    Args:
+      ranges (list[tuple[int | str, int | str]]): Memory ranges to read (start, end).
+      regions (list[str]): Named memory regions (@region) to read.
+
+    Returns:
+      The memory contents as a bytearray, or None if the read failed. The bytes are the flat binary image Commander writes for a .bin file: one contiguous span from the lowest address read to the highest, with any gaps filled with 0xFF.
+    """
+    outfile = tempfile.NamedTemporaryFile(dir=".", suffix=".bin", delete=False)
+    outfile.close()
+    outfile_path = Path(outfile.name)
+    try:
+      result = self._commander.readmem.readmem(
+        outfile=str(outfile_path),
+        ranges=ranges,
+        regions=regions,
+        target_device=self.part_number,
+      )
+      if not result["success"]:
+        return None
+      return bytearray(outfile_path.read_bytes())
+    finally:
+      outfile_path.unlink(missing_ok=True)
+
   def writeManufacturingTokens(self,
                   tokenfiles: list[Path] = [],
                   tokens: list[tuple[str, str]] = [],
