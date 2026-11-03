@@ -68,6 +68,7 @@ The Python API adds three distinct abstraction layers, plus stream objects for l
 
   commander.device.info(target_device="EFR32MG24")
   commander.flash.flash(filenames=[Path("firmware.hex")])
+  commander.writemem.writemem(filename="data.bin", address=0x20000000)
   ```
 
 - The `Adapter` class, which provides a higher-level API featuring convenience methods for common tasks for interfacing with _Silicon Labs adapters_. This includes setting up the adapter's VCOM configuration, configuring the target device's supply voltage, and more. An `Adapter` instance may have a `Target` instance (described below) associated with it, to represent a physical Silicon Labs kit (adapter with a target device (radio board) connected to it).
@@ -88,7 +89,7 @@ The Python API adds three distinct abstraction layers, plus stream objects for l
   print(result.signal_characteristics.max_current_ma)
   ```
 
-- The `Target` class, which provides a higher-level API featuring convenience methods for common tasks for interfacing with the target device. This includes flashing firmware, erasing the device's flash, provisioning keys, configuring security, and more.
+- The `Target` class, which provides a higher-level API featuring convenience methods for common tasks for interfacing with the target device. This includes flashing firmware, erasing the device's flash, reading memory, provisioning keys, configuring security, and more.
 
   ```python
   from pathlib import Path
@@ -99,6 +100,8 @@ The Python API adds three distinct abstraction layers, plus stream objects for l
   print(target.info())
 
   target.setCTUNE(value=0xa8)
+
+  data = target.readmem(ranges=[(0x00000000, 0x00000100)])
 
   target.flashApplication(filenames=[Path("firmware.hex")], masserase=True, verify=True)
 

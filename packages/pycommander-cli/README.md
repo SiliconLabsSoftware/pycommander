@@ -54,6 +54,9 @@ print(commander.util.appinfo(filename="firmware.hex"))
 
 # Perform the 'commander flash' command
 print(commander.flash.flash(filenames=["firmware.hex"], address=0x08000000))
+
+# Perform the 'commander writemem' command
+print(commander.writemem.writemem(filename="data.bin", address=0x20000000))
 ```
 
 The `Commander` class also exposes a few standalone helpers; for example, `getVersion()` returns the embedded Simplicity Commander, J-Link, EMDLL and other component versions as a `CommanderVersionInfo` object:
@@ -116,6 +119,7 @@ The `Target` class handles tasks related to the target device (a Silicon Labs MC
 - Setting the CTUNE value
 - Flashing firmware to the device
 - Erasing the device's flash
+- Reading memory from the device
 - Configuring code regions (Series 3 only)
 - +++
 
