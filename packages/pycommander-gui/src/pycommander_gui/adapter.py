@@ -12,6 +12,10 @@ sections of the MSLA applicable to Source Code.
 """
 
 # Compatibility shim. Imports of pycommander_gui.adapter use the CLI executable.
+from ._deprecate import warn_deprecated_api
+
+warn_deprecated_api()
+
 from pycommander_cli.adapter import Adapter
 
 __all__ = ["Adapter"]

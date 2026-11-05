@@ -32,6 +32,9 @@ def __getattr__(name: str):
   if name not in __all__:
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
+  from ._deprecate import warn_deprecated_api
+  warn_deprecated_api()
+
   try:
     import pycommander_cli
   except ImportError:

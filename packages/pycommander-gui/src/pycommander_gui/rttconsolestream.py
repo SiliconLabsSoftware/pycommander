@@ -12,6 +12,10 @@ sections of the MSLA applicable to Source Code.
 """
 
 # Compatibility shim. Imports of pycommander_gui.rttconsolestream use the CLI executable.
+from ._deprecate import warn_deprecated_api
+
+warn_deprecated_api()
+
 from pycommander_cli.rttconsolestream import RttConsoleStream
 
 __all__ = ["RttConsoleStream"]
