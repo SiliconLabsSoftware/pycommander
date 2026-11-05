@@ -12,16 +12,23 @@ sections of the MSLA applicable to Source Code.
 """
 
 try:
-  from pycommander_gui import Commander, CommanderResult, Adapter, Target, AemStream, SwoConsoleStream, RttConsoleStream, VcomConsoleStream, VuartConsoleStream, __version__
+  from pycommander_cli import \
+    Commander, \
+    CommanderResult, \
+    Adapter, \
+    Target, \
+    AemStream, \
+    SwoConsoleStream, \
+    RttConsoleStream, \
+    VcomConsoleStream, \
+    VuartConsoleStream, \
+    __version__
+
 except ImportError:
-  try:
-    from pycommander_cli import Commander, CommanderResult, Adapter, Target, AemStream, SwoConsoleStream, RttConsoleStream, VcomConsoleStream, VuartConsoleStream, __version__
-  except ImportError:
-    raise ImportError(
-      "No version of Simplicity Commander is installed. Install one of the following packages:\n\n"
-      "  pip install silabs-pycommander-cli\n"
-      "  pip install silabs-pycommander-gui\n"
-    )
+  raise ImportError(
+    "The pycommander_cli package is not installed, but is required to use the Python API. Install the complete pycommander package:\n\n"
+    "  pip install silabs-pycommander\n"
+  )
 
 __all__ = [
   "Commander",

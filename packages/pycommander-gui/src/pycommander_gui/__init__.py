@@ -11,20 +11,13 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-from .commander import Commander
-from .adapter import Adapter
-from .target import Target
-from .aemstream import AemStream
-from .swoconsolestream import SwoConsoleStream
-from .rttconsolestream import RttConsoleStream
-from .vcomconsolestream import VcomConsoleStream
-from .vuartconsolestream import VuartConsoleStream
-
-from pycommander_core.commander_base import CommanderResult
-from pycommander_core._version import __version__
+# The GUI package ships the GUI executable. The Python API lives in the CLI
+# package and is imported only when a script asks for it, so launching the GUI
+# does not require pycommander_cli to be installed.
 
 __all__ = [
   "Commander",
+  "CommanderResult",
   "Adapter",
   "Target",
   "AemStream",
@@ -32,6 +25,24 @@ __all__ = [
   "RttConsoleStream",
   "VcomConsoleStream",
   "VuartConsoleStream",
-  "CommanderResult",
   "__version__",
 ]
+
+def __getattr__(name: str):
+  if name not in __all__:
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+  try:
+    import pycommander_cli
+  except ImportError:
+    raise ImportError(
+      "The pycommander_cli package is not installed, but is required to use the Python API. Install the pycommander package:\n\n"
+      "  pip install silabs-pycommander\n"
+    )
+
+  value = getattr(pycommander_cli, name)
+  globals()[name] = value
+  return value
+
+def __dir__():
+  return sorted(set(globals()) | set(__all__))

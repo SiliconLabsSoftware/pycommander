@@ -13,29 +13,23 @@ sections of the MSLA applicable to Source Code.
 
 import sys
 
-from pycommander_core.cli import PyCommanderCLI
+from pycommander_cli.launcher import PyCommanderCLI
 
 try:
-  from pycommander_gui import Commander
-  CLI = False
-
+  from pycommander_gui.launcher import PyCommanderGUI
+  GUI = True
 except ImportError:
-  try:
-    from pycommander_cli import Commander
-    CLI = True
+  GUI = False
 
-  except ImportError:
-    raise ImportError(
-      "No version of Simplicity Commander is installed.\n\n"
-      "Install either of the following packages:\n"
-      "  pip install silabs-pycommander-cli\n"
-      "  pip install silabs-pycommander-gui\n"
-    )
 
 def main() -> int:
-  cli = PyCommanderCLI(cli=CLI)
   args = sys.argv[1:]  # Skip the script name
-  return cli.run(*args)
+
+  # Launch the GUI executable only if we need the GUI explicitly
+  if GUI and (len(args) == 0 or args[0] == "gui"):
+    return PyCommanderGUI().run(*args)
+  else:
+    return PyCommanderCLI().run(*args)
 
 if __name__ == "__main__":
   raise SystemExit(main())

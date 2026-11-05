@@ -26,4 +26,4 @@ path = "build_hook.py"
 gui = ["silabs-pycommander-gui==1.4.0"]
 
 [project.scripts]
-pycommander = "pycommander.cli:main"
+pycommander = "pycommander.cli_hook:main"

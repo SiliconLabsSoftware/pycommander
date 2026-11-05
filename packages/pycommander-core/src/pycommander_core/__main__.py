@@ -12,7 +12,7 @@ sections of the MSLA applicable to Source Code.
 """
 
 # Entry point for `pycommander` command and `python3 -m pycommander`
-from .cli import main
+# from .cli import main
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+# if __name__ == "__main__":
+#     raise SystemExit(main())
