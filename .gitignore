@@ -55,3 +55,6 @@ code-convention-tool/
 # Coverage
 .coverage*
 htmlcov/
+
+# Virtual environments
+.venv/
