@@ -21,13 +21,19 @@ Additionally, Simplicity Commander requires the SEGGER J-Link drivers to be inst
 pip install "silabs-pycommander"
 ```
 
+To launch the GUI from the `pycommander` command, install the `gui` extra:
+
+```bash
+pip install "silabs-pycommander[gui]"
+```
+
 ## Usage
 
 More details about Simplicity Commander and its Command Line Interface can be found in the [official documentation for Simplicity Commander](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/). The documentation is also helpful when using the Python API, as the command names and available options are the same.
 
 ### Command Line Interface
 
-From the command line, `pycommander` is a razor-thin wrapper around the Simplicity Commander CLI; it behaves exactly like the Simplicity Commander CLI, except for the case when the options `-v` or `--version` are passed as arguments, in which case the version of the `pycommander` package is printed in addition to the normal version information from the Simplicity Commander CLI.
+This is the only package that installs the `pycommander` command. It runs the Simplicity Commander CLI executable:
 
 ```bash
 pycommander --help
@@ -36,7 +42,25 @@ pycommander <command> [options]
 pycommander <command> <subcommand> [options]
 ```
 
+With the `gui` extra installed, `pycommander` and `pycommander gui` launch the GUI executable. Every other command line still runs the CLI executable. Without the GUI package, the `pycommander gui` command is not supported.
+
+```bash
+pycommander
+pycommander gui
+```
+
+The CLI and GUI executables share the same `commander.ini`. The Python API does not use that file.
+
+To run one executable directly:
+
+```bash
+python -m pycommander_cli <command> [options]
+python -m pycommander_gui
+```
+
 ### Python API
+
+Import the API from `pycommander`. These classes call the CLI executable. Imports from `pycommander_gui` still resolve to the same classes, but they emit a `DeprecationWarning` and will be removed in a future release.
 
 At the lowest level, the `Commander` class provides all the CLI commands as methods to the class. These methods return a dictionary containing the command output, similarly to what the Simplicity Commander CLI does when the `--json` flag is used.
 
