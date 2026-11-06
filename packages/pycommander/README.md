@@ -55,7 +55,7 @@ To run one executable directly:
 
 ```bash
 python -m pycommander_cli <command> [options]
-python -m pycommander_gui
+python -m pycommander_gui <command> [options]
 ```
 
 ### Python API
