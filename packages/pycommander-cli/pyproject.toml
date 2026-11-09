@@ -27,6 +27,3 @@ path = "build_hook.py"
 
 [project.urls]
 Homepage = "https://github.com/SiliconLabsSoftware/pycommander"
-
-[project.scripts]
-pycommander-cli = "pycommander_cli.cli:main"

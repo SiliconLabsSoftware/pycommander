@@ -11,31 +11,11 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-from pathlib import Path
+# Compatibility shim. Imports of pycommander_gui.commander use the CLI executable.
+from ._deprecate import warn_deprecated_api
 
-from pycommander_core.commander_base import CommanderBase
+warn_deprecated_api()
 
-class Commander(CommanderBase):
-  def __init__(self,
-              serial_number:    str  | None = None,
-              ip_address:       str  | None = None,
-              serial_port:      str  | None = None,
-              target_device:    str  | None = None,
-              debug_speed:      int  | None = None,
-              debug_tif:        str  | None = None,
-              debug_irpre:      int  | None = None,
-              debug_drpre:      int  | None = None,
-              log_file_path:    Path | None = None,
-              executable_path:  Path | None = None):
+from pycommander_cli.commander import Commander
 
-    super().__init__(serial_number=serial_number,
-                     ip_address=ip_address,
-                     serial_port=serial_port,
-                     target_device=target_device,
-                     debug_speed=debug_speed,
-                     debug_tif=debug_tif,
-                     debug_irpre=debug_irpre,
-                     debug_drpre=debug_drpre,
-                     log_file_path=log_file_path,
-                     executable_path=executable_path,
-                     cli=False)
+__all__ = ["Commander"]

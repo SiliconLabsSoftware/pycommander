@@ -11,15 +11,10 @@ sections of the MSLA applicable to Source Code.
 *******************************************************************************
 """
 
-import sys
+from pathlib import Path
 
-from pycommander_core.cli import PyCommanderCLI
+from pycommander_core.launcher import CommanderLauncher
 
-def main() -> int:
-  cli = PyCommanderCLI(cli=False)
-  args = sys.argv[1:]  # Skip the script name
-  return cli.run(*args)
-
-
-if __name__ == "__main__":
-  raise SystemExit(main())
+class PyCommanderGUI(CommanderLauncher):
+  def __init__(self, executable_path: Path | None = None):
+    super().__init__(cli=False, executable_path=executable_path)

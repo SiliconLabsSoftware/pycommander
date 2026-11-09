@@ -12,9 +12,9 @@ PyCommander can be used to interact with both Silicon Labs adapters (including t
 
 ## Available packages
 
-- [`silabs-pycommander`](packages/pycommander/README.md): Meta-package for clean UX when installing either the CLI or GUI version of Simplicity Commander. This is the package that should be installed by end users!
-- [`silabs-pycommander-cli`](packages/pycommander-cli/README.md): The package that contains the CLI version of Simplicity Commander. This package depends on `pycommander-core`.
-- [`silabs-pycommander-gui`](packages/pycommander-gui/README.md): The package that contains the GUI version of Simplicity Commander. This package depends on `pycommander-core`. It is currently not advertised, but it can be installed if needed. In that case, it should be installed instead of the CLI version, unless you want two versions of Simplicity Commander installed on your system.
+- [`silabs-pycommander`](packages/pycommander/README.md): Meta-package for end users. It depends on `pycommander-core` and `pycommander-cli`, and it is the only package that installs the `pycommander` command. It also provides the Python API. The optional `gui` extra adds the GUI executable. This is the recommended way to install PyCommander.
+- [`silabs-pycommander-cli`](packages/pycommander-cli/README.md): The CLI executable and the Python API. This package depends on `pycommander-core`. It does not install a terminal command; run its executable with `python -m pycommander_cli`.
+- [`silabs-pycommander-gui`](packages/pycommander-gui/README.md): The GUI executable. This package depends on `pycommander-core`. It does not install a terminal command; run its executable with `python -m pycommander_gui`.
 - [`silabs-pycommander-core`](packages/pycommander-core/README.md): The package that contains the core functionality, i.e. the Python framework for interacting with Simplicity Commander. Not functional on its own, please install one of the other packages instead.
 
 ## Requirements
@@ -30,17 +30,30 @@ To install `pycommander` on your system, you can use the following command:
 pip install "silabs-pycommander"
 ```
 
-By default this pulls in the CLI flavor of Simplicity Commander.
+This installs the CLI executable and the Python API. The Python API always drives the CLI executable.
 
-To install the GUI version of Simplicity Commander, use the `gui` extra:
+To also install the Commander GUI, use the `gui` extra:
 
 ```bash
 pip install "silabs-pycommander[gui]"
 ```
 
-This will install the GUI version of Simplicity Commander _in addition to_ the CLI version.
+The `pycommander` command runs the CLI executable. With the GUI package installed, `pycommander` and `pycommander gui` launch the GUI executable, and every other command line still runs the CLI executable. Without the GUI package, the `pycommander gui` command is not supported. Both executables can be installed together.
 
-Both the CLI and GUI versions can coexist peacefully on the same system, but do note that when importing the `pycommander` package or when running the `pycommander` command from the terminal, the GUI version will be used over the CLI version. The flavor to use can be explicitly selected by importing the appropriate package, e.g. `import pycommander_cli` or `import pycommander_gui`, or by using the `pycommander-cli` or `pycommander-gui` commands from the terminal.
+To run one executable explicitly, bypassing that choice:
+
+```bash
+python -m pycommander_cli <command> [options]
+python -m pycommander_gui <command> [options]
+```
+
+Import the Python API from `pycommander`:
+
+```python
+from pycommander import Commander
+```
+
+Imports from `pycommander_gui` still resolve to this API. They emit a `DeprecationWarning` and will be removed in a future release.
 
 Installing PyCommander does not interfere with any existing installations of Simplicity Commander on your system, but do note that the different user-facing Commander CLI and GUI instances (e.g. when running the `pycommander` command from the terminal) will all share the same underlying configuration file, i.e. the `commander.ini` file. For example, if command logging is enabled using one Commander instance, it will also be enabled for all the other Commander instances.
 
@@ -48,7 +61,7 @@ Using Commander via the Python API is on the other hand completely independent o
 
 ## Usage
 
-The `pycommander` command is a drop-in replacement for the Simplicity Commander CLI. It can be used to perform all the same commands as the CLI, and the output is the same:
+These examples use the `pycommander` command. Its output matches Simplicity Commander.
 
 ```bash
 pycommander --version
@@ -118,4 +131,4 @@ The Python API adds three distinct abstraction layers, plus stream objects for l
       print(line, end="", flush=True)
   ```
 
-See the per-package READMEs linked above for the full quick-start, including error handling, logging, the stream classes, and the low-level `Commander` class. More details about Simplicity Commander and its underlying Command Line Interface can be found in the [official documentation for Simplicity Commander](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/). That documentation is also helpful when using the Python API, as the command names and available options mostly match the CLI commands.
+The full guide, including error handling, logging, the stream classes, and the low-level `Commander` class, is in the [silabs-pycommander README](packages/pycommander/README.md). More details about Simplicity Commander and its underlying Command Line Interface can be found in the [official documentation for Simplicity Commander](https://docs.silabs.com/simplicity-commander/latest/simplicity-commander-start/). That documentation is also helpful when using the Python API, as the command names and available options mostly match the CLI commands.
